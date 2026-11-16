@@ -15,6 +15,8 @@
 - ajil_core: 25/25 (أصلح `AjilError.parse` — كان «message:» يبتلع رمز الخطأ).
 - التطبيق: `flutter analyze` بلا أخطاء، `flutter test` 9/9. إصلاحات توافق Flutter 3.24: `drift_flutter <0.2.5`، و`dependency_overrides: app_links: 6.3.3`.
 - debug فقط: رمز OTP الراجع من الخادم يظهر في SnackBar (30 ثانية + نسخ) ويُعبّأ في حقل الرمز (`showDevOtp`). `usesCleartextTraffic` في `src/debug` فقط.
+- **جوال حقيقي (Infinix X6840، Android 16) لاسلكياً:** `adb connect` + `adb reverse tcp:54321` يعمل عبر Wireless debugging. التطبيق يفتح ← «إنشاء بقالة جديدة» ← send-otp (الرمز في SnackBar ويُعبّأ تلقائياً) ← register-store ← **شاشة PIN** ✅ (تحقق آلي بـ uiautomator لأن FLAG_SECURE يمنع لقطات الشاشة).
+- `compileSdk = 35` في `android/app/build.gradle` (تطلبه الإضافات). أول بناء ينزّل NDK 25.1 (~1.4GB).
 - ملاحظة: `npx supabase db reset` يمسح بصمة سر البوابة ← أعد تشغيل `dev-up.ps1` بعده.
 - لاحقاً: ترقية Flutter لإصدار حديث ثم رفع الحزم (122 حزمة لها إصدارات أحدث) وإزالة الـ overrides، واستبدال `anonKey` بـ `publishableKey`.
 
@@ -47,8 +49,8 @@
 - [x] ✅ `flutter pub get && dart run build_runner build --delete-conflicting-outputs` (يولّد `db.g.dart`)
 - [x] ✅ `flutter analyze` ← أصلح كل الأخطاء
 - [x] ✅ `flutter test` ← اختبارات محرك المزامنة (8) يجب أن تنجح
-- [ ] شغّل على المحاكي:
-  `flutter run --dart-define=SUPABASE_URL=http://10.0.2.2:54321 --dart-define=SUPABASE_ANON_KEY=<من supabase status>`
+- [x] ✅ شغّل على جوال حقيقي: `scripts/run-phone.ps1 -Phone <ip:port>` (أو على المحاكي:
+  `flutter run --dart-define=SUPABASE_URL=http://10.0.2.2:54321 --dart-define=SUPABASE_ANON_KEY=<من supabase status>`)
 - [ ] سيناريو كامل يدوياً: تسجيل بقالة ← PIN ← زبون برصيد افتتاحي ← دين بموعد ← اقطع النت وسجّل ← أرجعه وتأكد من ✓ ← وعد ← كشف PDF ← واتساب ← موظف بجهاز ثانٍ (اعتماد) ← إلغاء من الموظف بعد المهلة يُرفض
 
 ## 5. الويب

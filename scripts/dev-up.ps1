@@ -1,6 +1,8 @@
 ﻿# يشغّل الخادم المحلي كاملاً: Supabase (Docker) ← سر البوابة ← Edge Functions ← adb reverse
-# الاستخدام: powershell -ExecutionPolicy Bypass -File scripts\dev-up.ps1   [-Reset]  (Reset يمسح القاعدة ويعيد الـ migrations)
-param([switch]$Reset)
+# الاستخدام: powershell -ExecutionPolicy Bypass -File scripts\dev-up.ps1  [-Phone 192.168.0.100:34279]  [-Reset]
+#   -Phone  عنوان Wireless debugging من الجوال (اتركه إن كان الجوال موصولاً بـ USB)
+#   -Reset  يمسح القاعدة ويعيد الـ migrations
+param([switch]$Reset, [string]$Phone)
 . "$PSScriptRoot\_common.ps1"
 Set-Location $Root
 
@@ -38,6 +40,7 @@ if ($running) {
   Write-Host 'functions serve بدأ في نافذة جديدة' -ForegroundColor Green
 }
 
+Connect-WirelessPhone $Phone
 Set-AdbReverse | Out-Null
 
 $st = Get-SupabaseStatus

@@ -25,6 +25,14 @@ function Get-SupabaseStatus {
   return $json | ConvertFrom-Json
 }
 
+# تصحيح لاسلكي: Wireless debugging في الجوال يعرض ip:port (يتغير المنفذ عند كل تفعيل)
+function Connect-WirelessPhone([string]$Address) {
+  if (-not $Address) { return }
+  $out = & (Get-Adb) connect $Address 2>&1 | Out-String
+  if ($out -notmatch 'connected') { throw "تعذّر الاتصال بالجوال $Address — تأكد أن Wireless debugging مفعّل وأن المنفذ صحيح (والجوال والكمبيوتر على نفس الشبكة): $out" }
+  Write-Host "متصل لاسلكياً بـ $Address" -ForegroundColor Green
+}
+
 function Set-AdbReverse {
   $adb = Get-Adb
   $devs = @(Get-AndroidDevices)
