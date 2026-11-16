@@ -6,35 +6,47 @@
 > قاعدة البيانات مختبرة فعلياً (97 اختباراً)، ومنطق Edge Functions المشترك مختبر (6 اختبارات).
 > أول مهمة لك: تشغيل `flutter analyze` وإصلاح أي أخطاء ترجمة أو اختلاف في إصدارات الحزم — **بدون تغيير القواعد في CLAUDE.md**.
 
+## ✅ جلسة التجهيز (2026-11-16)
+- البيئة: Flutter 3.24.5 (Dart 3.5.4)، Supabase CLI 3.2، Docker. git + `.gitignore` + `.gitattributes`.
+- سكربتان: `scripts/dev-up.ps1` (Supabase + بصمة سر البوابة + functions serve + adb reverse) و`scripts/run-phone.ps1` (`-Apk` للتثبيت فقط، `-Lan` لاستخدام IP الشبكة بدل adb reverse).
+- القاعدة: 11 migration (الجديدة `…11_enable_pg_cron.sql` تفعّل pg_cron وتجدول الفحص اليومي) و**98 اختبار SQL ناجح** (أضيف `cron_test.sql`). psql غير مثبت على Windows ← الاختبارات تُشغَّل داخل الحاوية:
+  `docker cp supabase/tests/. supabase_db_ajil:/tmp/tests/ && docker exec supabase_db_ajil psql -U postgres -v ON_ERROR_STOP=1 -f /tmp/tests/ledger_test.sql`
+- Edge Functions: send-otp ← register-store ← الدخول (JWT فيه store_id/app_user_id/app_role) ← add-employee — كلها تعمل محلياً. اختبارات المنطق المشترك 6/6.
+- ajil_core: 25/25 (أصلح `AjilError.parse` — كان «message:» يبتلع رمز الخطأ).
+- التطبيق: `flutter analyze` بلا أخطاء، `flutter test` 9/9. إصلاحات توافق Flutter 3.24: `drift_flutter <0.2.5`، و`dependency_overrides: app_links: 6.3.3`.
+- debug فقط: رمز OTP الراجع من الخادم يظهر في SnackBar (30 ثانية + نسخ) ويُعبّأ في حقل الرمز (`showDevOtp`). `usesCleartextTraffic` في `src/debug` فقط.
+- ملاحظة: `npx supabase db reset` يمسح بصمة سر البوابة ← أعد تشغيل `dev-up.ps1` بعده.
+- لاحقاً: ترقية Flutter لإصدار حديث ثم رفع الحزم (122 حزمة لها إصدارات أحدث) وإزالة الـ overrides، واستبدال `anonKey` بـ `publishableKey`.
+
 ## 1. الخادم محلياً
-- [ ] `npx supabase init` ثم انسخ محتوى `supabase/config.additions.toml` إلى `supabase/config.toml`
-- [ ] `npx supabase start && npx supabase db reset` — يجب أن تُطبَّق 10 migrations بلا خطأ
-- [ ] شغّل الاختبارات على قاعدة Supabase المحلية:
+- [x] ✅ `npx supabase init` ثم انسخ محتوى `supabase/config.additions.toml` إلى `supabase/config.toml`
+- [x] ✅ `npx supabase start && npx supabase db reset` — يجب أن تُطبَّق 10 migrations بلا خطأ
+- [x] ✅ شغّل الاختبارات على قاعدة Supabase المحلية:
   `for f in supabase/tests/*_test.sql; do psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f $f; done`
   ← 97 ✓ (ثم `npx supabase db reset` للتنظيف). بديل بدون Supabase: `bash supabase/tests/run_local.sh`
-- [ ] فعّل pg_cron من لوحة Supabase (Database → Extensions) ثم `npx supabase db reset` لجدولة الفحص اليومي
+- [x] ✅ فعّل pg_cron من لوحة Supabase (Database → Extensions) ثم `npx supabase db reset` لجدولة الفحص اليومي
 
 ## 2. Edge Functions
-- [ ] `cp supabase/functions/.env.example supabase/functions/.env` واضبط `AJIL_GATEWAY_SECRET` بقيمة عشوائية طويلة
-- [ ] خزّن بصمة السر في القاعدة (وفي الإنتاج فعّل البوابة):
+- [x] ✅ `cp supabase/functions/.env.example supabase/functions/.env` واضبط `AJIL_GATEWAY_SECRET` بقيمة عشوائية طويلة
+- [x] ✅ خزّن بصمة السر في القاعدة (وفي الإنتاج فعّل البوابة):
   ```sql
   update app.platform_config set value = encode(sha256(convert_to('<السر>', 'UTF8')), 'hex') where key = 'gateway_secret_sha256';
   update app.platform_config set value = 'true' where key = 'require_gateway';  -- في الإنتاج
   ```
-- [ ] `npx supabase functions serve --env-file supabase/functions/.env`
-- [ ] `deno test supabase/functions/_shared/deno_test.ts` (أو `bash supabase/functions/_shared/run_node_tests.sh`)
-- [ ] جرّب بالترتيب بـ curl: `send-otp` (الرمز يظهر في الرد لأن OTP_DEV_ECHO=true) ← `register-store` ← الدخول ← `add-employee`
+- [x] ✅ `npx supabase functions serve --env-file supabase/functions/.env`
+- [x] ✅ `deno test supabase/functions/_shared/deno_test.ts` (أو `bash supabase/functions/_shared/run_node_tests.sh`)
+- [x] ✅ جرّب بالترتيب بـ curl: `send-otp` (الرمز يظهر في الرد لأن OTP_DEV_ECHO=true) ← `register-store` ← الدخول ← `add-employee`
 
 ## 3. الحزمة المشتركة
-- [ ] `cd packages/ajil_core && dart pub get && dart test` — كل الاختبارات يجب أن تنجح (أرقامها مطابقة لاختبارات الخادم)
+- [x] ✅ `cd packages/ajil_core && dart pub get && dart test` — كل الاختبارات يجب أن تنجح (أرقامها مطابقة لاختبارات الخادم)
 
 ## 4. تطبيق Flutter
-- [ ] `cd app && flutter create --org app.ajil --project-name ajil --platforms android,web .`
-- [ ] اتبع `app/android-overrides/README.md` (MainActivity بـ FLAG_SECURE + الصلاحيات + desugaring)
-- [ ] ضع ملفات خط IBM Plex Sans Arabic في `app/assets/fonts/` (Regular, Medium, SemiBold)
-- [ ] `flutter pub get && dart run build_runner build --delete-conflicting-outputs` (يولّد `db.g.dart`)
-- [ ] `flutter analyze` ← أصلح كل الأخطاء
-- [ ] `flutter test` ← اختبارات محرك المزامنة (8) يجب أن تنجح
+- [x] ✅ `cd app && flutter create --org app.ajil --project-name ajil --platforms android,web .`
+- [x] ✅ اتبع `app/android-overrides/README.md` (MainActivity بـ FLAG_SECURE + الصلاحيات + desugaring)
+- [x] ✅ ضع ملفات خط IBM Plex Sans Arabic في `app/assets/fonts/` (Regular, Medium, SemiBold)
+- [x] ✅ `flutter pub get && dart run build_runner build --delete-conflicting-outputs` (يولّد `db.g.dart`)
+- [x] ✅ `flutter analyze` ← أصلح كل الأخطاء
+- [x] ✅ `flutter test` ← اختبارات محرك المزامنة (8) يجب أن تنجح
 - [ ] شغّل على المحاكي:
   `flutter run --dart-define=SUPABASE_URL=http://10.0.2.2:54321 --dart-define=SUPABASE_ANON_KEY=<من supabase status>`
 - [ ] سيناريو كامل يدوياً: تسجيل بقالة ← PIN ← زبون برصيد افتتاحي ← دين بموعد ← اقطع النت وسجّل ← أرجعه وتأكد من ✓ ← وعد ← كشف PDF ← واتساب ← موظف بجهاز ثانٍ (اعتماد) ← إلغاء من الموظف بعد المهلة يُرفض

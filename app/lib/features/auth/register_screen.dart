@@ -1,4 +1,5 @@
 import 'package:ajil_core/ajil_core.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,7 +39,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         final s = ref.read(sessionProvider);
         final dev = await s.api.sendOtp(Identity.normalizePhone(_phone.text), 'register');
         setState(() => _codeSent = true);
-        if (dev != null && mounted) showOk(context, 'رمز التطوير: $dev');
+        if (dev != null && kDebugMode) _code.text = dev;
+        if (mounted) showDevOtp(context, dev);
       });
 
   Future<void> _create() => _run(() async {

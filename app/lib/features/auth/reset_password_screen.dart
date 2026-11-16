@@ -56,7 +56,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 : () => _run(() async {
                       final dev = await api.sendOtp(Identity.normalizePhone(_phone.text), 'reset_owner');
                       setState(() => _sent = true);
-                      if (dev != null && mounted) showOk(context, 'رمز التطوير: $dev');
+                      if (context.mounted) showDevOtp(context, dev);
                     }),
             child: const Text('إرسال رمز التحقق'),
           )
@@ -74,7 +74,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 ? null
                 : () => _run(() async {
                       await api.resetOwnerPassword(Identity.normalizePhone(_phone.text), _code.text.trim(), _password.text);
-                      if (!mounted) return;
+                      if (!context.mounted) return;
                       showOk(context, 'تم تغيير كلمة المرور — سجّل الدخول');
                       context.go('/login');
                     }),

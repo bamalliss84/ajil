@@ -1,5 +1,6 @@
 import 'package:ajil_core/ajil_core.dart';
 import 'package:decimal/decimal.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -233,6 +234,21 @@ void showError(BuildContext context, Object e) {
 
 void showOk(BuildContext context, String msg) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: AjilColors.primary));
+}
+
+/// نسخة debug فقط: يعرض رمز OTP الراجع من الخادم (OTP_DEV_ECHO) للتجربة بدون SMS
+void showDevOtp(BuildContext context, String? code) {
+  if (!kDebugMode || code == null) return;
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text('رمز التحقق (تطوير): $code'),
+    backgroundColor: AjilColors.primary,
+    duration: const Duration(seconds: 30),
+    action: SnackBarAction(
+      label: 'نسخ',
+      textColor: Colors.white,
+      onPressed: () => Clipboard.setData(ClipboardData(text: code)),
+    ),
+  ));
 }
 
 /// شريط التنقل السفلي

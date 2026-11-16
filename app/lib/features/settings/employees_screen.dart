@@ -23,7 +23,11 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
     try {
       final u = await api.users();
       final b = await api.myBranches();
-      if (mounted) setState(() => (_users, _branches) = (u, b));
+      if (!mounted) return;
+      setState(() {
+        _users = u;
+        _branches = b;
+      });
     } catch (e) {
       if (mounted) showError(context, e);
     }

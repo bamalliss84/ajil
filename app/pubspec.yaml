@@ -25,7 +25,7 @@ dependencies:
 
   # القاعدة المحلية (تعمل على Android والويب)
   drift: ^2.22.0
-  drift_flutter: ^0.2.4
+  drift_flutter: ">=0.2.4 <0.2.5"  # 0.2.5+ تتطلب drift أحدث من المتاح لـ Dart 3.5
   path_provider: ^2.1.5
 
   # الأمان
@@ -65,3 +65,7 @@ flutter:
   # ضع ملفات الخط هنا (من Google Fonts: IBM Plex Sans Arabic) ليعمل التطبيق والـ PDF بدون إنترنت
   assets:
     - assets/fonts/
+
+# Flutter 3.24 (Dart 3.5): app_links 6.4+ يستخدم flutter.compileSdkVersion في Gradle ولا يُبنى عليه
+dependency_overrides:
+  app_links: 6.3.3

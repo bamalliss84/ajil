@@ -51,6 +51,8 @@ docs/                  التحليل والتصميم والمهام
 
 ## الأوامر
 ```bash
+powershell -ExecutionPolicy Bypass -File scripts/dev-up.ps1     # Supabase + الدوال + adb reverse
+powershell -ExecutionPolicy Bypass -File scripts/run-phone.ps1  # بناء وتثبيت على الجوال الموصول
 npx supabase start && npx supabase db reset           # تشغيل وتطبيق المخطط
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f supabase/tests/ledger_test.sql
 npx supabase db reset                                  # تنظيف بعد الاختبارات
@@ -60,11 +62,12 @@ cd app && flutter pub get && flutter test && flutter run
 
 ## الحالة الحالية
 - ✅ المرحلة 0: التحليل والتصميم (8 شاشات)
-- ✅ المرحلة 1: قاعدة البيانات — 10 migrations و **97 اختباراً ناجحاً** (`supabase/tests/`)
-- ✅ المرحلة 2.1: Edge Functions — send-otp, register-store, add-employee, reset-password, sync-push (توقيع الجهاز) + 6 اختبارات للمنطق المشترك
-- ✅ المرحلة 2.2: `packages/ajil_core` — المبالغ، أنواع الحركات، الأرصدة، كشف الحساب، أعمار الديون، الأخطاء، الهوية، التوقيع + اختبارات
-- 🟡 المرحلة 2.3–2.4: تطبيق Flutter مكتوب كاملاً (الأساس + كل الشاشات) **لكن لم يُترجم بعد** — ابدأ بـ `flutter analyze`
-- 🟡 المرحلة 3: لوحة الإدارة (`web/admin`) وصفحة التعريف (`web/landing`) مكتوبتان؛ صفحة المشترك = التطبيق نفسه على الويب
+- ✅ المرحلة 1: قاعدة البيانات — 11 migrations و **98 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
+- ✅ المرحلة 2.1: Edge Functions — send-otp, register-store, add-employee, reset-password, sync-push — مجرّبة محلياً بـ curl + 6 اختبارات للمنطق المشترك
+- ✅ المرحلة 2.2: `packages/ajil_core` — 25 اختباراً ناجحاً
+- ✅ المرحلة 2.3–2.4: تطبيق Flutter يُترجم: `flutter analyze` بلا أخطاء، `flutter test` 9/9. البيئة Flutter 3.24.5 (لهذا `drift_flutter <0.2.5` و override لـ `app_links`)
+- 🟡 التجربة على جوال حقيقي: `scripts/dev-up.ps1` ثم `scripts/run-phone.ps1` (adb reverse ← `SUPABASE_URL=http://127.0.0.1:54321`)
+- 🟡 المرحلة 3: لوحة الإدارة (`web/admin`) وصفحة التعريف (`web/landing`) مكتوبتان ولم تُترجما بعد؛ صفحة المشترك = التطبيق نفسه على الويب
 - ⏭️ التفاصيل والخطوات: `docs/NEXT_TASKS.md`
 
 حدّث هذا القسم و `docs/NEXT_TASKS.md` في نهاية كل جلسة عمل.

@@ -19,7 +19,8 @@ class AjilError implements Exception {
     final m = _re.firstMatch(s.trim());
     if (m != null) return AjilError(m.group(1)!, m.group(2)!.trim());
     // رسالة PostgREST: «... message: plan_customer_limit: ...»
-    for (final inner in RegExp(r'([a-z_]{4,}):\s*([^\n,}]+)').allMatches(s)) {
+    // الرسالة لا تُستهلك في المطابقة (lookahead) حتى لا تبتلع «message:» الرمزَ الذي بعدها
+    for (final inner in RegExp(r'\b([a-z_]{4,}):\s*(?=([^\n,}]+))').allMatches(s)) {
       if (_known.contains(inner.group(1))) return AjilError(inner.group(1)!, inner.group(2)!.trim());
     }
     if (s.contains('SocketException') || s.contains('Failed host lookup') || s.contains('ClientException')) {
