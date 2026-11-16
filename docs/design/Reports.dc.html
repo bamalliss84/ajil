@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>آجِل – التقارير (شهري)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F6E56}a:hover{color:#085041}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 2200px; box-sizing: border-box; background: #F5F7F6; font-family: 'IBM Plex Sans Arabic', sans-serif; color: #1F2A2E; display: flex; flex-direction: column">
+<header style="flex: none; background: #FFFFFF; padding: 16px 16px 12px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #E3E9E7">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="flex: 1; display: flex; flex-direction: column">
+<h1 style="margin: 0; font-size: 22px; font-weight: 600">التقارير</h1>
+<span style="font-size: 13px; color: #5B6B70">بقالة الأمانة · الفرع الرئيسي</span>
+</div>
+<button type="button" aria-label="مشاركة التقرير PDF أو Excel" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #1F2A2E; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"></path><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg>
+</button>
+</div>
+<div role="tablist" aria-label="نوع الفترة" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: #EEF2F1; border-radius: 12px; padding: 4px; gap: 4px">
+<a href="ReportsDay.dc.html" role="tab" aria-selected="false" style="height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #5B6B70; font-size: 15px; text-decoration: none">يوم</a>
+<button type="button" role="tab" aria-selected="true" style="height: 38px; border-radius: 9px; border: none; background: #FFFFFF; color: #085041; font: inherit; font-size: 15px; font-weight: 600; box-shadow: 0 1px 2px rgba(15, 40, 35, 0.12)">شهر</button>
+<a href="ReportsYear.dc.html" role="tab" aria-selected="false" style="height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #5B6B70; font-size: 15px; text-decoration: none">سنة</a>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" aria-label="الشهر السابق" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #1F2A2E; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</button>
+<a href="ReportsPicker.dc.html" style="flex: 1; height: 44px; border-radius: 12px; background: #E1F5EE; color: #085041; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-size: 17px; font-weight: 600">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>
+نوفمبر 2026
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+</a>
+<button type="button" aria-label="الشهر التالي (غير متاح، هذا الشهر الحالي)" disabled style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #EEF2F1; background: #FFFFFF; color: #B7C2BF; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+</button>
+</div>
+<div style="display: flex; gap: 8px; overflow: hidden">
+<sc-for list="{{months}}" as="m" hint-placeholder-count="6">
+<button type="button" style="flex: none; height: 34px; padding: 0 14px; border-radius: 17px; font: inherit; font-size: 14px; border: 1px solid {{m.border}}; background: {{m.bg}}; color: {{m.fg}}; font-weight: {{m.weight}}">{{m.name}}</button>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span style="font-size: 13px; color: #5B6B70">1 – 17 نوفمبر · الشهر الحالي</span>
+<div role="group" aria-label="العملة" style="display: flex; background: #EEF2F1; border-radius: 10px; padding: 3px; gap: 3px">
+<button type="button" aria-pressed="true" style="height: 30px; padding: 0 12px; border-radius: 8px; border: none; background: #FFFFFF; color: #085041; font: inherit; font-size: 13px; font-weight: 600">ر.ي</button>
+<button type="button" aria-pressed="false" style="height: 30px; padding: 0 12px; border-radius: 8px; border: none; background: transparent; color: #5B6B70; font: inherit; font-size: 13px">ر.س</button>
+</div>
+</div>
+</header>
+
+<section style="flex: none; margin: 14px 16px 0; background: #0F6E56; color: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px; color: #CFEDE3">الديون عند الزبائن نهاية الفترة</span>
+<div style="font-size: 30px; font-weight: 600">1,245,000 <span style="font-size: 16px; font-weight: 500">ر.ي</span></div>
+<span style="font-size: 13px; color: #CFEDE3">كانت 1,370,500 في بداية الشهر · انخفضت 125,500 ✓</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="background: #1A7D64; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; color: #CFEDE3">التحصيل</span>
+<span style="font-size: 20px; font-weight: 600">612,000</span>
+<span style="font-size: 12px; color: #CFEDE3">↑ 12% عن أكتوبر · 184 عملية</span>
+</div>
+<div style="background: #1A7D64; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; color: #CFEDE3">ديون جديدة</span>
+<span style="font-size: 20px; font-weight: 600">486,500</span>
+<span style="font-size: 12px; color: #CFEDE3">↓ 4% عن أكتوبر · 311 عملية</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: #CFEDE3">نسبة التحصيل إلى الديون الجديدة</span><span style="font-weight: 600">126%</span></div>
+<div style="height: 8px; border-radius: 4px; background: #1A7D64; overflow: hidden"><div style="width: 100%; height: 100%; background: #9FE0C6"></div></div>
+</div>
+</section>
+
+<section style="flex: none; margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">الحركة اليومية</h2>
+<span style="font-size: 12px; color: #5B6B70">اضغط على يوم لتفاصيله</span>
+</div>
+<div style="display: flex; gap: 14px; font-size: 12px; color: #5B6B70">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #1E7A43"></span>تحصيل</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #D9776B"></span>ديون جديدة</span>
+</div>
+<div role="img" aria-label="رسم يومي للتحصيل والديون في نوفمبر" style="display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: stretch; height: 170px; gap: 3px">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="30">
+<div style="flex: 1; display: flex; flex-direction: column; align-items: center">
+<div style="flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center">
+<span style="width: 100%; height: {{d.up}}; border-radius: 3px 3px 0 0; background: {{d.upColor}}"></span>
+</div>
+<span style="width: 100%; height: 1px; background: {{d.axis}}"></span>
+<div style="flex: 1; width: 100%; display: flex; flex-direction: column; justify-content: flex-start; align-items: center">
+<span style="width: 100%; height: {{d.down}}; border-radius: 0 0 3px 3px; background: {{d.downColor}}"></span>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: row-reverse; justify-content: space-between; font-size: 11px; color: #5B6B70"><span>1</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
+<div style="margin-top: 2px; padding: 10px 12px; border-radius: 12px; background: #F5F7F6; display: flex; justify-content: space-between; font-size: 13px">
+<span>أفضل يوم تحصيل: <b style="font-weight: 600">الخميس 12</b></span>
+<span style="color: #1E7A43; font-weight: 600">71,000 ر.ي</span>
+</div>
+</section>
+
+<section style="flex: none; margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; overflow: hidden">
+<h2 style="margin: 0; padding: 14px 14px 6px; font-size: 16px; font-weight: 600">ملخص الحركات</h2>
+<sc-for list="{{kinds}}" as="k" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-top: 1px solid #EEF2F1">
+<span style="min-width: 58px; text-align: center; font-size: 12px; font-weight: 500; padding: 3px 8px; border-radius: 8px; background: {{k.bg}}; color: {{k.fg}}">{{k.name}}</span>
+<span style="flex: 1; font-size: 13px; color: #5B6B70">{{k.count}}</span>
+<span style="font-size: 15px; font-weight: 600; color: {{k.color}}">{{k.amount}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="flex: none; margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">وعود السداد هذا الشهر</h2>
+<span style="font-size: 13px; color: #5B6B70">18 وعداً</span>
+</div>
+<div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; gap: 2px">
+<span style="flex: 11; background: #1E7A43"></span>
+<span style="flex: 4; background: #B03224"></span>
+<span style="flex: 3; background: #E0962A"></span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 13px">
+<span style="display: flex; flex-direction: column"><b style="font-size: 17px; font-weight: 600; color: #1E7A43">11</b>وُفي بها</span>
+<span style="display: flex; flex-direction: column"><b style="font-size: 17px; font-weight: 600; color: #B03224">4</b>متأخرة</span>
+<span style="display: flex; flex-direction: column"><b style="font-size: 17px; font-weight: 600; color: #7A4A07">3</b>قادمة</span>
+</div>
+</section>
+
+<section style="flex: none; margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; overflow: hidden">
+<div role="tablist" aria-label="الزبائن" style="display: flex; gap: 6px; padding: 14px 14px 8px">
+<button type="button" role="tab" aria-selected="true" style="height: 34px; padding: 0 14px; border-radius: 17px; border: none; background: #0F6E56; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">الأكثر سداداً</button>
+<button type="button" role="tab" aria-selected="false" style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #1F2A2E; font: inherit; font-size: 14px">الأكثر ديناً</button>
+<button type="button" role="tab" aria-selected="false" style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #1F2A2E; font: inherit; font-size: 14px">بلا سداد</button>
+</div>
+<sc-for list="{{top}}" as="t" hint-placeholder-count="5">
+<a href="Customer.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-top: 1px solid #EEF2F1; color: inherit; text-decoration: none; min-height: 44px">
+<span style="width: 24px; font-size: 13px; color: #5B6B70; text-align: center">{{t.rank}}</span>
+<span style="width: 36px; height: 36px; border-radius: 18px; background: #E1F5EE; color: #085041; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">{{t.initials}}</span>
+<span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px">{{t.name}}</span><span style="font-size: 12px; color: #5B6B70">{{t.sub}}</span></span>
+<span style="font-size: 15px; font-weight: 600; color: #1E7A43">{{t.amount}}</span>
+</a>
+</sc-for>
+</section>
+
+<section style="flex: none; margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; overflow: hidden">
+<h2 style="margin: 0; padding: 14px 14px 6px; font-size: 16px; font-weight: 600">حسب المستخدم</h2>
+<sc-for list="{{users}}" as="u" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 10px 14px; border-top: 1px solid #EEF2F1">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span style="font-weight: 500">{{u.name}}</span><span style="color: #5B6B70; font-size: 13px">{{u.ops}}</span></div>
+<div style="display: flex; gap: 16px; font-size: 13px"><span>تحصيل <b style="color: #1E7A43; font-weight: 600">{{u.paid}}</b></span><span>ديون <b style="color: #B03224; font-weight: 600">{{u.debt}}</b></span></div>
+</div>
+</sc-for>
+</section>
+
+<section style="flex: none; margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">أعمار الديون</h2>
+<span style="font-size: 12px; color: #5B6B70">كما في 17 نوفمبر</span>
+</div>
+<div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; gap: 2px">
+<span style="flex: 52; background: #9FD3BF"></span>
+<span style="flex: 24; background: #F2C46B"></span>
+<span style="flex: 14; background: #E58A55"></span>
+<span style="flex: 10; background: #B03224"></span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; font-size: 13px">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #9FD3BF"></span>أقل من 30 يوماً · 647 ألف</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #F2C46B"></span>30–60 يوماً · 299 ألف</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #E58A55"></span>60–90 يوماً · 174 ألف</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #B03224"></span>أكثر من 90 يوماً · 125 ألف</span>
+</div>
+</section>
+
+<div style="flex: none; margin: 14px 16px 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button type="button" style="height: 50px; border-radius: 14px; border: 1px solid #C9D6D2; background: #FFFFFF; color: #0F6E56; font: inherit; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg>تقرير PDF</button>
+<button type="button" style="height: 50px; border-radius: 14px; border: 1px solid #C9D6D2; background: #FFFFFF; color: #0F6E56; font: inherit; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M4 10h16M10 4v16"></path></svg>Excel</button>
+</div>
+
+<nav aria-label="القائمة الرئيسية" style="margin-top: auto; background: #FFFFFF; border-top: 1px solid #E3E9E7; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 8px 0 14px">
+<a href="Home.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #5B6B70; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"></path></svg>الرئيسية</a>
+<a href="Customers.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #5B6B70; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0"></path><path d="M16 4a4 4 0 0 1 0 8M19 21a6 6 0 0 0-3-5"></path></svg>الزبائن</a>
+<a href="Reports.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #0F6E56; font-weight: 600; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg>التقارير</a>
+<a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #5B6B70; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>المزيد</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2200}}'>
+class Component extends DCLogic {
+renderVals() {
+var monthNames = ['نوفمبر', 'أكتوبر', 'سبتمبر', 'أغسطس', 'يوليو', 'يونيو'];
+var months = monthNames.map(function (n, i) {
+  return { name: n, bg: i === 0 ? '#0F6E56' : '#FFFFFF', fg: i === 0 ? '#FFFFFF' : '#1F2A2E', border: i === 0 ? '#0F6E56' : '#D5DDDB', weight: i === 0 ? '600' : '400' };
+});
+var up = [38, 52, 30, 61, 44, 20, 57, 49, 66, 41, 35, 71, 47, 55, 28, 60, 42];
+var dn = [29, 41, 35, 24, 50, 15, 31, 44, 27, 38, 22, 33, 45, 26, 19, 36, 30];
+var days = [];
+for (var i = 0; i < 30; i++) {
+  var has = i < up.length;
+  var today = i === up.length - 1;
+  days.push({
+    up: has ? Math.round(up[i] / 71 * 76) + 'px' : '0px',
+    down: has ? Math.round(dn[i] / 71 * 76) + 'px' : '0px',
+    upColor: today ? '#0F6E56' : '#1E7A43',
+    downColor: '#D9776B',
+    axis: has ? '#B7C2BF' : '#E3E9E7'
+  });
+}
+return {
+months: months,
+days: days,
+kinds: [
+{ name: 'سداد', count: '184 عملية', amount: '612,000', bg: '#E3F3E9', fg: '#1E7A43', color: '#1E7A43' },
+{ name: 'دين', count: '311 عملية', amount: '486,500', bg: '#FCEDEB', fg: '#8E2519', color: '#B03224' },
+{ name: 'مرتجع', count: '9 عمليات', amount: '14,200', bg: '#EEF2F1', fg: '#1F2A2E', color: '#1F2A2E' },
+{ name: 'خصم', count: '6 عمليات', amount: '3,800', bg: '#EEF2F1', fg: '#1F2A2E', color: '#1F2A2E' },
+{ name: 'افتتاحي', count: '4 زبائن جدد', amount: '62,000', bg: '#E6EEF8', fg: '#1D4F86', color: '#1D4F86' },
+{ name: 'إلغاء', count: '3 قيود', amount: '7,500', bg: '#FBEFD9', fg: '#7A4A07', color: '#7A4A07' }
+],
+top: [
+{ rank: '1', initials: 'عب', name: 'عبدالله باوزير', sub: '6 دفعات', amount: '58,000' },
+{ rank: '2', initials: 'مس', name: 'محمد سالم', sub: '4 دفعات', amount: '41,500' },
+{ rank: '3', initials: 'فب', name: 'فاطمة بن سلم', sub: '3 دفعات', amount: '36,000' },
+{ rank: '4', initials: 'خع', name: 'خالد العمودي', sub: '5 دفعات', amount: '29,750' },
+{ rank: '5', initials: 'سب', name: 'سعيد بامطرف', sub: 'دفعتان', amount: '24,000' }
+],
+users: [
+{ name: 'أحمد (المالك)', ops: '312 عملية', paid: '402,000', debt: '268,500' },
+{ name: 'سالم (موظف)', ops: '183 عملية', paid: '210,000', debt: '218,000' }
+]
+};
+}
+}
+</script>
+</body>
+</html>

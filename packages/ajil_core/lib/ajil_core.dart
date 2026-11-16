@@ -11,3 +11,4 @@ export 'src/identity.dart';
 export 'src/signing.dart';
 export 'src/arabic_words.dart';
 export 'src/balance_notice.dart';
+export 'src/reports.dart';

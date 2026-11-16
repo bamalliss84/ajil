@@ -6,11 +6,21 @@ import '../core/theme.dart';
 
 /// مقطّع: مسار رمادي #EEF2F1 وعنصر مختار أبيض (زوايا 12 / 9، ارتفاع 38)
 class AjilSegmented<T> extends StatelessWidget {
-  const AjilSegmented({super.key, required this.options, required this.value, required this.onChanged, this.fontSize = 14});
+  const AjilSegmented({
+    super.key,
+    required this.options,
+    required this.value,
+    required this.onChanged,
+    this.fontSize = 14,
+    this.selectedFg = AjilColors.text,
+    this.shadow = false,
+  });
   final List<(T, String)> options;
   final T value;
   final ValueChanged<T> onChanged;
   final double fontSize;
+  final Color selectedFg;
+  final bool shadow;
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(4),
@@ -31,12 +41,15 @@ class AjilSegmented<T> extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: v == value ? Colors.white : Colors.transparent,
                       borderRadius: BorderRadius.circular(9),
+                      boxShadow: shadow && v == value
+                          ? const [BoxShadow(color: Color(0x1F0F2823), blurRadius: 2, offset: Offset(0, 1))]
+                          : null,
                     ),
                     child: Text(label,
                         style: TextStyle(
                           fontSize: fontSize,
                           fontWeight: v == value ? FontWeight.w600 : FontWeight.w400,
-                          color: v == value ? AjilColors.text : AjilColors.textSoft,
+                          color: v == value ? selectedFg : AjilColors.textMuted,
                         )),
                   ),
                 ),

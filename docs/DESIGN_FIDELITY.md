@@ -13,6 +13,10 @@
 | `AddDebt.png` | `features/tx/add_tx_screen.dart` (وضع الدين؛ السداد بنفس الشكل بالأخضر) |
 | `Promise.png` | `features/promises/promise_screen.dart` |
 | `Reminders.png` | `features/settings/reminders_screen.dart` |
+| `Reports.png` | `features/reports/reports_screen.dart` — العرض الشهري (الافتراضي) |
+| `ReportsPicker.png` | نافذة اختيار الفترة (BottomSheet) |
+| `ReportsDay.png` | التقارير — عرض يوم |
+| `ReportsYear.png` | التقارير — عرض سنة |
 
 ## طريقة العمل لكل شاشة
 1. افتح الصورة واقرأ ملف `.dc.html` المقابل: فيه القيم الدقيقة (أحجام الخط، المسافات، الزوايا، الألوان، الارتفاعات).
