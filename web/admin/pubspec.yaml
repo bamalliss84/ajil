@@ -1,0 +1,25 @@
+name: ajil_admin
+description: لوحة إدارة منصة آجِل (Flutter Web)
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  ajil_core:
+    path: ../../packages/ajil_core
+  supabase_flutter: ^2.8.0
+  decimal: ^3.0.2
+  intl: any
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

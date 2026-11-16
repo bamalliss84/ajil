@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>آجِل – الزبائن</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F6E56}a:hover{color:#085041}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; box-sizing: border-box; background: #F5F7F6; font-family: 'IBM Plex Sans Arabic', sans-serif; color: #1F2A2E; display: flex; flex-direction: column">
+<header style="background: #FFFFFF; padding: 20px 16px 12px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #E3E9E7">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 22px; font-weight: 600">الزبائن</div>
+<div style="font-size: 13px; color: #5B6B70">186 من 200 في باقتك · الفرع الرئيسي</div>
+</div>
+<button type="button" aria-label="إضافة زبون" style="width: 48px; height: 48px; border: none; border-radius: 14px; background: #0F6E56; color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</button>
+</div>
+<label style="position: relative; display: block">
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">بحث بالاسم أو رقم الجوال</span>
+<input type="search" placeholder="بحث بالاسم أو رقم الجوال" style="width: 100%; height: 48px; box-sizing: border-box; border: 1px solid #D5DDDB; border-radius: 12px; padding: 0 44px 0 14px; font: inherit; font-size: 15px; background: #F5F7F6; color: #1F2A2E">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6B70" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" style="position: absolute; right: 14px; top: 14px"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+</label>
+<div style="display: flex; gap: 8px">
+<button type="button" style="height: 36px; padding: 0 14px; border-radius: 18px; border: none; background: #0F6E56; color: #FFFFFF; font: inherit; font-size: 14px">الكل</button>
+<button type="button" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">عليهم دين</button>
+<button type="button" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">متأخرون</button>
+<button type="button" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">مؤرشفون</button>
+</div>
+</header>
+<div style="flex: 1; overflow: hidden; display: flex; flex-direction: column">
+<sc-for list="{{customers}}" as="c" hint-placeholder-count="8">
+<a href="Customer.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #FFFFFF; border-bottom: 1px solid #EEF2F1; color: inherit; text-decoration: none; min-height: 68px; box-sizing: border-box">
+<span style="width: 42px; height: 42px; border-radius: 50%; background: #E1F5EE; color: #085041; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; flex: none">{{c.initials}}</span>
+<span style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+<span style="font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 6px">{{c.name}}
+<sc-if value="{{c.pending}}" hint-placeholder-val="{{false}}"><span title="حركات غير متزامنة" style="width: 8px; height: 8px; border-radius: 50%; background: #E0962A"></span></sc-if>
+</span>
+<span style="font-size: 12px; color: #5B6B70; direction: ltr; text-align: right">{{c.phone}}</span>
+</span>
+<span style="display: flex; flex-direction: column; align-items: flex-end">
+<span style="font-size: 16px; font-weight: 600; color: {{c.color}}">{{c.amount}}</span>
+<span style="font-size: 12px; color: #5B6B70">{{c.cur}}</span>
+</span>
+</a>
+</sc-for>
+</div>
+<nav aria-label="القائمة الرئيسية" style="background: #FFFFFF; border-top: 1px solid #E3E9E7; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 8px 0 14px">
+<a href="Home.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #5B6B70; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z"></path></svg>الرئيسية</a>
+<a href="Customers.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #0F6E56; font-weight: 600; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0"></path><path d="M16 4a4 4 0 0 1 0 8M19 21a6 6 0 0 0-3-5"></path></svg>الزبائن</a>
+<a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #5B6B70; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"></path></svg>التقارير</a>
+<a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; color: #5B6B70; text-decoration: none; min-height: 48px; justify-content: center">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>المزيد</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+var red = '#B03224', green = '#1E7A43', gray = '#5B6B70';
+return {
+customers: [
+{ initials: 'م س', name: 'محمد سالم', phone: '777 412 908', amount: '45,250', cur: 'ر.ي', color: red, pending: true },
+{ initials: 'ع ب', name: 'عبدالله باوزير', phone: '733 205 117', amount: '38,000', cur: 'ر.ي', color: red, pending: false },
+{ initials: 'س ع', name: 'سعيد العمودي', phone: '771 880 342', amount: '120', cur: 'ر.س', color: red, pending: false },
+{ initials: 'خ ح', name: 'خالد الحامد', phone: '735 661 020', amount: '12,700', cur: 'ر.ي', color: red, pending: true },
+{ initials: 'ف ب', name: 'فاطمة بن سلم', phone: '772 190 455', amount: '6,300', cur: 'ر.ي', color: red, pending: false },
+{ initials: 'ع ك', name: 'عمر الكثيري', phone: '730 554 781', amount: 'لا دين', cur: 'مسدد', color: green, pending: false },
+{ initials: 'ي ج', name: 'ياسر الجابري', phone: '774 302 966', amount: '2,150', cur: 'ر.ي', color: red, pending: false },
+{ initials: 'ح ن', name: 'حسن النهدي', phone: '736 118 204', amount: 'لا دين', cur: 'مسدد', color: green, pending: false }
+]
+};
+}
+}
+</script>
+</body>
+</html>

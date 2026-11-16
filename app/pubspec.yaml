@@ -1,0 +1,67 @@
+name: ajil
+description: آجِل — دفتر ديون البقالة (Android + Web)
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  ajil_core:
+    path: ../packages/ajil_core
+
+  # الحالة والتنقل
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.6.2
+
+  # الخادم
+  supabase_flutter: ^2.8.0
+  http: ^1.2.2
+
+  # القاعدة المحلية (تعمل على Android والويب)
+  drift: ^2.22.0
+  drift_flutter: ^0.2.4
+  path_provider: ^2.1.5
+
+  # الأمان
+  flutter_secure_storage: ^9.2.2
+  local_auth: ^2.3.0
+  webcrypto: ^0.5.8
+  crypto: ^3.0.6
+
+  # التنبيهات
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
+  flutter_timezone: ^3.0.1
+
+  # الكشف والمشاركة
+  pdf: ^3.11.1
+  printing: ^5.13.4
+  url_launcher: ^6.3.1
+  share_plus: ^10.1.4
+  qr_flutter: ^4.1.0
+
+  # أخرى
+  decimal: ^3.0.2
+  uuid: ^4.5.1
+  intl: any
+  google_fonts: ^6.2.1
+  connectivity_plus: ^6.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  drift_dev: ^2.22.0
+
+flutter:
+  uses-material-design: true
+  # ضع ملفات الخط هنا (من Google Fonts: IBM Plex Sans Arabic) ليعمل التطبيق والـ PDF بدون إنترنت
+  assets:
+    - assets/fonts/

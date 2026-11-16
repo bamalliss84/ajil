@@ -1,0 +1,25 @@
+# أضف هذه الأقسام إلى supabase/config.toml بعد `npx supabase init`
+
+[api]
+schemas = ["public", "graphql_public", "app"]
+extra_search_path = ["public", "extensions"]
+
+[auth]
+enable_signup = false            # التسجيل فقط عبر register-store
+
+[auth.email]
+enable_confirmations = false     # البريد داخلي مشتق
+
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/public/ajil_access_token_hook"
+
+# دوال تُستدعى بدون جلسة (قبل الدخول)
+[functions.send-otp]
+verify_jwt = false
+
+[functions.register-store]
+verify_jwt = false
+
+[functions.reset-password]
+verify_jwt = false               # وضع owner بدون جلسة؛ الوضعان الآخران يتحققان داخلياً

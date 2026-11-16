@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>آجِل – تسجيل وعد سداد</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F6E56}a:hover{color:#085041}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; box-sizing: border-box; background: #FFFFFF; font-family: 'IBM Plex Sans Arabic', sans-serif; color: #1F2A2E; display: flex; flex-direction: column">
+<header style="padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #E3E9E7">
+<a href="Customer.dc.html" aria-label="إغلاق" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #1F2A2E">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</a>
+<div style="flex: 1; display: flex; flex-direction: column">
+<div style="font-size: 18px; font-weight: 600">وعد بالسداد</div>
+<div style="font-size: 13px; color: #5B6B70">محمد سالم · عليه 45,250 ر.ي</div>
+</div>
+</header>
+<div style="padding: 18px 16px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 14px; font-weight: 500">متى قال بيسدد؟</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<button type="button" style="height: 46px; border-radius: 12px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">اليوم</button>
+<button type="button" aria-pressed="true" style="height: 46px; border-radius: 12px; border: 2px solid #0F6E56; background: #E1F5EE; color: #085041; font: inherit; font-size: 14px; font-weight: 600">غداً</button>
+<button type="button" style="height: 46px; border-radius: 12px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">بعد 3 أيام</button>
+<button type="button" style="height: 46px; border-radius: 12px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">بعد أسبوع</button>
+<button type="button" style="height: 46px; border-radius: 12px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">آخر الشهر</button>
+<button type="button" style="height: 46px; border-radius: 12px; border: 1px solid #D5DDDB; background: #FFFFFF; color: #3D4B50; font: inherit; font-size: 14px">تاريخ…</button>
+</div>
+<div style="font-size: 14px; color: #085041">الثلاثاء 17 نوفمبر 2026</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500">المبلغ الموعود (اختياري)
+<span style="display: flex; gap: 8px">
+<input type="text" value="20,000" style="flex: 1; height: 50px; box-sizing: border-box; border: 1px solid #D5DDDB; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 18px; color: #1F2A2E">
+<span style="height: 50px; padding: 0 14px; border-radius: 12px; background: #EEF2F1; display: flex; align-items: center; font-size: 15px; font-weight: 400">ر.ي</span>
+</span>
+<span style="font-size: 12px; font-weight: 400; color: #5B6B70">فارغ = يسدد الرصيد كاملاً</span>
+</label>
+<fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px">
+<legend style="font-size: 14px; font-weight: 500; padding: 0; margin-bottom: 6px">التنبيهات</legend>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 48px; font-size: 15px; border-bottom: 1px solid #EEF2F1">تنبيهي يوم الموعد 9:00 ص
+<input type="checkbox" checked style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 48px; font-size: 15px; border-bottom: 1px solid #EEF2F1">تنبيهي قبلها بيوم
+<input type="checkbox" style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 48px; font-size: 15px">تذكير الزبون عبر واتساب يوم الموعد
+<input type="checkbox" checked style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+</fieldset>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500">ملاحظة
+<input type="text" value="قال بعد ما يستلم الراتب" style="height: 46px; box-sizing: border-box; border: 1px solid #D5DDDB; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 15px; font-weight: 400; color: #1F2A2E">
+</label>
+<div style="font-size: 13px; color: #5B6B70; background: #F5F7F6; border-radius: 12px; padding: 10px 12px">إذا مرّ الموعد بدون سداد يتحول إلى «وعد متأخر» ويظهر في «مطلوب تحصيله اليوم» حتى يُسدَّد أو يُعدَّل.</div>
+</div>
+<div style="margin-top: auto; padding: 12px 16px 18px; border-top: 1px solid #E3E9E7">
+<button type="button" style="width: 100%; height: 56px; border: none; border-radius: 14px; background: #0F6E56; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 600">حفظ الوعد</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>آجِل – إعدادات التنبيهات</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F6E56}a:hover{color:#085041}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 1040px; box-sizing: border-box; background: #F5F7F6; font-family: 'IBM Plex Sans Arabic', sans-serif; color: #1F2A2E; display: flex; flex-direction: column">
+<header style="background: #FFFFFF; padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #E3E9E7">
+<a href="Home.dc.html" aria-label="رجوع" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #1F2A2E">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</a>
+<div style="font-size: 19px; font-weight: 600">التنبيهات والتحصيل</div>
+</header>
+<section style="margin: 16px 16px 0; background: #FFFFFF; border-radius: 16px; padding: 4px 14px 12px">
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; font-size: 16px; font-weight: 600; border-bottom: 1px solid #EEF2F1">المطالبة الشهرية
+<input type="checkbox" checked style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding-top: 12px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #3D4B50">يوم المطالبة من كل شهر
+<select style="height: 46px; border: 1px solid #D5DDDB; border-radius: 12px; padding: 0 10px; font: inherit; font-size: 15px; color: #1F2A2E; background: #FFFFFF">
+<option>يوم 1</option><option>يوم 5</option><option>يوم 15</option><option>يوم 25</option><option>آخر يوم في الشهر</option>
+</select></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #3D4B50">الوقت
+<select style="height: 46px; border: 1px solid #D5DDDB; border-radius: 12px; padding: 0 10px; font: inherit; font-size: 15px; color: #1F2A2E; background: #FFFFFF">
+<option>9:00 ص</option><option>4:00 م</option><option>8:00 م</option>
+</select></label>
+</div>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #3D4B50; padding-top: 10px">تشمل الزبائن الذين عليهم أكثر من
+<span style="display: flex; gap: 8px">
+<input type="text" value="1,000" style="flex: 1; height: 46px; box-sizing: border-box; border: 1px solid #D5DDDB; border-radius: 12px; padding: 0 12px; font: inherit; font-size: 15px; color: #1F2A2E">
+<span style="height: 46px; padding: 0 12px; border-radius: 12px; background: #EEF2F1; display: flex; align-items: center; font-size: 14px">ر.ي</span>
+</span></label>
+<div style="font-size: 13px; color: #5B6B70; padding-top: 10px">في يوم المطالبة يجهّز التطبيق قائمة تحصيل بكل الزبائن المشمولين، مع رسالة واتساب جاهزة لكل واحد.</div>
+</section>
+<section style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; padding: 4px 14px">
+<div style="min-height: 52px; display: flex; align-items: center; font-size: 16px; font-weight: 600; border-bottom: 1px solid #EEF2F1">مواعيد ووعود السداد</div>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; border-bottom: 1px solid #EEF2F1">تنبيه يوم الموعد
+<input type="checkbox" checked style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; border-bottom: 1px solid #EEF2F1">تنبيه قبل الموعد بيوم
+<input type="checkbox" style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px; border-bottom: 1px solid #EEF2F1">تذكير يومي بالوعود المتأخرة
+<input type="checkbox" checked style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px">وقت التنبيه اليومي
+<select style="height: 40px; border: 1px solid #D5DDDB; border-radius: 10px; padding: 0 8px; font: inherit; font-size: 14px; color: #1F2A2E; background: #FFFFFF"><option>9:00 ص</option><option>4:00 م</option></select></label>
+</section>
+<section style="margin: 14px 16px 0; background: #FFFFFF; border-radius: 16px; padding: 4px 14px">
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 16px; font-weight: 600; border-bottom: 1px solid #EEF2F1">الديون المتأخرة
+<input type="checkbox" checked style="width: 22px; height: 22px; accent-color: #0F6E56"></label>
+<label style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; font-size: 15px">نبّهني إذا لم يسدد الزبون منذ
+<select style="height: 40px; border: 1px solid #D5DDDB; border-radius: 10px; padding: 0 8px; font: inherit; font-size: 14px; color: #1F2A2E; background: #FFFFFF"><option>30 يوماً</option><option>60 يوماً</option><option>90 يوماً</option></select></label>
+</section>
+<section style="margin: 14px 16px 16px; background: #FFFFFF; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+<label for="tpl" style="font-size: 16px; font-weight: 600">رسالة التذكير للزبون</label>
+<textarea id="tpl" rows="4" style="border: 1px solid #D5DDDB; border-radius: 12px; padding: 10px 12px; font: inherit; font-size: 14px; line-height: 1.7; color: #1F2A2E; resize: none">السلام عليكم {الاسم}، نذكّرك بأن رصيدك لدى {البقالة} هو {المبلغ}. كشف حسابك: {الرابط}. شكراً لتعاملك معنا.</textarea>
+<div style="font-size: 12px; color: #5B6B70">تُرسل من واتساب جوالك بضغطة، ولا تُرسل تلقائياً بدون موافقتك.</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1040}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
