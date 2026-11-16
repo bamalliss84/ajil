@@ -140,7 +140,7 @@ class _PickerState extends State<_Picker> {
           onPressed: onTap,
         );
     return Row(children: [
-      arrow(Icons.chevron_right_rounded, start > 0 ? () => setState(() => _windowEnd--) : null, 'السنوات السابقة'),
+      arrow(Icons.chevron_left_rounded, start > 0 ? () => setState(() => _windowEnd--) : null, 'السنوات السابقة'),
       Expanded(
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           for (final y in visible)
@@ -160,7 +160,7 @@ class _PickerState extends State<_Picker> {
             ),
         ]),
       ),
-      arrow(Icons.chevron_left_rounded, end < _years.length - 1 ? () => setState(() => _windowEnd++) : null, 'السنوات التالية'),
+      arrow(Icons.chevron_right_rounded, end < _years.length - 1 ? () => setState(() => _windowEnd++) : null, 'السنوات التالية'),
     ]);
   }
 

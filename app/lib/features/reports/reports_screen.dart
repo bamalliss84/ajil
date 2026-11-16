@@ -43,14 +43,16 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
 
     return Scaffold(
       bottomNavigationBar: const AjilNavBar(index: 2),
-      body: Column(children: [
+      // الهيدر يتمرر مع المحتوى (في الوضع الأفقي أو الشاشات القصيرة لا يأكل الشاشة)
+      body: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
         _header(w, f, period, currency, today, fresh ? r : null),
-        if (report.isLoading && r != null) const LinearProgressIndicator(minHeight: 2),
-        Expanded(
-          child: r == null
-              ? (report.hasError ? Center(child: Text('تعذّر حساب التقرير: ${report.error}')) : const ReportSkeleton())
-              : ListView(padding: const EdgeInsets.only(bottom: 16), children: _body(w, f, r, names, customers)),
-        ),
+        SizedBox(height: 2, child: report.isLoading && r != null ? const LinearProgressIndicator(minHeight: 2) : null),
+        if (r == null)
+          report.hasError
+              ? Padding(padding: const EdgeInsets.all(24), child: Text('تعذّر حساب التقرير: ${report.error}'))
+              : const ReportSkeleton()
+        else
+          ..._body(w, f, r, names, customers),
       ]),
     );
   }
@@ -137,7 +139,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             const SizedBox(height: 12),
             Row(children: [
               SquareIconButton(
-                icon: Icons.chevron_right_rounded,
+                icon: Icons.chevron_left_rounded,
                 tooltip: 'الفترة السابقة',
                 color: AjilColors.text,
                 onPressed: () => _set(period.prev()),
@@ -170,7 +172,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               ),
               const SizedBox(width: 8),
               SquareIconButton(
-                icon: Icons.chevron_left_rounded,
+                icon: Icons.chevron_right_rounded,
                 tooltip: hasNext ? 'الفترة التالية' : 'الفترة التالية (غير متاحة، هذه الفترة الحالية)',
                 color: hasNext ? AjilColors.text : RC.disabled,
                 borderColor: hasNext ? AjilColors.border : AjilColors.divider,

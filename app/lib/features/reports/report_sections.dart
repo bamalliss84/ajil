@@ -562,7 +562,7 @@ class ReportSkeleton extends StatelessWidget {
           margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
           decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(16)),
         );
-    return ListView(physics: const NeverScrollableScrollPhysics(), children: [
+    return Column(children: [
       box(190, c: AjilColors.primary.withOpacity(0.25)),
       box(260),
       box(200),

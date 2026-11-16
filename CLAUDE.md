@@ -64,10 +64,11 @@ cd app && flutter pub get && flutter test && flutter run
 - ✅ المرحلة 0: التحليل والتصميم (8 شاشات)
 - ✅ المرحلة 1: قاعدة البيانات — 11 migrations و **98 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
 - ✅ المرحلة 2.1: Edge Functions — send-otp, register-store, add-employee, reset-password, sync-push — مجرّبة محلياً بـ curl + 6 اختبارات للمنطق المشترك
-- ✅ المرحلة 2.2: `packages/ajil_core` — 25 اختباراً ناجحاً
+- ✅ المرحلة 2.2: `packages/ajil_core` — 44 اختباراً ناجحاً
 - ✅ المرحلة 2.3–2.4: تطبيق Flutter يُترجم: `flutter analyze` بلا أخطاء، `flutter test` 9/9. البيئة Flutter 3.24.5 (لهذا `drift_flutter <0.2.5` و override لـ `app_links`)
 - ✅ التجربة على جوال حقيقي (لاسلكياً): `scripts/dev-up.ps1 -Phone ip:port` ثم `scripts/run-phone.ps1 -Phone ip:port` (adb reverse ← `SUPABASE_URL=http://127.0.0.1:54321`). مُتحقَّق حتى شاشة PIN؛ بقية السيناريو يدوي
 - 🟡 مطابقة التصميم: الثيم والخط وكل الشاشات أُعيد بناؤها حسب `docs/design` (`widgets/ui.dart`)، وقورنت لقطات الجوال بالتصميم (عدا شاشة الدخول)
+- ✅ شاشة التقارير (يوم/شهر/سنة/فترة + PDF/Excel) حسب `docs/REPORTS_SPEC.md` — منطقها في `ajil_core/src/reports.dart` (ajil_core 44 اختباراً)
 - 🟡 المرحلة 3: لوحة الإدارة (`web/admin`) وصفحة التعريف (`web/landing`) مكتوبتان ولم تُترجما بعد؛ صفحة المشترك = التطبيق نفسه على الويب
 - ⏭️ التفاصيل والخطوات: `docs/NEXT_TASKS.md`
 

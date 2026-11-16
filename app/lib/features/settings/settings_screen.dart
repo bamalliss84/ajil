@@ -107,7 +107,7 @@ class SettingsScreen extends ConsumerWidget {
                 decoration: BoxDecoration(color: AjilColors.pendingDot, borderRadius: BorderRadius.circular(11)),
                 child: Text(trailing, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AjilColors.badgeText)),
               )
-            : (color == null ? const Icon(Icons.chevron_left_rounded, color: AjilColors.textMuted) : null),
+            : (color == null ? const Icon(Icons.chevron_right_rounded, color: AjilColors.textMuted) : null),
       );
 
   Widget _row(IconData icon, String title, VoidCallback? onTap, {Widget? trailingWidget, Color? color}) => InkWell(

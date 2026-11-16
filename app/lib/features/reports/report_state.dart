@@ -77,6 +77,7 @@ bool sameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month &
 
 /// عدد مع المعدود بالعربية: 1 عملية، 2 عمليتان، 3–10 عمليات، 11+ عملية
 String counted(MoneyFormat f, int n, String one, String two, String few, [String? many]) {
+  if (n == 0) return '${f.digits('0')} $few';
   if (n == 1) return '${f.digits('1')} $one';
   if (n == 2) return two;
   if (n >= 3 && n <= 10) return '${f.digits('$n')} $few';

@@ -59,7 +59,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       onPressed: () => context.pop(),
-                      icon: const Icon(Icons.chevron_right_rounded, size: 30),
+                      icon: const Icon(Icons.chevron_left_rounded, size: 30),
                       tooltip: 'رجوع',
                     ),
                   ),

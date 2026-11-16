@@ -197,7 +197,7 @@ class _DayTxListState extends State<DayTxList> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
         child: Row(children: [
-          SizedBox(width: 50, child: TypeBadge(name, bg: bg, fg: fg)),
+          SizedBox(width: 58, child: Align(alignment: AlignmentDirectional.centerStart, child: FittedBox(fit: BoxFit.scaleDown, child: TypeBadge(name, bg: bg, fg: fg)))),
           const SizedBox(width: 10),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -365,7 +365,7 @@ class MonthList extends StatelessWidget {
                     style: const TextStyle(fontSize: 13, color: AjilColors.debt, fontWeight: FontWeight.w600)),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_left_rounded, size: 20, color: AjilColors.textMuted),
+              const Icon(Icons.chevron_right_rounded, size: 20, color: AjilColors.textMuted),
             ]),
           ),
         ),

@@ -6,6 +6,15 @@
 > قاعدة البيانات مختبرة فعلياً (97 اختباراً)، ومنطق Edge Functions المشترك مختبر (6 اختبارات).
 > أول مهمة لك: تشغيل `flutter analyze` وإصلاح أي أخطاء ترجمة أو اختلاف في إصدارات الحزم — **بدون تغيير القواعد في CLAUDE.md**.
 
+## ✅ شاشة التقارير الجديدة (2026-11-17) — `docs/REPORTS_SPEC.md`
+- المنطق في `packages/ajil_core/lib/src/reports.dart` (`ReportPeriod`، `PeriodReport.build`) + 19 اختباراً (ajil_core: 44/44). الشاشة عرض فقط.
+- الشاشة: `app/lib/features/reports/` (reports_screen، report_sections، report_views، period_picker، report_state). الافتراضي الشهر الحالي، يوم/شهر/سنة/من–إلى، الفترة تبقى طوال الجلسة. السنة أو >3000 حركة تُحسب في isolate.
+- التصدير PDF و Excel (`services/report_export.dart`، حزمة `excel`) ومشاركة ملخص اليوم نصاً.
+- قورنت لقطات الجوال بـ Reports / ReportsDay / ReportsYear / ReportsPicker.
+- أيقونات الأسهم (chevron) كانت معكوسة في RTL في كل التطبيق — صُحّحت.
+- [ ] شريط «إغلاق السنة» في تصميم السنة غير منفّذ (لا توجد ميزة إغلاق سنة بعد).
+- [ ] «حسب المستخدم» بدون اتصال يعرض اسم المستخدم الحالي فقط (الأسماء من الخادم).
+
 ## 🟡 جلسة مطابقة التصميم (2026-11-17)
 - الخط IBM Plex Sans Arabic مضمّن كأصل (`fonts:` في pubspec، أُزيل google_fonts) و`core/theme.dart` يحوي كل رموز `docs/DESIGN.md`.
 - مكوّنات مشتركة في `app/lib/widgets/ui.dart` (هيدر، مقطّع، شرائح، خيارات، صفوف اختيار، بطاقات) مطابقة لـ `docs/design/*.dc.html`.

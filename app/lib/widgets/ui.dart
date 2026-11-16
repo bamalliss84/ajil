@@ -313,7 +313,7 @@ class AjilHeader extends StatelessWidget implements PreferredSizeWidget {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: onBack ?? () => Navigator.of(context).maybePop(),
-                  icon: Icon(close ? Icons.close_rounded : Icons.chevron_right_rounded, size: close ? 26 : 30),
+                  icon: Icon(close ? Icons.close_rounded : Icons.chevron_left_rounded, size: close ? 26 : 30),
                   tooltip: close ? 'إغلاق' : 'رجوع',
                 ),
               ),
