@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app.dart';
@@ -15,6 +16,8 @@ import 'state/session_controller.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ar');
+  // التواريخ تتبع إعداد الأرقام (الافتراضي 123) — intl يستخدم الهندية لـ ar افتراضياً
+  DateFormat.useNativeDigitsByDefaultFor('ar', false);
   await Supabase.initialize(url: AppConfig.supabaseUrl, anonKey: AppConfig.supabaseAnonKey);
 
   const storage = FlutterSecureStorage(aOptions: AndroidOptions(encryptedSharedPreferences: true));

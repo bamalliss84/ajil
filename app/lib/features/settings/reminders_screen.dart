@@ -27,7 +27,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
       if (!mounted) return;
       setState(() {
         _s = Map.of(v);
-        _min.text = '${v['monthly_claim_min']}';
+        _min.text = '${v['monthly_claim_min']}'.replaceFirst(RegExp(r'\.0+$'), '');
         _tpl.text = v['reminder_template'];
       });
     }).catchError((e) {

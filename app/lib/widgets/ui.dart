@@ -74,8 +74,7 @@ class PillChip extends StatelessWidget {
           onTap: onTap,
           child: Container(
             height: height,
-            padding: const EdgeInsets.symmetric(horizontal: 13),
-            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               if (icon != null) ...[
                 Icon(icon, size: 16, color: selected ? Colors.white : AjilColors.textSoft),

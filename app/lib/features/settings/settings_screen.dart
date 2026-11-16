@@ -67,7 +67,10 @@ class SettingsScreen extends ConsumerWidget {
             null,
             trailingWidget: Switch(
               value: f.arabicIndicDigits,
-              onChanged: (v) => ref.read(moneyFormatProvider.notifier).state = MoneyFormat(arabicIndicDigits: v),
+              onChanged: (v) {
+                intl.DateFormat.useNativeDigitsByDefaultFor('ar', v);
+                ref.read(moneyFormatProvider.notifier).state = MoneyFormat(arabicIndicDigits: v);
+              },
             ),
           ),
           _tile(Icons.password_outlined, 'تغيير كلمة المرور', () => _changePassword(context, ref)),

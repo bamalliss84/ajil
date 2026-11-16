@@ -118,7 +118,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AjilHeader(close: true, title: widget.kind.labelAr, subtitle: '${c.name} · ${w.branch.name}'),
+      appBar: AjilHeader(close: true, title: 'تسجيل ${widget.kind.labelAr}', subtitle: '${c.name} · ${w.branch.name}'),
       body: Column(children: [
         Expanded(
           child: ListView(padding: const EdgeInsets.fromLTRB(16, 20, 16, 12), children: [
@@ -267,7 +267,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
                   minimumSize: const Size.fromHeight(56),
                   textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600),
                 ),
-                child: Text('حفظ ${widget.kind.labelAr}'),
+                child: Text(switch (widget.kind) { TxKind.debt => 'حفظ الدين', TxKind.payment => 'حفظ السداد', _ => 'حفظ ${widget.kind.labelAr}' }),
               ),
             ]),
           ),
