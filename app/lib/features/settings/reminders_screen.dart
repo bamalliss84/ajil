@@ -1,3 +1,4 @@
+import 'package:ajil_core/ajil_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -58,103 +59,144 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
   Widget build(BuildContext context) {
     final s = _s;
     final owner = sessionOf(ref).isOwner;
+    final cur = Currency.of(sessionOf(ref).defaultCurrency).symbolAr;
+    const dd = TextStyle(fontFamily: ajilFont, fontSize: 15, color: AjilColors.text);
+    const ddPad = EdgeInsets.symmetric(horizontal: 10, vertical: 12);
+    Widget compactDrop(int value, List<(int, String)> items, ValueChanged<int?>? onChanged) => SizedBox(
+          width: 124,
+          child: DropdownButtonFormField<int>(
+            value: value,
+            isExpanded: true,
+            style: const TextStyle(fontFamily: ajilFont, fontSize: 14, color: AjilColors.text),
+            icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+            decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 9)),
+            items: [for (final (v, l) in items) DropdownMenuItem(value: v, child: Text(l))],
+            onChanged: onChanged,
+          ),
+        );
+    Widget inlineRow(String label, Widget trailing, {bool divider = true}) => Container(
+          constraints: const BoxConstraints(minHeight: 56),
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          decoration: divider ? const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.divider))) : null,
+          child: Row(children: [
+            Expanded(child: Text(label, style: const TextStyle(fontSize: 15))),
+            const SizedBox(width: 8),
+            trailing,
+          ]),
+        );
+
     return Scaffold(
-      appBar: AppBar(title: const Text('التنبيهات والتحصيل')),
+      appBar: const AjilHeader(title: 'التنبيهات والتحصيل', titleSize: 19),
       body: s == null
           ? const Center(child: CircularProgressIndicator())
           : ListView(padding: const EdgeInsets.only(bottom: 24), children: [
-              SectionCard(
+              AjilCard(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('المطالبة الشهرية', style: TextStyle(fontWeight: FontWeight.w600)),
+                  CheckRow(
+                    label: 'المطالبة الشهرية',
+                    bold: true,
+                    minHeight: 56,
                     value: s['monthly_claim_enabled'] == true,
                     onChanged: owner ? (v) => setState(() => s['monthly_claim_enabled'] = v) : null,
                   ),
-                  Row(children: [
+                  const SizedBox(height: 12),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Expanded(
-                      child: DropdownButtonFormField<int>(
-                        value: s['monthly_claim_day'] as int,
-                        decoration: const InputDecoration(labelText: 'يوم المطالبة من كل شهر'),
-                        items: [
-                          for (final d in [1, 5, 10, 15, 20, 25, 28]) DropdownMenuItem(value: d, child: Text('يوم $d')),
-                          const DropdownMenuItem(value: 0, child: Text('آخر يوم في الشهر')),
-                        ],
-                        onChanged: owner ? (v) => setState(() => s['monthly_claim_day'] = v) : null,
+                      child: LabeledField(
+                        label: 'يوم المطالبة من كل شهر',
+                        child: DropdownButtonFormField<int>(
+                          value: s['monthly_claim_day'] as int,
+                          isExpanded: true,
+                          style: dd,
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                          decoration: const InputDecoration(contentPadding: ddPad),
+                          items: [
+                            for (final d in [1, 5, 10, 15, 20, 25, 28]) DropdownMenuItem(value: d, child: Text('يوم $d')),
+                            const DropdownMenuItem(value: 0, child: Text('آخر يوم في الشهر')),
+                          ],
+                          onChanged: owner ? (v) => setState(() => s['monthly_claim_day'] = v) : null,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: DropdownButtonFormField<String>(
-                        value: (s['monthly_claim_time'] as String).substring(0, 5),
-                        decoration: const InputDecoration(labelText: 'الوقت'),
-                        items: const [
-                          DropdownMenuItem(value: '09:00', child: Text('9:00 ص')),
-                          DropdownMenuItem(value: '16:00', child: Text('4:00 م')),
-                          DropdownMenuItem(value: '20:00', child: Text('8:00 م')),
-                        ],
-                        onChanged: owner ? (v) => setState(() => s['monthly_claim_time'] = v) : null,
+                      child: LabeledField(
+                        label: 'الوقت',
+                        child: DropdownButtonFormField<String>(
+                          value: (s['monthly_claim_time'] as String).substring(0, 5),
+                          isExpanded: true,
+                          style: dd,
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                          decoration: const InputDecoration(contentPadding: ddPad),
+                          items: const [
+                            DropdownMenuItem(value: '09:00', child: Text('9:00 ص')),
+                            DropdownMenuItem(value: '16:00', child: Text('4:00 م')),
+                            DropdownMenuItem(value: '20:00', child: Text('8:00 م')),
+                          ],
+                          onChanged: owner ? (v) => setState(() => s['monthly_claim_time'] = v) : null,
+                        ),
                       ),
                     ),
                   ]),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _min,
-                    enabled: owner,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'تشمل الزبائن الذين عليهم أكثر من'),
+                  const SizedBox(height: 12),
+                  LabeledField(
+                    label: 'تشمل الزبائن الذين عليهم أكثر من',
+                    child: Row(children: [
+                      Expanded(
+                        child: TextField(controller: _min, enabled: owner, style: const TextStyle(fontSize: 15), keyboardType: TextInputType.number),
+                      ),
+                      const SizedBox(width: 8),
+                      UnitBox(cur),
+                    ]),
                   ),
-                  const SizedBox(height: 8),
-                  const Text('في يوم المطالبة يجهّز التطبيق قائمة تحصيل مع رسالة واتساب جاهزة لكل زبون.',
-                      style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
-                ]),
-              ),
-              SectionCard(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const Text('الديون المتأخرة', style: TextStyle(fontWeight: FontWeight.w600)),
-                  DropdownButtonFormField<int>(
-                    value: s['overdue_days'] as int,
-                    decoration: const InputDecoration(labelText: 'نبّهني إذا لم يسدد الزبون منذ'),
-                    items: const [
-                      DropdownMenuItem(value: 30, child: Text('30 يوماً')),
-                      DropdownMenuItem(value: 60, child: Text('60 يوماً')),
-                      DropdownMenuItem(value: 90, child: Text('90 يوماً')),
-                    ],
-                    onChanged: owner ? (v) => setState(() => s['overdue_days'] = v) : null,
-                  ),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<int>(
-                    value: s['employee_void_hours'] as int,
-                    decoration: const InputDecoration(labelText: 'مهلة الموظف لإلغاء حركاته'),
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text('ساعة')),
-                      DropdownMenuItem(value: 24, child: Text('24 ساعة')),
-                      DropdownMenuItem(value: 72, child: Text('3 أيام')),
-                    ],
-                    onChanged: owner ? (v) => setState(() => s['employee_void_hours'] = v) : null,
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
+                    child: const Text('في يوم المطالبة يجهّز التطبيق قائمة تحصيل مع رسالة واتساب جاهزة لكل زبون.',
+                        style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
                   ),
                 ]),
               ),
-              SectionCard(
+              AjilCard(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const Text('رسالة التذكير للزبون', style: TextStyle(fontWeight: FontWeight.w600)),
+                  const CardTitle('الديون المتأخرة والمهلة'),
+                  inlineRow(
+                    'نبّهني إذا لم يسدد الزبون منذ',
+                    compactDrop(s['overdue_days'] as int, const [(30, '30 يوماً'), (60, '60 يوماً'), (90, '90 يوماً')],
+                        owner ? (v) => setState(() => s['overdue_days'] = v) : null),
+                  ),
+                  inlineRow(
+                    'مهلة الموظف لإلغاء حركاته',
+                    compactDrop(s['employee_void_hours'] as int, const [(1, 'ساعة'), (24, '24 ساعة'), (72, '3 أيام')],
+                        owner ? (v) => setState(() => s['employee_void_hours'] = v) : null),
+                    divider: false,
+                  ),
+                ]),
+              ),
+              AjilCard(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  const CardTitle('رسالة التذكير للزبون', divider: false),
+                  TextField(controller: _tpl, enabled: owner, maxLines: 4, style: const TextStyle(fontSize: 14, height: 1.7)),
                   const SizedBox(height: 8),
-                  TextField(controller: _tpl, enabled: owner, maxLines: 4),
-                  const SizedBox(height: 6),
                   const Text('{الاسم} {البقالة} {المبلغ} {الرابط} — تُرسل من واتساب جوالك بضغطة، ولا تُرسل تلقائياً.',
                       style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
                 ]),
               ),
-              SectionCard(
+              AjilCard(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const Text('إرسال الأرصدة للزبائن', style: TextStyle(fontWeight: FontWeight.w600)),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('السماح للموظفين بإرسال الأرصدة'),
-                    subtitle: const Text('المالك يستطيع دائماً'),
+                  const CardTitle('إرسال الأرصدة للزبائن', divider: false),
+                  CheckRow(
+                    label: 'السماح للموظفين بإرسال الأرصدة',
+                    subtitle: 'المالك يستطيع دائماً',
                     value: s['employees_can_send_notices'] == true,
                     onChanged: owner ? (v) => setState(() => s['employees_can_send_notices'] = v) : null,
                   ),
+                  const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: () => context.push('/notices'),
                     icon: const Icon(Icons.campaign_outlined),
@@ -162,7 +204,11 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   ),
                 ]),
               ),
-              if (owner) Padding(padding: const EdgeInsets.all(16), child: FilledButton(onPressed: _save, child: const Text('حفظ'))),
+              if (owner)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+                  child: FilledButton(onPressed: _save, child: const Text('حفظ الإعدادات')),
+                ),
             ]),
     );
   }

@@ -112,54 +112,63 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
     final color = widget.kind.isDebit ? AjilColors.debt : AjilColors.paid;
     final displayCur = _fx ? (_paidCurrency ?? cur) : cur;
 
+    // لوحة الأرقام تظهر فقط عند إدخال المبلغ؛ إذا كان المؤشر في حقل نصي (الوصف…) تختفي ويظهر كيبورد الجوال
+    final typing = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final now = DateTime.now();
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(onPressed: () => context.pop(), icon: const Icon(Icons.close), tooltip: 'إغلاق'),
-        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(widget.kind.labelAr),
-          Text('${c.name} · ${w.branch.name}', style: const TextStyle(fontSize: 13, color: AjilColors.textMuted, fontWeight: FontWeight.w400)),
-        ]),
-      ),
+      appBar: AjilHeader(close: true, title: widget.kind.labelAr, subtitle: '${c.name} · ${w.branch.name}'),
       body: Column(children: [
         Expanded(
-          child: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), children: [
-            Center(
-              child: Text(
-                _amount.isEmpty ? '0' : f.amount(_entered!, displayCur),
-                style: TextStyle(fontSize: 44, fontWeight: FontWeight.w600, color: color),
-                textDirection: TextDirection.ltr,
+          child: ListView(padding: const EdgeInsets.fromLTRB(16, 20, 16, 12), children: [
+            GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Center(
+                child: Text(
+                  _amount.isEmpty ? '0' : f.amount(_entered!, displayCur),
+                  style: TextStyle(fontSize: 44, fontWeight: FontWeight.w600, color: color, height: 1.2),
+                  textDirection: TextDirection.ltr,
+                ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Center(
               child: _fx
-                  ? Text('المدفوع بـ ${Currency.of(displayCur).nameAr}', style: const TextStyle(color: AjilColors.textMuted))
+                  ? Text('المدفوع بـ ${Currency.of(displayCur).nameAr}', style: const TextStyle(fontSize: 13, color: AjilColors.textMuted))
                   : CurrencyToggle(currencies: w.enabledCurrencies, value: cur, onChanged: (v) => setState(() => _currency = v)),
             ),
-            if (!_fx && cur == c.defaultCurrency && w.enabledCurrencies.length > 1)
+            if (!_fx && cur == c.defaultCurrency && w.enabledCurrencies.length > 1) ...[
+              const SizedBox(height: 12),
               Center(
                 child: Text('العملة الافتراضية للزبون: ${Currency.of(c.defaultCurrency).nameAr}',
                     style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
               ),
+            ],
             if (_fx) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Row(children: [
-                const Expanded(child: Text('الدين بعملة')),
-                CurrencyToggle(currencies: w.enabledCurrencies, value: cur, onChanged: (v) => setState(() {
-                      _currency = v;
-                      _paidCurrency = w.enabledCurrencies.firstWhere((x) => x != v, orElse: () => v);
-                    })),
+                const Expanded(child: Text('الدين بعملة', style: TextStyle(fontSize: 13, color: AjilColors.textSoft))),
+                CurrencyToggle(
+                    currencies: w.enabledCurrencies,
+                    value: cur,
+                    onChanged: (v) => setState(() {
+                          _currency = v;
+                          _paidCurrency = w.enabledCurrencies.firstWhere((x) => x != v, orElse: () => v);
+                        })),
               ]),
               const SizedBox(height: 10),
-              TextField(
-                controller: _rate,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: 'سعر الصرف المتفق عليه',
-                  helperText: '1 ${Currency.of(cur).symbolAr} = كم ${Currency.of(_paidCurrency ?? '').symbolAr}',
+              LabeledField(
+                label: 'سعر الصرف المتفق عليه',
+                helper: '1 ${Currency.of(cur).symbolAr} = كم ${Currency.of(_paidCurrency ?? '').symbolAr}',
+                child: TextField(
+                  controller: _rate,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textDirection: TextDirection.ltr,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(fontSize: 15),
+                  onChanged: (_) => setState(() {}),
                 ),
-                onChanged: (_) => setState(() {}),
               ),
               if (applied != null)
                 Padding(
@@ -168,38 +177,66 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
                       style: const TextStyle(fontWeight: FontWeight.w600, color: AjilColors.paid)),
                 ),
             ],
-            const SizedBox(height: 12),
-            TextField(controller: _desc, decoration: const InputDecoration(labelText: 'الوصف (اختياري)')),
-            if (_isDebt) ...[
-              const SizedBox(height: 10),
-              TextField(
-                controller: _invoice,
-                decoration: const InputDecoration(labelText: 'رقم الفاتورة (يُولَّد تلقائياً إن تُرك فارغاً)'),
+            const SizedBox(height: 16),
+            LabeledField(
+              label: 'الوصف (اختياري)',
+              child: TextField(controller: _desc, style: const TextStyle(fontSize: 15), textInputAction: TextInputAction.done),
+            ),
+            const SizedBox(height: 10),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              if (_isDebt) ...[
+                Expanded(
+                  child: LabeledField(
+                    label: 'رقم الفاتورة',
+                    child: TextField(
+                      controller: _invoice,
+                      textDirection: TextDirection.ltr,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(fontSize: 15),
+                      decoration: const InputDecoration(hintText: 'تلقائي'),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: LabeledField(
+                  label: 'التاريخ',
+                  child: Container(
+                    height: 46,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    alignment: AlignmentDirectional.centerStart,
+                    decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
+                    child: Text('اليوم ${intl.DateFormat('h:mm a', 'ar').format(now)}', style: const TextStyle(fontSize: 15)),
+                  ),
+                ),
               ),
+            ]),
+            if (_isDebt) ...[
               const SizedBox(height: 10),
               const Text('موعد السداد (اختياري — للتنبيه)', style: TextStyle(fontSize: 13, color: AjilColors.textSoft)),
               const SizedBox(height: 6),
               Wrap(spacing: 6, runSpacing: 6, children: [
                 for (final (label, date) in [
                   ('بدون موعد', null),
-                  ('غداً', DateTime.now().add(const Duration(days: 1))),
-                  ('بعد أسبوع', DateTime.now().add(const Duration(days: 7))),
-                  ('آخر الشهر', DateTime(DateTime.now().year, DateTime.now().month + 1, 0)),
+                  ('غداً', now.add(const Duration(days: 1))),
+                  ('بعد أسبوع', now.add(const Duration(days: 7))),
+                  ('آخر الشهر', DateTime(now.year, now.month + 1, 0)),
                 ])
-                  ChoiceChip(
-                    label: Text(label),
+                  PillChip(
+                    label: label,
                     selected: (_due == null && date == null) || (_due != null && date != null && _sameDay(_due!, date)),
-                    onSelected: (_) => setState(() => _due = date),
+                    onTap: () => setState(() => _due = date),
                   ),
-                ActionChip(
-                  avatar: const Icon(Icons.event_outlined, size: 18),
-                  label: Text(_due == null ? 'تاريخ…' : intl.DateFormat('yyyy/MM/dd').format(_due!)),
-                  onPressed: () async {
+                PillChip(
+                  label: _due == null || _isPreset(_due!) ? 'تاريخ…' : intl.DateFormat('yyyy/MM/dd').format(_due!),
+                  selected: _due != null && !_isPreset(_due!),
+                  onTap: () async {
                     final d = await showDatePicker(
                         context: context,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                        initialDate: _due ?? DateTime.now().add(const Duration(days: 1)));
+                        firstDate: now,
+                        lastDate: now.add(const Duration(days: 365)),
+                        initialDate: _due ?? now.add(const Duration(days: 1)));
                     if (d != null) setState(() => _due = d);
                   },
                 ),
@@ -210,23 +247,26 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
               child: Row(children: [
-                const Expanded(child: Text('الرصيد بعد العملية', style: TextStyle(color: AjilColors.textMuted))),
-                MoneyText(after, cur, size: 15),
+                const Expanded(child: Text('الرصيد بعد العملية', style: TextStyle(fontSize: 14, color: AjilColors.textMuted))),
+                MoneyText(after, cur, size: 14),
               ]),
             ),
           ]),
         ),
         Container(
           color: AjilColors.background,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: SafeArea(
             top: false,
             child: Column(children: [
-              AmountKeypad(onKey: _onKey),
-              const SizedBox(height: 12),
+              if (!typing) ...[AmountKeypad(onKey: _onKey), const SizedBox(height: 12)],
               FilledButton(
                 onPressed: _busy ? null : () => _save(c, balances),
-                style: FilledButton.styleFrom(backgroundColor: color),
+                style: FilledButton.styleFrom(
+                  backgroundColor: color,
+                  minimumSize: const Size.fromHeight(56),
+                  textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600),
+                ),
                 child: Text('حفظ ${widget.kind.labelAr}'),
               ),
             ]),
@@ -234,6 +274,12 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
         ),
       ]),
     );
+  }
+
+  bool _isPreset(DateTime d) {
+    final now = DateTime.now();
+    return [now.add(const Duration(days: 1)), now.add(const Duration(days: 7)), DateTime(now.year, now.month + 1, 0)]
+        .any((x) => _sameDay(x, d));
   }
 
   static bool _sameDay(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;

@@ -18,7 +18,7 @@ class UnsyncedScreen extends ConsumerWidget {
     final customers = {for (final c in ref.watch(customersProvider).valueOrNull ?? const []) c.customer.id: c.customer.name};
     final f = ref.watch(moneyFormatProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('حركات غير متزامنة')),
+      appBar: const AjilHeader(title: 'حركات غير متزامنة'),
       body: Column(children: [
         ListTile(
           tileColor: Colors.white,

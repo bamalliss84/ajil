@@ -65,37 +65,49 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
-          child: Column(children: [
-            Container(
-              width: 56,
-              height: 56,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: AjilColors.primary, borderRadius: BorderRadius.circular(16)),
-              child: const Text('آ', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w600)),
+        child: LayoutBuilder(
+          builder: (context, box) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: box.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(32, 48, 32, 24),
+                  child: Column(children: [
+                    const AjilLogo(size: 56),
+                    const SizedBox(height: 24),
+                    Text('أهلاً ${w?.displayName ?? ''}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text('المستخدم ${w?.userNo ?? ''} · ${w?.branch.name ?? ''}', style: const TextStyle(fontSize: 14, color: AjilColors.textMuted)),
+                    const SizedBox(height: 24),
+                    const Text('أدخل رمز PIN', style: TextStyle(fontSize: 15, color: AjilColors.textSoft)),
+                    const SizedBox(height: 24),
+                    PinDots(length: _pin.length, max: _len),
+                    const SizedBox(height: 36),
+                    PinPad(
+                      onKey: _onKey,
+                      leading: _bio
+                          ? Material(
+                              color: AjilColors.primaryLight,
+                              shape: const CircleBorder(),
+                              child: InkWell(
+                                customBorder: const CircleBorder(),
+                                onTap: () => s.lock.unlockWithBiometric(),
+                                child: const Icon(Icons.fingerprint_rounded, size: 30, color: AjilColors.primary, semanticLabel: 'الدخول بالبصمة'),
+                              ),
+                            )
+                          : null,
+                    ),
+                    const Spacer(),
+                    const SizedBox(height: 24),
+                    LinkText('الدخول بكلمة المرور', onTap: () => s.logout()),
+                    LinkText('تبديل المستخدم', onTap: () => s.logout()),
+                    const SizedBox(height: 4),
+                    const Text('يُقفل التطبيق بعد 5 دقائق بدون استخدام', style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                  ]),
+                ),
+              ),
             ),
-            const SizedBox(height: 18),
-            Text('أهلاً ${w?.displayName ?? ''}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
-            Text('المستخدم ${w?.userNo ?? ''} · ${w?.branch.name ?? ''}', style: const TextStyle(color: AjilColors.textMuted)),
-            const SizedBox(height: 22),
-            const Text('أدخل رمز PIN'),
-            const SizedBox(height: 14),
-            PinDots(length: _pin.length, max: _len),
-            const Spacer(),
-            PinPad(
-              onKey: _onKey,
-              leading: _bio
-                  ? IconButton.filledTonal(
-                      onPressed: () => s.lock.unlockWithBiometric(),
-                      icon: const Icon(Icons.fingerprint, size: 32),
-                      tooltip: 'الدخول بالبصمة',
-                    )
-                  : null,
-            ),
-            const SizedBox(height: 16),
-            TextButton(onPressed: () => s.logout(), child: const Text('الدخول بكلمة المرور / تبديل المستخدم')),
-          ]),
+          ),
         ),
       ),
     );

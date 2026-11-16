@@ -60,68 +60,104 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
 
     final picking = widget.pickFor != null;
     return Scaffold(
-      appBar: AppBar(
-        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(picking ? 'اختر الزبون — ${widget.pickFor!.labelAr}' : 'الزبائن'),
-          Text(limit == null ? '$active زبون · ${s.session!.branch.name}' : '$active من $limit في باقتك · ${s.session!.branch.name}',
-              style: const TextStyle(fontSize: 13, color: AjilColors.textMuted, fontWeight: FontWeight.w400)),
-        ]),
-        actions: [
-          if (s.canWrite)
-            Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: IconButton.filled(
-                onPressed: () => context.push('/customers/new'),
-                icon: const Icon(Icons.add_rounded),
-                tooltip: 'إضافة زبون',
-              ),
-            ),
-        ],
-      ),
       bottomNavigationBar: picking ? null : const AjilNavBar(index: 1),
       body: Column(children: [
-        Container(
+        Material(
           color: Colors.white,
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-          child: Column(children: [
-            TextField(
-              autofocus: picking,
-              decoration: const InputDecoration(
-                hintText: 'بحث بالاسم أو رقم الجوال',
-                prefixIcon: Icon(Icons.search),
-                fillColor: AjilColors.background,
-              ),
-              onChanged: (v) => setState(() => _q = v),
-            ),
-            if (!picking) ...[
-              const SizedBox(height: 10),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(children: [
-                  for (final (f, label) in const [
-                    (_Filter.all, 'الكل'),
-                    (_Filter.debt, 'عليهم دين'),
-                    (_Filter.late, 'متأخرون'),
-                    (_Filter.archived, 'مؤرشفون'),
-                  ])
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: ChoiceChip(label: Text(label), selected: _filter == f, onSelected: (_) => setState(() => _filter = f)),
+          child: SafeArea(
+            bottom: false,
+            child: Container(
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.headerBorder))),
+              padding: EdgeInsets.fromLTRB(16, picking ? 14 : 20, 16, 12),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Row(children: [
+                  if (picking) ...[
+                    SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () => context.pop(),
+                        icon: const Icon(Icons.close_rounded, size: 26),
+                        tooltip: 'إغلاق',
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(picking ? 'اختر الزبون — ${widget.pickFor!.labelAr}' : 'الزبائن',
+                          style: TextStyle(fontSize: picking ? 18 : 22, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 2),
+                      Text(
+                        limit == null ? '$active زبون · ${s.session!.branch.name}' : '$active من $limit في باقتك · ${s.session!.branch.name}',
+                        style: const TextStyle(fontSize: 13, color: AjilColors.textMuted),
+                      ),
+                    ]),
+                  ),
+                  if (s.canWrite)
+                    SquareIconButton(
+                      icon: Icons.add_rounded,
+                      iconSize: 26,
+                      size: 48,
+                      radius: 14,
+                      tooltip: 'إضافة زبون',
+                      color: Colors.white,
+                      bg: AjilColors.primary,
+                      borderColor: null,
+                      onPressed: () => context.push('/customers/new'),
                     ),
                 ]),
-              ),
-            ],
-          ]),
+                const SizedBox(height: 12),
+                TextField(
+                  autofocus: picking,
+                  style: const TextStyle(fontSize: 15),
+                  decoration: const InputDecoration(
+                    hintText: 'بحث بالاسم أو رقم الجوال',
+                    prefixIcon: Icon(Icons.search_rounded, color: AjilColors.textSoft),
+                    fillColor: AjilColors.background,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  ),
+                  onChanged: (v) => setState(() => _q = v),
+                ),
+                if (!picking) ...[
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: [
+                      for (final (f, label) in const [
+                        (_Filter.all, 'الكل'),
+                        (_Filter.debt, 'عليهم دين'),
+                        (_Filter.late, 'متأخرون'),
+                        (_Filter.archived, 'مؤرشفون'),
+                      ])
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(end: 8),
+                          child: PillChip(
+                            label: label,
+                            selected: _filter == f,
+                            selectedColor: AjilColors.primary,
+                            height: 36,
+                            fontSize: 14,
+                            onTap: () => setState(() => _filter = f),
+                          ),
+                        ),
+                    ]),
+                  ),
+                ],
+              ]),
+            ),
+          ),
         ),
         const StatusBanner(),
         Expanded(
           child: all == null
               ? const Center(child: CircularProgressIndicator())
               : list.isEmpty
-                  ? _Empty(hasAny: all.isNotEmpty)
-                  : ListView.separated(
+                  ? _Empty(hasAny: all.isNotEmpty, onAdd: s.canWrite ? () => context.push('/customers/new') : null)
+                  : ListView.builder(
+                      padding: EdgeInsets.zero,
                       itemCount: list.length,
-                      separatorBuilder: (_, __) => const Divider(),
                       itemBuilder: (_, i) => _CustomerTile(
                         list[i],
                         onTap: () => picking
@@ -144,53 +180,90 @@ class _CustomerTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final f = ref.watch(moneyFormatProvider);
     final owed = c.balances.values.where((b) => b.balance != Decimal.zero).toList();
-    return ListTile(
-      tileColor: Colors.white,
-      minVerticalPadding: 12,
-      onTap: onTap,
-      leading: Initials(c.customer.initials),
-      title: Row(children: [
-        Flexible(child: Text(c.customer.name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w500))),
-        if (c.hasPending) ...[
-          const SizedBox(width: 6),
-          const Tooltip(
-            message: 'حركات غير متزامنة',
-            child: CircleAvatar(radius: 4, backgroundColor: AjilColors.pendingDot),
-          ),
-        ],
-        if (c.customer.status == CustomerStatus.suspended) ...[
-          const SizedBox(width: 6),
-          const Icon(Icons.block, size: 14, color: AjilColors.debt),
-        ],
-      ]),
-      subtitle: c.customer.phone == null
-          ? null
-          : Text(c.customer.phone!, textDirection: TextDirection.ltr, textAlign: TextAlign.right),
-      trailing: owed.isEmpty
-          ? const Text('لا دين', style: TextStyle(color: AjilColors.paid, fontWeight: FontWeight.w600))
-          : Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-              for (final b in owed.take(2))
-                Text(f.amount(b.balance, b.currency, withSymbol: true),
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600, color: b.balance > Decimal.zero ? AjilColors.debt : AjilColors.paid)),
+    final main = owed.isEmpty ? null : owed.first;
+    return Material(
+      color: Colors.white,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 68),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.divider))),
+          child: Row(children: [
+            Initials(c.customer.initials),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Flexible(
+                    child: Text(c.customer.name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  ),
+                  if (c.hasPending) ...[
+                    const SizedBox(width: 6),
+                    Tooltip(
+                      message: 'حركات غير متزامنة',
+                      child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: AjilColors.pendingDot, shape: BoxShape.circle)),
+                    ),
+                  ],
+                  if (c.customer.status == CustomerStatus.suspended) ...[
+                    const SizedBox(width: 6),
+                    const Icon(Icons.block, size: 14, color: AjilColors.debt),
+                  ],
+                ]),
+                if (c.customer.phone != null)
+                  Text(c.customer.phone!,
+                      textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              ]),
+            ),
+            const SizedBox(width: 12),
+            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              if (main == null) ...[
+                const Text('لا دين', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AjilColors.paid)),
+                const Text('مسدد', style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              ] else ...[
+                Text(f.amount(main.balance.abs(), main.currency),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: main.balance > Decimal.zero ? AjilColors.debt : AjilColors.paid)),
+                Text(
+                  owed.length > 1 ? '${Currency.of(main.currency).symbolAr} +${owed.length - 1}' : (main.balance < Decimal.zero ? '${Currency.of(main.currency).symbolAr} · له' : Currency.of(main.currency).symbolAr),
+                  style: const TextStyle(fontSize: 12, color: AjilColors.textMuted),
+                ),
+              ],
             ]),
+          ]),
+        ),
+      ),
     );
   }
 }
 
 class _Empty extends StatelessWidget {
-  const _Empty({required this.hasAny});
+  const _Empty({required this.hasAny, this.onAdd});
   final bool hasAny;
+  final VoidCallback? onAdd;
   @override
   Widget build(BuildContext context) => Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.people_outline, size: 56, color: AjilColors.textMuted),
-            const SizedBox(height: 12),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: const BoxDecoration(color: AjilColors.primaryLight, shape: BoxShape.circle),
+              child: const Icon(Icons.people_outline_rounded, size: 36, color: AjilColors.primaryDark),
+            ),
+            const SizedBox(height: 14),
             Text(hasAny ? 'لا نتائج' : 'أضف أول زبون', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            if (!hasAny)
+            if (!hasAny) ...[
+              const SizedBox(height: 4),
               const Text('سجّل زبائن دفترك مع رصيدهم السابق', style: TextStyle(color: AjilColors.textMuted)),
+              if (onAdd != null) ...[
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: 200,
+                  child: FilledButton.icon(onPressed: onAdd, icon: const Icon(Icons.add_rounded), label: const Text('إضافة زبون')),
+                ),
+              ],
+            ],
           ]),
         ),
       );

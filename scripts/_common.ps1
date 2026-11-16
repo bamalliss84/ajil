@@ -2,6 +2,7 @@
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $PSScriptRoot
 $DbContainer = 'supabase_db_ajil'
+$FirewallRuleName = 'Ajil Supabase 54321'
 
 function Get-Adb {
   $sdk = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } elseif ($env:ANDROID_SDK_ROOT) { $env:ANDROID_SDK_ROOT } else { Join-Path $env:LOCALAPPDATA 'Android\Sdk' }

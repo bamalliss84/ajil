@@ -3,6 +3,7 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' as intl;
 
 import '../../core/theme.dart';
 import '../../data/repository.dart';
@@ -59,6 +60,8 @@ class DashboardScreen extends ConsumerWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final cur = w.defaultCurrency;
+    final sym = Currency.of(cur).symbolAr;
+    final f = ref.watch(moneyFormatProvider);
 
     // الإجماليات
     final totals = <String, Decimal>{};
@@ -76,17 +79,19 @@ class DashboardScreen extends ConsumerWidget {
     Decimal sumWhere(bool Function(LedgerTx) f) =>
         txs.where((t) => t.sync != SyncState.failed && t.currency == cur && f(t)).fold(Decimal.zero, (a, t) => a + t.amount);
     bool isToday(LedgerTx t) => !t.createdAt.isBefore(today);
-    final collectedToday = sumWhere((t) => isToday(t) && (t.kind == TxKind.payment || t.kind == TxKind.paymentFx));
+    bool isPay(LedgerTx t) => t.kind == TxKind.payment || t.kind == TxKind.paymentFx;
+    final collectedToday = sumWhere((t) => isToday(t) && isPay(t));
     final debtToday = sumWhere((t) => isToday(t) && t.kind == TxKind.debt);
     final countToday = txs.where((t) => isToday(t) && t.kind == TxKind.payment).length;
     final countDebtToday = txs.where((t) => isToday(t) && t.kind == TxKind.debt).length;
+    final monthStart = DateTime(now.year, now.month);
+    final collectedMonth = sumWhere((t) => isPay(t) && !t.createdAt.isBefore(monthStart));
 
     // التحصيل آخر 7 أيام
     final week = List.generate(7, (i) {
       final d = today.subtract(Duration(days: 6 - i));
       final next = d.add(const Duration(days: 1));
-      return sumWhere((t) =>
-          (t.kind == TxKind.payment || t.kind == TxKind.paymentFx) && !t.createdAt.isBefore(d) && t.createdAt.isBefore(next));
+      return sumWhere((t) => isPay(t) && !t.createdAt.isBefore(d) && t.createdAt.isBefore(next));
     });
 
     // أعمار الديون
@@ -96,22 +101,41 @@ class DashboardScreen extends ConsumerWidget {
     }
     var aging = AgingBuckets.zero;
     var over60 = 0;
+    var over60Amount = Decimal.zero;
     for (final list in byCustomer.values) {
       final a = AgingBuckets.of(list, cur, now);
       aging = aging + a;
-      if (a.d60to90 + a.over90 > Decimal.zero) over60++;
+      if (a.d60to90 + a.over90 > Decimal.zero) {
+        over60++;
+        over60Amount += a.d60to90 + a.over90;
+      }
     }
 
     final due = computeDue(customers, promises, txs, now);
-    final weekPromises = promises.where((p) => p.status == PromiseStatus.open && p.promisedDate.isBefore(today.add(const Duration(days: 7)))).length;
-    final f = ref.watch(moneyFormatProvider);
+    final dueTotal = due.where((d) => d.currency == cur).fold(Decimal.zero, (a, d) => a + d.amount);
+    final weekEnd = today.add(const Duration(days: 7));
+    final openWeek = promises.where((p) => p.status == PromiseStatus.open && p.promisedDate.isBefore(weekEnd)).toList();
+    final weekPromisesAmount = openWeek.where((p) => (p.currency ?? cur) == cur && p.amount != null).fold(Decimal.zero, (a, p) => a + p.amount!);
+
+    // يوم المطالبة الشهري
+    final claimOn = s.settings?['monthly_claim_enabled'] != false;
+    final claimDay = (s.settings?['monthly_claim_day'] as int?) ?? 1;
+    var claimDate = DateTime(now.year, now.month, claimDay);
+    if (claimDate.isBefore(today)) claimDate = DateTime(now.year, now.month + 1, claimDay);
+    final claimIn = claimDate.difference(today).inDays;
+    final canNotices = debtors > 0 && (w.isOwner || s.settings?['employees_can_send_notices'] == true);
+
+    String thousands(Decimal v) {
+      final k = (v / Decimal.fromInt(1000)).toDecimal(scaleOnInfinitePrecision: 0);
+      return '${f.amount(Decimal.parse(k.toStringAsFixed(0)), cur)} ألف';
+    }
 
     return Scaffold(
       bottomNavigationBar: const AjilNavBar(index: 0),
       body: RefreshIndicator(
         onRefresh: () async => s.sync?.syncNow(verify: true),
         child: ListView(padding: EdgeInsets.zero, children: [
-          _Header(totals: totals, debtors: debtors),
+          _Header(totals: totals, debtors: debtors, collectedMonth: f.amount(collectedMonth, cur, withSymbol: true), badge: due.length),
           const StatusBanner(),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
@@ -120,7 +144,10 @@ class DashboardScreen extends ConsumerWidget {
               onPay: () => context.push('/pick/payment'),
             ),
           ),
-          SectionCard(
+
+          // مطلوب تحصيله اليوم
+          AjilCard(
+            margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             padding: EdgeInsets.zero,
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Padding(
@@ -129,60 +156,75 @@ class DashboardScreen extends ConsumerWidget {
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       const Text('مطلوب تحصيله اليوم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                      Text(due.isEmpty ? 'لا يوجد شيء اليوم' : '${due.length} زبائن',
-                          style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                      Text(
+                        due.isEmpty ? 'لا توجد وعود أو مواعيد مستحقة اليوم' : '${due.length} زبائن · ${f.amount(dueTotal, cur)} $sym',
+                        style: const TextStyle(fontSize: 13, color: AjilColors.textMuted),
+                      ),
                     ]),
                   ),
+                  LinkText('الكل', onTap: () => context.go('/customers'), size: 14),
                 ]),
               ),
-              for (final d in due.take(6)) _DueTile(d),
+              if (customers.isEmpty)
+                _EmptyStart(onAdd: () => context.push('/customers/new'))
+              else
+                for (final d in due.take(6)) _DueTile(d),
             ]),
           ),
-          if (debtors > 0 && (w.isOwner || s.settings?['employees_can_send_notices'] == true))
-            SectionCard(
-              padding: EdgeInsets.zero,
-              child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: AjilColors.primaryLight,
-                  child: Icon(Icons.campaign_outlined, color: AjilColors.primaryDark),
-                ),
-                title: const Text('إرسال الأرصدة للزبائن', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: const Text('رصيد كل زبون حتى تاريخ تختاره — عبر واتساب'),
-                trailing: const Icon(Icons.chevron_left_rounded),
-                onTap: () => context.push('/notices'),
-              ),
-            ),
+
+          // المؤشرات
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-            child: GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.9,
-              children: [
-                _Kpi('تحصيل اليوم', f.amount(collectedToday, cur), '${Currency.of(cur).symbolAr} · $countToday عمليات', AjilColors.paid),
-                _Kpi('ديون اليوم', f.amount(debtToday, cur), '${Currency.of(cur).symbolAr} · $countDebtToday عملية', AjilColors.debt),
-                _Kpi('وعود هذا الأسبوع', '$weekPromises', 'وعد مفتوح', AjilColors.text),
-                _Kpi('متأخرة +60 يوماً', '$over60', 'زبوناً', AjilColors.debt),
-              ],
-            ),
-          ),
-          SectionCard(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            child: Column(children: [
               Row(children: [
-                const Expanded(child: Text('التحصيل آخر 7 أيام', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-                Text(Currency.of(cur).symbolAr, style: const TextStyle(color: AjilColors.textMuted, fontSize: 13)),
+                Expanded(child: _Kpi('تحصيل اليوم', f.amount(collectedToday, cur), '$sym · $countToday عمليات', AjilColors.paid)),
+                const SizedBox(width: 12),
+                Expanded(child: _Kpi('ديون اليوم', f.amount(debtToday, cur), '$sym · $countDebtToday عملية', AjilColors.debt)),
               ]),
               const SizedBox(height: 12),
-              _WeekBars(values: week, format: (v) => f.amount(v, cur)),
+              Row(children: [
+                Expanded(child: _Kpi('وعود هذا الأسبوع', '${openWeek.length}', '${f.amount(weekPromisesAmount, cur)} $sym', AjilColors.text)),
+                const SizedBox(width: 12),
+                Expanded(child: _Kpi('ديون متأخرة +60 يوماً', '$over60', 'زبوناً · ${thousands(over60Amount)} $sym', AjilColors.debt)),
+              ]),
             ]),
           ),
-          SectionCard(
-            margin: const EdgeInsets.fromLTRB(16, 14, 16, 24),
-            child: _AgingBar(aging: aging, format: (v) => f.amount(v, cur, withSymbol: true)),
+
+          // التحصيل آخر 7 أيام
+          AjilCard(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                const Expanded(child: Text('التحصيل آخر 7 أيام', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
+                Text('ألف $sym', style: const TextStyle(color: AjilColors.textMuted, fontSize: 13)),
+              ]),
+              const SizedBox(height: 12),
+              _WeekBars(values: week),
+            ]),
           ),
+
+          // أعمار الديون
+          AjilCard(child: _AgingBar(aging: aging, format: thousands)),
+
+          if (canNotices)
+            InfoStrip(
+              margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              icon: Icons.campaign_outlined,
+              bg: AjilColors.primaryLight,
+              fg: AjilColors.primaryDark,
+              text: 'إرسال الأرصدة للزبائن عبر واتساب',
+              action: ('فتح', () => context.push('/notices')),
+            ),
+
+          if (claimOn)
+            InfoStrip(
+              margin: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              icon: Icons.calendar_month_outlined,
+              text: 'يوم المطالبة الشهري: ${intl.DateFormat('d MMMM', 'ar').format(claimDate)}'
+                  '${claimIn == 0 ? ' (اليوم)' : ' (بعد $claimIn ${claimIn == 1 ? 'يوم' : 'يوماً'})'}',
+              action: ('ضبط', () => context.push('/settings/reminders')),
+            )
+          else
+            const SizedBox(height: 16),
         ]),
       ),
     );
@@ -190,42 +232,93 @@ class DashboardScreen extends ConsumerWidget {
 }
 
 class _Header extends ConsumerWidget {
-  const _Header({required this.totals, required this.debtors});
+  const _Header({required this.totals, required this.debtors, required this.collectedMonth, required this.badge});
   final Map<String, Decimal> totals;
   final int debtors;
+  final String collectedMonth;
+  final int badge;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final w = ref.watch(sessionProvider).session!;
     final f = ref.watch(moneyFormatProvider);
+    final entries = totals.entries.toList()..sort((a, b) => a.key == w.defaultCurrency ? -1 : (b.key == w.defaultCurrency ? 1 : 0));
+    if (entries.isEmpty) entries.add(MapEntry(w.defaultCurrency, Decimal.zero));
     return Container(
       color: AjilColors.primary,
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 16, 20, 22),
+      padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 20, 20, 22),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(w.storeName, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
               const BranchChip(light: true),
             ]),
           ),
-          IconButton(
-            onPressed: () => context.push('/settings/reminders'),
-            icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+          SquareIconButton(
+            icon: Icons.notifications_none_rounded,
+            iconSize: 22,
             tooltip: 'التنبيهات',
+            color: Colors.white,
+            bg: AjilColors.primaryMid,
+            borderColor: null,
+            badge: badge,
+            onPressed: () => context.push('/settings/reminders'),
           ),
         ]),
         const SizedBox(height: 14),
-        const Text('إجمالي الديون عند الزبائن', style: TextStyle(color: Color(0xFFCFEDE3), fontSize: 14)),
-        Wrap(spacing: 18, crossAxisAlignment: WrapCrossAlignment.end, children: [
-          if (totals.isEmpty) const Text('0', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w600)),
-          for (final e in totals.entries)
-            Text(f.amount(e.value, e.key, withSymbol: true),
-                style: TextStyle(color: Colors.white, fontSize: e.key == w.defaultCurrency ? 30 : 22, fontWeight: FontWeight.w600)),
+        const Text('إجمالي الديون عند الزبائن', style: TextStyle(color: AjilColors.onPrimaryMuted, fontSize: 14)),
+        const SizedBox(height: 4),
+        Wrap(spacing: 20, crossAxisAlignment: WrapCrossAlignment.end, children: [
+          for (final (i, e) in entries.indexed)
+            Text.rich(
+              TextSpan(children: [
+                TextSpan(text: f.amount(e.value, e.key), style: TextStyle(fontSize: i == 0 ? 30 : 22, fontWeight: FontWeight.w600)),
+                TextSpan(text: ' ${Currency.of(e.key).symbolAr}', style: TextStyle(fontSize: i == 0 ? 16 : 14, fontWeight: FontWeight.w500)),
+              ]),
+              style: const TextStyle(color: Colors.white, height: 1.3),
+            ),
         ]),
-        Text('عند $debtors زبوناً', style: const TextStyle(color: Color(0xFFCFEDE3), fontSize: 13)),
+        const SizedBox(height: 4),
+        Text('عند $debtors زبوناً · تحصيل الشهر $collectedMonth', style: const TextStyle(color: AjilColors.onPrimaryMuted, fontSize: 13)),
       ]),
     );
   }
+}
+
+/// متجر جديد بلا زبائن: دعوة لإضافة أول زبون بدل مساحة فارغة
+class _EmptyStart extends StatelessWidget {
+  const _EmptyStart({required this.onAdd});
+  final VoidCallback onAdd;
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+        padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
+        child: Row(children: [
+          const CircleAvatar(
+            radius: 21,
+            backgroundColor: AjilColors.primaryLight,
+            child: Icon(Icons.person_add_alt_1_outlined, color: AjilColors.primaryDark, size: 22),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('ابدأ بإضافة أول زبون', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+              Text('مع رصيده الافتتاحي من الدفتر الورقي', style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+            ]),
+          ),
+          SquareIconButton(
+            icon: Icons.add_rounded,
+            tooltip: 'إضافة زبون',
+            color: Colors.white,
+            bg: AjilColors.primary,
+            borderColor: null,
+            size: 40,
+            radius: 10,
+            onPressed: onAdd,
+          ),
+        ]),
+      );
 }
 
 class _DueTile extends ConsumerWidget {
@@ -234,7 +327,7 @@ class _DueTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final (tag, bg, fg) = switch (d.reason) {
-      'promise_overdue' => ('وعد متأخر ${d.daysLate} أيام', AjilColors.debtBg, const Color(0xFF8E2519)),
+      'promise_overdue' => ('وعد متأخر ${d.daysLate} أيام', AjilColors.debtBg, AjilColors.debtTag),
       'promise_today' => ('وعد بالسداد اليوم', AjilColors.pendingBg, AjilColors.pendingText),
       _ => ('موعد سداد فاتورة', AjilColors.infoBg, AjilColors.infoText),
     };
@@ -247,7 +340,7 @@ class _DueTile extends ConsumerWidget {
         child: Row(children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(c.name, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+              Text(c.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
               const SizedBox(height: 3),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -257,17 +350,27 @@ class _DueTile extends ConsumerWidget {
             ]),
           ),
           MoneyText(d.amount, d.currency, symbol: false, size: 15),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           if (c.phone != null) ...[
-            IconButton.outlined(
-              onPressed: () => Whatsapp.call(c.phone!),
-              icon: const Icon(Icons.call_outlined, size: 18),
+            SquareIconButton(
+              icon: Icons.call_outlined,
+              iconSize: 18,
+              size: 40,
+              radius: 10,
               tooltip: 'اتصال',
+              onPressed: () => Whatsapp.call(c.phone!),
             ),
-            IconButton.filledTonal(
-              onPressed: () => Whatsapp.remind(ref, d.customer),
-              icon: const Icon(Icons.chat_outlined, size: 18),
+            const SizedBox(width: 10),
+            SquareIconButton(
+              icon: Icons.chat_bubble_outline_rounded,
+              iconSize: 18,
+              size: 40,
+              radius: 10,
               tooltip: 'تذكير عبر واتساب',
+              color: AjilColors.paidDark,
+              bg: AjilColors.paidBg,
+              borderColor: AjilColors.paidBorder,
+              onPressed: () => Whatsapp.remind(ref, d.customer),
             ),
           ],
         ]),
@@ -284,48 +387,53 @@ class _Kpi extends StatelessWidget {
   final Color color;
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(label, style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
-          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: color)),
-          Text(sub, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+          const SizedBox(height: 2),
+          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: color, height: 1.3)),
+          const SizedBox(height: 2),
+          Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
         ]),
       );
 }
 
 class _WeekBars extends StatelessWidget {
-  const _WeekBars({required this.values, required this.format});
+  const _WeekBars({required this.values});
   final List<Decimal> values;
-  final String Function(Decimal) format;
   static const _days = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
   @override
   Widget build(BuildContext context) {
     final max = values.fold(Decimal.zero, (a, b) => b > a ? b : a);
     final today = DateTime.now();
+    String k(Decimal v) {
+      final t = v.toDouble() / 1000;
+      return t >= 10 || t == t.roundToDouble() ? t.round().toString() : t.toStringAsFixed(1);
+    }
+
     return SizedBox(
-      height: 130,
+      height: 120,
       child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        for (var i = 0; i < 7; i++)
+        for (var i = 0; i < 7; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                FittedBox(child: Text(values[i] == Decimal.zero ? '' : format(values[i]), style: const TextStyle(fontSize: 10))),
-                const SizedBox(height: 3),
-                Container(
-                  height: max == Decimal.zero ? 2 : 2 + 80 * (values[i] / max).toDouble(),
-                  decoration: BoxDecoration(
-                    color: i == 6 ? AjilColors.primary : const Color(0xFF9FD3BF),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-                  ),
+            child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+              Text(values[i] == Decimal.zero ? '0' : k(values[i]), style: const TextStyle(fontSize: 11, color: AjilColors.textSoft)),
+              const SizedBox(height: 4),
+              Container(
+                height: max == Decimal.zero ? 4 : 4 + 76 * (values[i].toDouble() / max.toDouble()),
+                decoration: BoxDecoration(
+                  color: i == 6 ? AjilColors.primary : AjilColors.chartLight,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(6), bottom: Radius.circular(2)),
                 ),
-                const SizedBox(height: 4),
-                Text(i == 6 ? 'اليوم' : _days[today.subtract(Duration(days: 6 - i)).weekday % 7],
-                    style: const TextStyle(fontSize: 11, color: AjilColors.textMuted)),
-              ]),
-            ),
+              ),
+              const SizedBox(height: 4),
+              Text(i == 6 ? 'اليوم' : _days[today.subtract(Duration(days: 6 - i)).weekday % 7],
+                  maxLines: 1, style: const TextStyle(fontSize: 11, color: AjilColors.textMuted)),
+            ]),
           ),
+        ],
       ]),
     );
   }
@@ -338,9 +446,9 @@ class _AgingBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parts = [
-      ('أقل من 30 يوماً', aging.under30, const Color(0xFF9FD3BF)),
-      ('30–60 يوماً', aging.d30to60, const Color(0xFFF2C46B)),
-      ('60–90 يوماً', aging.d60to90, const Color(0xFFE58A55)),
+      ('أقل من 30 يوماً', aging.under30, AjilColors.chartLight),
+      ('30–60 يوماً', aging.d30to60, AjilColors.aging30),
+      ('60–90 يوماً', aging.d60to90, AjilColors.aging60),
       ('أكثر من 90 يوماً', aging.over90, AjilColors.debt),
     ];
     final total = aging.total;
@@ -354,20 +462,31 @@ class _AgingBar extends StatelessWidget {
           child: Row(children: [
             if (total == Decimal.zero) Expanded(child: Container(color: AjilColors.divider)),
             for (final p in parts)
-              if (p.$2 > Decimal.zero)
-                Expanded(flex: (1000 * (p.$2 / total).toDouble()).round().clamp(1, 1000), child: Container(color: p.$3)),
+              if (p.$2 > Decimal.zero) ...[
+                Expanded(flex: (1000 * (p.$2.toDouble() / total.toDouble())).round().clamp(1, 1000), child: Container(color: p.$3)),
+                const SizedBox(width: 2),
+              ],
           ]),
         ),
       ),
       const SizedBox(height: 10),
-      Wrap(spacing: 14, runSpacing: 6, children: [
-        for (final p in parts)
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            Container(width: 10, height: 10, decoration: BoxDecoration(color: p.$3, borderRadius: BorderRadius.circular(3))),
-            const SizedBox(width: 6),
-            Text('${p.$1} · ${format(p.$2)}', style: const TextStyle(fontSize: 13)),
-          ]),
-      ]),
+      GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 6,
+        crossAxisSpacing: 12,
+        childAspectRatio: 7,
+        children: [
+          for (final p in parts)
+            Row(children: [
+              Container(width: 10, height: 10, decoration: BoxDecoration(color: p.$3, borderRadius: BorderRadius.circular(3))),
+              const SizedBox(width: 6),
+              Expanded(child: Text('${p.$1} · ${format(p.$2)}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13))),
+            ]),
+        ],
+      ),
     ]);
   }
 }

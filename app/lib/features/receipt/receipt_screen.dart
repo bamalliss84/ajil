@@ -101,18 +101,18 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
     final customerPhone = d?.customerPhone;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F4F3),
-      appBar: AppBar(
-        backgroundColor: AjilColors.primary,
-        foregroundColor: Colors.white,
-        title: Text(d?.title ?? 'الإشعار'),
+      appBar: AjilHeader(
+        close: true,
+        title: d?.title ?? 'الإشعار',
+        subtitle: d?.pending == true ? 'بانتظار المزامنة' : null,
         actions: [
           if (d != null)
             Builder(
-              builder: (ctx) => IconButton(
-                onPressed: _busy ? null : () => _sharePdf(d, _origin(ctx)),
-                icon: const Icon(Icons.share_rounded),
+              builder: (ctx) => SquareIconButton(
+                icon: Icons.share_rounded,
                 tooltip: 'مشاركة',
+                color: AjilColors.primary,
+                onPressed: _busy ? null : () => _sharePdf(d, _origin(ctx)),
               ),
             ),
         ],
@@ -133,17 +133,21 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                           Text('بانتظار المزامنة — يمكنك المشاركة الآن', style: TextStyle(color: AjilColors.pendingText, fontSize: 13)),
                         ]),
                       ),
-                    Material(
-                      elevation: 1.5,
-                      shadowColor: Colors.black26,
+                    Container(
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AjilColors.border),
+                      ),
                       child: RepaintBoundary(key: _captureKey, child: ReceiptCard(d)),
                     ),
                   ]),
                 ),
               ),
               Container(
-                color: Colors.white,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: AjilColors.headerBorder))),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 child: SafeArea(
                   top: false,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [

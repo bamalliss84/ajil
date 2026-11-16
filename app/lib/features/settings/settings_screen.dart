@@ -23,57 +23,101 @@ class SettingsScreen extends ConsumerWidget {
     final f = ref.watch(moneyFormatProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(w.storeName), const BranchChip()])),
+      appBar: AjilHeader(
+        title: 'الإعدادات',
+        titleSize: 22,
+        showLeading: false,
+        subtitle: '${w.storeName} · ${w.branch.name} · ${w.displayName}${w.isOwner ? ' (المالك)' : ''}',
+      ),
       bottomNavigationBar: const AjilNavBar(index: 3),
-      body: ListView(children: [
+      body: ListView(padding: const EdgeInsets.only(bottom: 24), children: [
         SectionCard(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Text('الباقة: $plan', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-            if (exp != null)
-              Text('تنتهي: ${intl.DateFormat('d MMMM y', 'ar').format(exp)}',
-                  style: TextStyle(color: s.subscriptionExpired ? AjilColors.debt : AjilColors.textMuted)),
-            if (w.isOwner) ...[
-              const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: () => _redeem(context, ref),
-                icon: const Icon(Icons.qr_code_2_outlined),
-                label: const Text('تفعيل بكود اشتراك'),
-              ),
-            ],
+          child: Row(children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(color: AjilColors.primaryLight, borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.workspace_premium_outlined, color: AjilColors.primaryDark),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('الباقة: $plan', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                if (exp != null)
+                  Text('تنتهي: ${intl.DateFormat('d MMMM y', 'ar').format(exp)}',
+                      style: TextStyle(fontSize: 13, color: s.subscriptionExpired ? AjilColors.debt : AjilColors.textMuted)),
+              ]),
+            ),
+            if (w.isOwner)
+              LinkText('تفعيل بكود', onTap: () => _redeem(context, ref), size: 14, weight: FontWeight.w500),
           ]),
         ),
-        const SizedBox(height: 8),
-        if (w.isOwner) ...[
-          _tile(Icons.notifications_active_outlined, 'التنبيهات والتحصيل', () => context.push('/settings/reminders')),
-          _tile(Icons.people_alt_outlined, 'الموظفون', () => context.push('/settings/employees')),
-          _tile(Icons.phonelink_setup_outlined, 'الأجهزة', () => context.push('/settings/devices')),
-          _tile(Icons.store_outlined, 'الفروع والعملات', () => _storeSheet(context, ref)),
-        ],
-        _tile(Icons.sync_outlined, 'حركات غير متزامنة', () => context.push('/unsynced'), trailing: s.pending > 0 ? '${s.pending}' : null),
-        SwitchListTile(
-          tileColor: Colors.white,
-          secondary: const Icon(Icons.translate_outlined),
-          title: const Text('الأرقام الهندية (١٢٣)'),
-          value: f.arabicIndicDigits,
-          onChanged: (v) => ref.read(moneyFormatProvider.notifier).state = MoneyFormat(arabicIndicDigits: v),
-        ),
-        _tile(Icons.password_outlined, 'تغيير كلمة المرور', () => _changePassword(context, ref)),
-        if (AppConfig.supportWhatsapp.isNotEmpty)
-          _tile(Icons.support_agent_outlined, 'الدعم الفني (واتساب)',
-              () => launchUrl(Uri.parse('https://wa.me/${AppConfig.supportWhatsapp}'), mode: LaunchMode.externalApplication)),
-        const SizedBox(height: 8),
-        _tile(Icons.logout, 'خروج (لتبديل الفرع أو المستخدم)', () => s.logout(), color: AjilColors.debt),
-        const SizedBox(height: 24),
+        if (w.isOwner)
+          _group([
+            _tile(Icons.notifications_active_outlined, 'التنبيهات والتحصيل', () => context.push('/settings/reminders')),
+            _tile(Icons.people_alt_outlined, 'الموظفون', () => context.push('/settings/employees')),
+            _tile(Icons.phonelink_setup_outlined, 'الأجهزة', () => context.push('/settings/devices')),
+            _tile(Icons.store_outlined, 'الفروع والعملات', () => _storeSheet(context, ref)),
+          ]),
+        _group([
+          _tile(Icons.sync_outlined, 'حركات غير متزامنة', () => context.push('/unsynced'), trailing: s.pending > 0 ? '${s.pending}' : null),
+          _row(
+            Icons.translate_outlined,
+            'الأرقام الهندية (١٢٣)',
+            null,
+            trailingWidget: Switch(
+              value: f.arabicIndicDigits,
+              onChanged: (v) => ref.read(moneyFormatProvider.notifier).state = MoneyFormat(arabicIndicDigits: v),
+            ),
+          ),
+          _tile(Icons.password_outlined, 'تغيير كلمة المرور', () => _changePassword(context, ref)),
+          if (AppConfig.supportWhatsapp.isNotEmpty)
+            _tile(Icons.support_agent_outlined, 'الدعم الفني (واتساب)',
+                () => launchUrl(Uri.parse('https://wa.me/${AppConfig.supportWhatsapp}'), mode: LaunchMode.externalApplication)),
+        ]),
+        _group([_tile(Icons.logout, 'خروج (لتبديل الفرع أو المستخدم)', () => s.logout(), color: AjilColors.debt)]),
       ]),
     );
   }
 
-  Widget _tile(IconData icon, String title, VoidCallback onTap, {String? trailing, Color? color}) => ListTile(
-        tileColor: Colors.white,
-        leading: Icon(icon, color: color),
-        title: Text(title, style: TextStyle(color: color)),
-        trailing: trailing == null ? const Icon(Icons.chevron_left) : Badge(label: Text(trailing)),
+  Widget _group(List<Widget> rows) => SectionCard(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        child: Column(children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            rows[i],
+            if (i < rows.length - 1) const Divider(height: 1, color: AjilColors.divider),
+          ],
+        ]),
+      );
+
+  Widget _tile(IconData icon, String title, VoidCallback onTap, {String? trailing, Color? color}) => _row(
+        icon,
+        title,
+        onTap,
+        color: color,
+        trailingWidget: trailing != null
+            ? Container(
+                constraints: const BoxConstraints(minWidth: 22),
+                height: 22,
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: AjilColors.pendingDot, borderRadius: BorderRadius.circular(11)),
+                child: Text(trailing, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AjilColors.badgeText)),
+              )
+            : (color == null ? const Icon(Icons.chevron_left_rounded, color: AjilColors.textMuted) : null),
+      );
+
+  Widget _row(IconData icon, String title, VoidCallback? onTap, {Widget? trailingWidget, Color? color}) => InkWell(
         onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Row(children: [
+            Icon(icon, size: 22, color: color ?? AjilColors.textSoft),
+            const SizedBox(width: 12),
+            Expanded(child: Text(title, style: TextStyle(fontSize: 15, color: color ?? AjilColors.text))),
+            if (trailingWidget != null) trailingWidget,
+          ]),
+        ),
       );
 
   Future<void> _redeem(BuildContext context, WidgetRef ref) async {

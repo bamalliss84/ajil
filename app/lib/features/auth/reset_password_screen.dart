@@ -36,7 +36,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     final api = ref.read(sessionProvider).api;
     return Scaffold(
-      appBar: AppBar(title: const Text('استعادة كلمة المرور')),
+      appBar: const AjilHeader(title: 'استعادة كلمة المرور'),
       body: ListView(padding: const EdgeInsets.all(20), children: [
         const Text('للمالك فقط. إذا كنت موظفاً اطلب من المالك إعادة تعيين كلمة مرورك.',
             style: TextStyle(color: AjilColors.textMuted)),

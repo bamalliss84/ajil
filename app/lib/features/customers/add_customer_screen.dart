@@ -108,82 +108,145 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
     final w = sessionOf(ref);
     final editing = widget.editId != null;
     return Scaffold(
-      appBar: AppBar(title: Text(editing ? 'تعديل بيانات الزبون' : 'زبون جديد')),
-      body: ListView(padding: const EdgeInsets.all(16), children: [
-        TextField(controller: _name, autofocus: !editing, decoration: const InputDecoration(labelText: 'الاسم *')),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _phone,
-          keyboardType: TextInputType.phone,
-          textDirection: TextDirection.ltr,
-          decoration: const InputDecoration(labelText: 'رقم الجوال (للتذكير عبر واتساب)'),
-        ),
-        const SizedBox(height: 12),
-        TextField(controller: _address, decoration: const InputDecoration(labelText: 'العنوان')),
-        const SizedBox(height: 12),
-        TextField(controller: _notes, maxLines: 2, decoration: const InputDecoration(labelText: 'ملاحظات')),
-        const SizedBox(height: 16),
-        Row(children: [
-          const Text('العملة الافتراضية'),
-          const Spacer(),
-          CurrencyToggle(currencies: w.enabledCurrencies, value: _currency, onChanged: (v) => setState(() => _currency = v)),
-        ]),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _limit,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(labelText: 'سقف الدين (اختياري)', suffixText: Currency.of(_currency).symbolAr),
-        ),
-        if (!editing) ...[
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: AjilColors.infoBg, borderRadius: BorderRadius.circular(14)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('رصيد سابق من الدفتر (اختياري)',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: AjilColors.infoText)),
-              const Text('ما كان على الزبون قبل استخدام التطبيق — يظهر أول سطر في الكشف',
-                  style: TextStyle(fontSize: 13, color: AjilColors.infoText)),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _opening,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'المبلغ', suffixText: Currency.of(_currency).symbolAr),
+      backgroundColor: Colors.white,
+      appBar: AjilHeader(close: true, title: editing ? 'تعديل بيانات الزبون' : 'زبون جديد'),
+      body: Column(children: [
+        Expanded(
+          child: ListView(padding: const EdgeInsets.fromLTRB(16, 18, 16, 18), children: [
+            LabeledField(
+              label: 'الاسم *',
+              child: TextField(controller: _name, autofocus: !editing, style: const TextStyle(fontSize: 16)),
+            ),
+            const SizedBox(height: 14),
+            LabeledField(
+              label: 'رقم الجوال',
+              helper: 'للتذكير عبر واتساب',
+              child: TextField(
+                controller: _phone,
+                keyboardType: TextInputType.phone,
+                textDirection: TextDirection.ltr,
+                textAlign: TextAlign.right,
+                style: const TextStyle(fontSize: 16),
               ),
-              const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  final d = await showDatePicker(
-                      context: context, firstDate: DateTime(2015), lastDate: DateTime.now(), initialDate: _openingDate);
-                  if (d != null) setState(() => _openingDate = d);
-                },
-                icon: const Icon(Icons.event_outlined),
-                label: Text('التاريخ: ${intl.DateFormat('yyyy/MM/dd').format(_openingDate)}'),
+            ),
+            const SizedBox(height: 14),
+            LabeledField(label: 'العنوان', child: TextField(controller: _address, style: const TextStyle(fontSize: 15))),
+            const SizedBox(height: 14),
+            LabeledField(label: 'ملاحظات', child: TextField(controller: _notes, maxLines: 2, style: const TextStyle(fontSize: 15))),
+            if (w.enabledCurrencies.length > 1) ...[
+              const SizedBox(height: 14),
+              LabeledField(
+                label: 'العملة الافتراضية',
+                child: AjilSegmented<String>(
+                  options: [for (final c in w.enabledCurrencies) (c, Currency.of(c).nameAr)],
+                  value: _currency,
+                  onChanged: (v) => setState(() => _currency = v),
+                ),
               ),
-              const SizedBox(height: 10),
-              TextField(controller: _openingNote, decoration: const InputDecoration(labelText: 'ملاحظة (مثل: صفحة 12 في الدفتر)')),
-            ]),
-          ),
-        ],
-        if (editing && w.isOwner) ...[
-          const SizedBox(height: 16),
-          SegmentedButton<CustomerStatus>(
-            segments: const [
-              ButtonSegment(value: CustomerStatus.active, label: Text('نشط')),
-              ButtonSegment(value: CustomerStatus.suspended, label: Text('موقوف')),
-              ButtonSegment(value: CustomerStatus.archived, label: Text('مؤرشف')),
             ],
-            selected: {_status},
-            onSelectionChanged: (s) => setState(() => _status = s.first),
+            const SizedBox(height: 14),
+            LabeledField(
+              label: 'سقف الدين (اختياري)',
+              child: Row(children: [
+                Expanded(
+                  child: TextField(
+                    controller: _limit,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                UnitBox(Currency.of(_currency).symbolAr),
+              ]),
+            ),
+            if (!editing) ...[
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: AjilColors.infoBg, borderRadius: BorderRadius.circular(14)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  const Text('رصيد سابق من الدفتر (اختياري)',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AjilColors.infoText)),
+                  const SizedBox(height: 2),
+                  const Text('ما كان على الزبون قبل استخدام التطبيق — يظهر أول سطر في الكشف',
+                      style: TextStyle(fontSize: 13, color: AjilColors.infoText)),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _opening,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        style: const TextStyle(fontSize: 16),
+                        decoration: const InputDecoration(hintText: 'المبلغ', fillColor: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Material(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AjilColors.border)),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () async {
+                          final d = await showDatePicker(
+                              context: context, firstDate: DateTime(2015), lastDate: DateTime.now(), initialDate: _openingDate);
+                          if (d != null) setState(() => _openingDate = d);
+                        },
+                        child: Container(
+                          height: 46,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          alignment: Alignment.center,
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            const Icon(Icons.event_outlined, size: 18, color: AjilColors.textSoft),
+                            const SizedBox(width: 6),
+                            Text(intl.DateFormat('yyyy/MM/dd').format(_openingDate), style: const TextStyle(fontSize: 14)),
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ]),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _openingNote,
+                    style: const TextStyle(fontSize: 15),
+                    decoration: const InputDecoration(hintText: 'ملاحظة (مثل: صفحة 12 في الدفتر)', fillColor: Colors.white),
+                  ),
+                ]),
+              ),
+            ],
+            if (editing && w.isOwner) ...[
+              const SizedBox(height: 18),
+              LabeledField(
+                label: 'الحالة',
+                helper: 'الأرشفة لا تحذف السجل المالي، ولا يُحسب المؤرشف ضمن حد الباقة.',
+                child: AjilSegmented<CustomerStatus>(
+                  options: const [
+                    (CustomerStatus.active, 'نشط'),
+                    (CustomerStatus.suspended, 'موقوف'),
+                    (CustomerStatus.archived, 'مؤرشف'),
+                  ],
+                  value: _status,
+                  onChanged: (v) => setState(() => _status = v),
+                ),
+              ),
+            ],
+          ]),
+        ),
+        Container(
+          decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.headerBorder))),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: SafeArea(
+            top: false,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+                textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              onPressed: _busy ? null : _save,
+              child: Text(editing ? 'حفظ التعديلات' : 'حفظ الزبون'),
+            ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 6),
-            child: Text('الأرشفة لا تحذف السجل المالي، ولا يُحسب المؤرشف ضمن حد الباقة.',
-                style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
-          ),
-        ],
-        const SizedBox(height: 24),
-        FilledButton(onPressed: _busy ? null : _save, child: const Text('حفظ')),
+        ),
       ]),
     );
   }

@@ -50,7 +50,6 @@ dependencies:
   decimal: ^3.0.2
   uuid: ^4.5.1
   intl: any
-  google_fonts: ^6.2.1
   connectivity_plus: ^6.1.1
 
 dev_dependencies:
@@ -65,6 +64,15 @@ flutter:
   # ضع ملفات الخط هنا (من Google Fonts: IBM Plex Sans Arabic) ليعمل التطبيق والـ PDF بدون إنترنت
   assets:
     - assets/fonts/
+  fonts:
+    - family: IBMPlexSansArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
 
 # Flutter 3.24 (Dart 3.5): app_links 6.4+ يستخدم flutter.compileSdkVersion في Gradle ولا يُبنى عليه
 dependency_overrides:

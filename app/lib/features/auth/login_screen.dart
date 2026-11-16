@@ -62,72 +62,117 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final branches = _branches;
     if (_branchId != null && !branches.any((b) => b.id == _branchId)) _branchId = null;
+    final last = branches.where((b) => b.id == _branchId).firstOrNull;
+    const label = TextStyle(fontSize: 14, color: AjilColors.textSoft);
+    const big = TextStyle(fontSize: 17);
+    const pad = EdgeInsets.symmetric(horizontal: 14, vertical: 15);
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-          children: [
-            const _Logo(),
-            const SizedBox(height: 28),
-            TextField(
-              controller: _phone,
-              keyboardType: TextInputType.phone,
-              textDirection: TextDirection.ltr,
-              decoration: const InputDecoration(labelText: 'رقم جوال البقالة'),
-              onChanged: (_) => setState(() {}),
-            ),
-            const SizedBox(height: 14),
-            Row(children: [
-              Expanded(
-                child: TextField(
-                  controller: _userNo,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'رقم المستخدم', helperText: 'المالك = 1'),
-                  onChanged: (_) => setState(() {}),
-                ),
-              ),
-              if (branches.length > 1) ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _branchId ?? branches.first.id,
-                    decoration: const InputDecoration(labelText: 'الفرع'),
-                    items: [for (final b in branches) DropdownMenuItem(value: b.id, child: Text(b.name))],
-                    onChanged: (v) => setState(() => _branchId = v),
+        child: LayoutBuilder(
+          builder: (context, box) => SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: box.maxHeight - 64),
+              child: IntrinsicHeight(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  const _Logo(),
+                  const SizedBox(height: 28),
+                  LabeledField(
+                    label: 'رقم جوال البقالة',
+                    labelStyle: label,
+                    gap: 6,
+                    child: TextField(
+                      controller: _phone,
+                      keyboardType: TextInputType.phone,
+                      textDirection: TextDirection.ltr,
+                      textAlign: TextAlign.right,
+                      style: big,
+                      decoration: const InputDecoration(contentPadding: pad, hintText: '7XX XXX XXX'),
+                      onChanged: (_) => setState(() {}),
+                    ),
                   ),
-                ),
-              ],
-            ]),
-            const SizedBox(height: 14),
-            TextField(
-              controller: _password,
-              obscureText: _obscure,
-              decoration: InputDecoration(
-                labelText: 'كلمة المرور',
-                suffixIcon: IconButton(
-                  icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                  onPressed: () => setState(() => _obscure = !_obscure),
-                  tooltip: 'إظهار',
-                ),
+                  const SizedBox(height: 16),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(
+                      child: LabeledField(
+                        label: 'رقم المستخدم',
+                        labelStyle: label,
+                        gap: 6,
+                        helper: 'المالك = 1',
+                        child: TextField(
+                          controller: _userNo,
+                          keyboardType: TextInputType.number,
+                          style: big,
+                          decoration: const InputDecoration(contentPadding: pad),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                      ),
+                    ),
+                    if (branches.isNotEmpty) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: LabeledField(
+                          label: 'الفرع',
+                          labelStyle: label,
+                          gap: 6,
+                          child: DropdownButtonFormField<String>(
+                            value: _branchId ?? branches.first.id,
+                            isExpanded: true,
+                            style: const TextStyle(fontFamily: ajilFont, fontSize: 16, color: AjilColors.text),
+                            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                            decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
+                            items: [for (final b in branches) DropdownMenuItem(value: b.id, child: Text(b.name, overflow: TextOverflow.ellipsis))],
+                            onChanged: (v) => setState(() => _branchId = v),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ]),
+                  const SizedBox(height: 16),
+                  LabeledField(
+                    label: 'كلمة المرور',
+                    labelStyle: label,
+                    gap: 6,
+                    child: TextField(
+                      controller: _password,
+                      obscureText: _obscure,
+                      style: big,
+                      decoration: InputDecoration(
+                        contentPadding: pad,
+                        suffixIcon: IconButton(
+                          icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: AjilColors.textMuted),
+                          onPressed: () => setState(() => _obscure = !_obscure),
+                          tooltip: 'إظهار',
+                        ),
+                      ),
+                      onSubmitted: (_) => _submit(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    last != null
+                        ? 'آخر دخول: ${last.name} — يُحفظ تلقائياً'
+                        : (branches.isEmpty ? 'أول دخول على هذا الجوال: ستختار الفرع بعد التحقق' : 'الفرع يُحفظ تلقائياً'),
+                    style: const TextStyle(color: AjilColors.textMuted, fontSize: 13),
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    onPressed: _busy ? null : _submit,
+                    style: FilledButton.styleFrom(textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600)),
+                    child: _busy
+                        ? const SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white))
+                        : const Text('دخول'),
+                  ),
+                  const Spacer(),
+                  const SizedBox(height: 28),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    LinkText('نسيت كلمة المرور؟', onTap: () => context.push('/reset')),
+                    LinkText('إنشاء بقالة جديدة', onTap: () => context.push('/register')),
+                  ]),
+                ]),
               ),
-              onSubmitted: (_) => _submit(),
             ),
-            if (branches.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text('أول دخول على هذا الجوال: ستختار الفرع بعد التحقق', style: TextStyle(color: AjilColors.textMuted, fontSize: 13)),
-              ),
-            const SizedBox(height: 22),
-            FilledButton(
-              onPressed: _busy ? null : _submit,
-              child: _busy ? const SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white)) : const Text('دخول'),
-            ),
-            const SizedBox(height: 24),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              TextButton(onPressed: () => context.push('/reset'), child: const Text('نسيت كلمة المرور؟')),
-              TextButton(onPressed: () => context.push('/register'), child: const Text('إنشاء بقالة جديدة')),
-            ]),
-          ],
+          ),
         ),
       ),
     );
@@ -137,16 +182,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 class _Logo extends StatelessWidget {
   const _Logo();
   @override
-  Widget build(BuildContext context) => Column(children: [
-        Container(
-          width: 72,
-          height: 72,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(color: AjilColors.primary, borderRadius: BorderRadius.circular(20)),
-          child: const Text('آ', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w600)),
-        ),
-        const SizedBox(height: 10),
-        const Text('آجِل', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600)),
-        const Text('دفتر ديون البقالة', style: TextStyle(color: AjilColors.textMuted)),
+  Widget build(BuildContext context) => const Column(children: [
+        AjilLogo(size: 72),
+        SizedBox(height: 12),
+        Text('آجِل', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600)),
+        SizedBox(height: 4),
+        Text('دفتر ديون البقالة', style: TextStyle(fontSize: 15, color: AjilColors.textMuted)),
       ]);
 }

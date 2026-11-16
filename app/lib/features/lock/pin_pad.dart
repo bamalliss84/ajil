@@ -21,7 +21,7 @@ class PinDots extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: i < length ? AjilColors.primary : Colors.transparent,
-                  border: Border.all(color: i < length ? AjilColors.primary : const Color(0xFF9FB3AD), width: 2),
+                  border: Border.all(color: i < length ? AjilColors.primary : AjilColors.dotEmpty, width: 2),
                 ),
               ),
           ],
@@ -36,10 +36,10 @@ class PinPad extends StatelessWidget {
   final Widget? leading;
 
   Widget _key(String k) => SizedBox(
-        width: 72,
-        height: 72,
+        width: 68,
+        height: 68,
         child: Material(
-          color: const Color(0xFFF1F5F4),
+          color: AjilColors.keyBg,
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
@@ -47,7 +47,7 @@ class PinPad extends StatelessWidget {
               HapticFeedback.selectionClick();
               onKey(k);
             },
-            child: Center(child: Text(k, style: const TextStyle(fontSize: 26))),
+            child: Center(child: Text(k, style: const TextStyle(fontSize: 26, color: AjilColors.text))),
           ),
         ),
       );
@@ -66,14 +66,14 @@ class PinPad extends StatelessWidget {
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [for (final k in row) _key(k)]),
             ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            SizedBox(width: 72, height: 72, child: leading),
+            SizedBox(width: 68, height: 68, child: leading),
             _key('0'),
             SizedBox(
-              width: 72,
-              height: 72,
+              width: 68,
+              height: 68,
               child: IconButton(
                 onPressed: () => onKey('del'),
-                icon: const Icon(Icons.backspace_outlined),
+                icon: const Icon(Icons.backspace_outlined, color: AjilColors.textSoft, size: 28),
                 tooltip: 'حذف',
               ),
             ),

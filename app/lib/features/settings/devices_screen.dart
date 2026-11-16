@@ -64,7 +64,7 @@ class _DevicesScreenState extends ConsumerState<DevicesScreen> {
     final list = _devices;
     final dt = intl.DateFormat('d/M h:mm a', 'ar');
     return Scaffold(
-      appBar: AppBar(title: const Text('الأجهزة')),
+      appBar: const AjilHeader(title: 'الأجهزة'),
       body: list == null
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(

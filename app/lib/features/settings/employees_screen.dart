@@ -102,7 +102,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
     final users = _users;
     final branchName = {for (final b in _branches) b.id: b.name};
     return Scaffold(
-      appBar: AppBar(title: const Text('الموظفون')),
+      appBar: const AjilHeader(title: 'الموظفون'),
       floatingActionButton: FloatingActionButton.extended(onPressed: _add, icon: const Icon(Icons.person_add_alt), label: const Text('موظف')),
       body: users == null
           ? const Center(child: CircularProgressIndicator())

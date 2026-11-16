@@ -4,7 +4,10 @@
 #   ... run-phone.ps1 -Apk                                                   # يبني apk debug ويثبّته فقط
 #   ... run-phone.ps1 -Phone 192.168.0.100:34279                            # جوال لاسلكي (Wireless debugging)
 #   ... run-phone.ps1 -Lan                                                   # بدل adb reverse: IP الكمبيوتر على الشبكة
-param([switch]$Apk, [switch]$Lan, [string]$Device, [string]$Phone)
+#   ... run-phone.ps1 -Reverse                                               # إجبار adb reverse حتى لو قاعدة الجدار موجودة
+# ملاحظة: adb reverse يضيع عند انقطاع التصحيح اللاسلكي فتبقى الحركات «بانتظار المزامنة».
+# الحل الثابت: شغّل scripts\open-firewall.ps1 مرة واحدة (كمسؤول) — بعدها يُستخدم IP الكمبيوتر تلقائياً.
+param([switch]$Apk, [switch]$Lan, [switch]$Reverse, [string]$Device, [string]$Phone)
 . "$PSScriptRoot\_common.ps1"
 Connect-WirelessPhone $Phone
 if ($Phone -and -not $Device) { $Device = $Phone }
@@ -15,15 +18,20 @@ $devs = @(Get-AndroidDevices)
 if ($devs.Count -eq 0) { throw 'لا يوجد جوال موصول — وصّل الجوال بـ USB وفعّل USB debugging ووافق على نافذة السماح' }
 if (-not $Device) { $Device = $devs[0] }
 
+if (-not $Lan -and -not $Reverse -and (Get-NetFirewallRule -DisplayName $FirewallRuleName -ErrorAction SilentlyContinue)) {
+  $Lan = $true
+  Write-Host 'قاعدة الجدار الناري موجودة ← وضع الشبكة المحلية (لا يتأثر بانقطاع adb)' -ForegroundColor Green
+}
+
 if ($Lan) {
   $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.PrefixOrigin -eq 'Dhcp' -and $_.IPAddress -notlike '169.*' } | Select-Object -First 1).IPAddress
   if (-not $ip) { throw 'تعذّر معرفة IP الكمبيوتر' }
   $url = "http://${ip}:54321"
-  Write-Host "يستخدم $url — إن لم يتصل افتح المنفذ (مرة واحدة، PowerShell كمسؤول):" -ForegroundColor Yellow
-  Write-Host "  New-NetFirewallRule -DisplayName 'Ajil Supabase 54321' -Direction Inbound -Protocol TCP -LocalPort 54321 -Action Allow -Profile Private"
+  Write-Host "يستخدم $url — إن لم يتصل شغّل مرة واحدة كمسؤول: scripts\open-firewall.ps1" -ForegroundColor Yellow
 } else {
   & (Get-Adb) -s $Device reverse tcp:54321 tcp:54321 | Out-Null
   $url = 'http://127.0.0.1:54321'
+  Write-Warning 'وضع adb reverse: إذا انقطع التصحيح اللاسلكي لن تتزامن الحركات حتى تعيد تشغيل هذا السكربت. للحل الثابت: scripts\open-firewall.ps1'
 }
 
 $defines = @("--dart-define=SUPABASE_URL=$url", "--dart-define=SUPABASE_ANON_KEY=$anon")

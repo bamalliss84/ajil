@@ -47,43 +47,53 @@ class ReportsScreen extends ConsumerWidget {
         .toList()
       ..sort((a, b) => b.$2!.compareTo(a.$2!));
 
-    Widget row(String name, String value, {VoidCallback? onTap, Color? color}) => ListTile(
-          dense: true,
+    Widget row(String name, String value, {VoidCallback? onTap, Color? color}) => InkWell(
           onTap: onTap,
-          title: Text(name),
-          trailing: Text(value, style: TextStyle(fontWeight: FontWeight.w600, color: color)),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+            child: Row(children: [
+              Expanded(child: Text(name, style: const TextStyle(fontSize: 15))),
+              Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color)),
+              if (onTap != null) const Icon(Icons.chevron_left_rounded, size: 20, color: AjilColors.textMuted),
+            ]),
+          ),
         );
 
     return Scaffold(
-      appBar: AppBar(title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [Text('التقارير'), BranchChip()])),
+      appBar: AjilHeader(title: 'التقارير', titleSize: 22, showLeading: false, subtitle: '${sessionOf(ref).branch.name} · ${sessionOf(ref).displayName}'),
       bottomNavigationBar: const AjilNavBar(index: 2),
       body: ListView(padding: const EdgeInsets.only(bottom: 24), children: [
         SectionCard(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('الديون عند الزبائن', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            const Text('الديون عند الزبائن', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, height: 2.4)),
             for (final e in totals.entries) row(Currency.of(e.key).nameAr, f.amount(e.value, e.key, withSymbol: true), color: AjilColors.debt),
-            if (totals.isEmpty) const Text('لا ديون'),
+            if (totals.isEmpty) const Padding(padding: EdgeInsets.only(bottom: 8), child: Text('لا ديون', style: TextStyle(color: AjilColors.textMuted))),
           ]),
         ),
         SectionCard(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('هذا الشهر', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            const Text('هذا الشهر', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, height: 2.4)),
             row('ديون جديدة', f.amount(monthDebt, cur, withSymbol: true), color: AjilColors.debt),
             row('تحصيل', f.amount(monthPaid, cur, withSymbol: true), color: AjilColors.paid),
           ]),
         ),
         SectionCard(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('الأعلى مديونية', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+            const Text('الأعلى مديونية', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, height: 2.4)),
             for (final c in top.take(10))
               row(c.customer.name, f.amount(c.balanceIn(cur), cur), color: AjilColors.debt,
                   onTap: () => context.push('/customers/${c.customer.id}')),
           ]),
         ),
         SectionCard(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('ديون متأخرة (30 يوماً فأكثر)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-            if (oldest.isEmpty) const Text('لا توجد ديون متأخرة'),
+            const Text('ديون متأخرة (30 يوماً فأكثر)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, height: 2.4)),
+            if (oldest.isEmpty) const Padding(padding: EdgeInsets.only(bottom: 8), child: Text('لا توجد ديون متأخرة', style: TextStyle(color: AjilColors.textMuted))),
             for (final (c, days) in oldest.take(15))
               row(c.customer.name, '$days يوماً', color: days! >= 90 ? AjilColors.debt : AjilColors.pendingText,
                   onTap: () => context.push('/customers/${c.customer.id}')),

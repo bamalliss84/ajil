@@ -198,11 +198,12 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('إرسال الأرصدة'),
+      appBar: AjilHeader(
+        title: 'إرسال الأرصدة',
+        subtitle: 'للزبائن عبر واتساب — رسالة لكل زبون بضغطة',
         actions: [
           if (_phase == _Phase.sending)
-            TextButton(onPressed: _abandon, child: const Text('إنهاء الدفعة')),
+            LinkText('إنهاء الدفعة', onTap: _abandon, color: AjilColors.debt, size: 14, weight: FontWeight.w500),
         ],
       ),
       body: !_allowed
@@ -239,29 +240,30 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
         child: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
           SectionCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('الرصيد حتى تاريخ', style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text('الرصيد حتى تاريخ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
-              Wrap(spacing: 8, children: [
-                ChoiceChip(
-                  label: const Text('اليوم'),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                PillChip(
+                  label: 'اليوم',
                   selected: DateUtils.isSameDay(_asOf, today),
-                  onSelected: (_) {
+                  onTap: () {
                     setState(() => _asOf = today);
                     _reselect();
                   },
                 ),
-                ChoiceChip(
-                  label: Text('نهاية الشهر الماضي (${BalanceNotices.date(lastMonthEnd, f)})'),
+                PillChip(
+                  label: 'نهاية الشهر الماضي (${BalanceNotices.date(lastMonthEnd, f)})',
                   selected: DateUtils.isSameDay(_asOf, lastMonthEnd),
-                  onSelected: (_) {
+                  onTap: () {
                     setState(() => _asOf = lastMonthEnd);
                     _reselect();
                   },
                 ),
-                ActionChip(
-                  avatar: const Icon(Icons.calendar_month_outlined, size: 18),
-                  label: Text(BalanceNotices.date(_asOf, f)),
-                  onPressed: () async {
+                PillChip(
+                  icon: Icons.calendar_month_outlined,
+                  label: BalanceNotices.date(_asOf, f),
+                  selected: !DateUtils.isSameDay(_asOf, today) && !DateUtils.isSameDay(_asOf, lastMonthEnd),
+                  onTap: () async {
                     final d = await showDatePicker(
                       context: context,
                       initialDate: _asOf,
@@ -282,11 +284,10 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
           ),
           SectionCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('من يستلم', style: TextStyle(fontWeight: FontWeight.w600)),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('الزبائن الذين عليهم فقط'),
-                subtitle: const Text('أطفئه لتشمل من لهم رصيد عندك'),
+              const Text('من يستلم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              CheckRow(
+                label: 'الزبائن الذين عليهم فقط',
+                subtitle: 'ألغِه لتشمل من لهم رصيد عندك',
                 value: _debtorsOnly,
                 onChanged: (v) {
                   setState(() => _debtorsOnly = v);
@@ -338,7 +339,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
           ),
           SectionCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('نص الرسالة', style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text('نص الرسالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               TextField(controller: _tpl, maxLines: 5, onChanged: (_) => setState(() {})),
               const SizedBox(height: 6),
@@ -509,7 +510,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
             const SizedBox(height: 6),
             TextButton(onPressed: () => _skip(r), child: const Text('تخطي هذا الزبون')),
           ] else ...[
-            const Text('هل وصلت الرسالة؟', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('هل وصلت الرسالة؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             FilledButton.icon(
               onPressed: () => _confirmSent(r),

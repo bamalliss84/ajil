@@ -8,6 +8,9 @@ import 'package:go_router/go_router.dart';
 
 import '../core/theme.dart';
 import '../state/providers.dart';
+import 'ui.dart';
+
+export 'ui.dart';
 
 /// مبلغ منسق بلون حسب الإشارة (الأحمر للدين فقط)
 class MoneyText extends ConsumerWidget {
@@ -44,12 +47,12 @@ class SyncBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (icon, color, label) = switch (state) {
       SyncState.synced => (Icons.check_rounded, AjilColors.paid, 'متزامن'),
-      SyncState.pending => (Icons.schedule_rounded, const Color(0xFFA15C07), 'بانتظار'),
+      SyncState.pending => (Icons.schedule_rounded, AjilColors.pendingIcon, 'بانتظار'),
       SyncState.failed => (Icons.warning_amber_rounded, AjilColors.debt, 'مرفوضة'),
     };
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      Icon(icon, size: 14, color: color, semanticLabel: label),
-      if (!compact) ...[const SizedBox(width: 3), Text(label, style: TextStyle(fontSize: 12, color: color))],
+      if (!compact) ...[Text(label, style: TextStyle(fontSize: 12, color: color)), const SizedBox(width: 4)],
+      Icon(icon, size: 16, color: color, semanticLabel: label),
     ]);
   }
 }
@@ -104,15 +107,15 @@ class _Banner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: action == null ? 11 : 2),
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
         child: Row(children: [
           Icon(icon, size: 20, color: fg),
           const SizedBox(width: 10),
           Expanded(child: Text(text, style: TextStyle(color: fg, fontSize: 14))),
           if (action != null)
-            TextButton(onPressed: action!.$2, child: Text(action!.$1, style: TextStyle(color: fg, fontWeight: FontWeight.w600))),
+            LinkText(action!.$1, onTap: action!.$2, color: fg, size: 14, weight: FontWeight.w500),
         ]),
       );
 }
@@ -152,11 +155,14 @@ class CurrencyToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (currencies.length < 2) return const SizedBox.shrink();
-    return SegmentedButton<String>(
-      segments: [for (final c in currencies) ButtonSegment(value: c, label: Text(Currency.of(c).symbolAr))],
-      selected: {value},
-      showSelectedIcon: false,
-      onSelectionChanged: (s) => onChanged(s.first),
+    return SizedBox(
+      width: currencies.length * 110.0,
+      child: AjilSegmented<String>(
+        options: [for (final c in currencies) (c, Currency.of(c).symbolAr)],
+        value: value,
+        onChanged: onChanged,
+        fontSize: 15,
+      ),
     );
   }
 }
@@ -171,13 +177,16 @@ class AmountKeypad extends StatelessWidget {
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0', 'del'];
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: GridView.count(
-        crossAxisCount: 3,
+      child: GridView(
         shrinkWrap: true,
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 2.6,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          mainAxisExtent: 46,
+        ),
         children: [
           for (final k in keys)
             Material(
@@ -191,8 +200,8 @@ class AmountKeypad extends StatelessWidget {
                 },
                 child: Center(
                   child: k == 'del'
-                      ? const Icon(Icons.backspace_outlined, semanticLabel: 'حذف')
-                      : Text(k, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
+                      ? const Icon(Icons.backspace_outlined, semanticLabel: 'حذف', color: AjilColors.text)
+                      : Text(k, style: const TextStyle(fontSize: 22, color: AjilColors.text)),
                 ),
               ),
             ),
@@ -204,25 +213,31 @@ class AmountKeypad extends StatelessWidget {
 
 /// زر الدين (حدود حمراء) وزر السداد (أخضر ممتلئ)
 class DebtPayButtons extends StatelessWidget {
-  const DebtPayButtons({super.key, required this.onDebt, required this.onPay});
+  const DebtPayButtons({super.key, required this.onDebt, required this.onPay, this.icons = true});
   final VoidCallback onDebt;
   final VoidCallback onPay;
+  final bool icons;
   @override
   Widget build(BuildContext context) => Row(children: [
         Expanded(
           child: OutlinedButton.icon(
             onPressed: onDebt,
-            icon: const Icon(Icons.add_rounded),
+            icon: icons ? const Icon(Icons.add_rounded, size: 22) : const SizedBox.shrink(),
             label: const Text('تسجيل دين'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AjilColors.debt,
               side: const BorderSide(color: AjilColors.debtBorder, width: 1.5),
+              textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w600),
             ),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: FilledButton.icon(onPressed: onPay, icon: const Icon(Icons.check_rounded), label: const Text('تسجيل سداد')),
+          child: FilledButton.icon(
+            onPressed: onPay,
+            icon: icons ? const Icon(Icons.check_rounded, size: 22) : const SizedBox.shrink(),
+            label: const Text('تسجيل سداد'),
+          ),
         ),
       ]);
 }
@@ -256,20 +271,47 @@ class AjilNavBar extends StatelessWidget {
   const AjilNavBar({super.key, required this.index});
   final int index;
   static const _routes = ['/', '/customers', '/reports', '/settings'];
+  static const _items = [
+    (Icons.home_outlined, 'الرئيسية'),
+    (Icons.people_outline_rounded, 'الزبائن'),
+    (Icons.bar_chart_rounded, 'التقارير'),
+    (Icons.menu_rounded, 'المزيد'),
+  ];
+
+  /// حسب التصميم: أبيض بخط علوي، المختار أخضر عريض، بلا مؤشر خلفي
   @override
-  Widget build(BuildContext context) => NavigationBar(
-        selectedIndex: index,
-        backgroundColor: Colors.white,
-        indicatorColor: AjilColors.primaryLight,
-        onDestinationSelected: (i) {
-          if (i != index) context.go(_routes[i]);
-        },
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home_rounded), label: 'الرئيسية'),
-          NavigationDestination(icon: Icon(Icons.people_outline), selectedIcon: Icon(Icons.people), label: 'الزبائن'),
-          NavigationDestination(icon: Icon(Icons.bar_chart_outlined), selectedIcon: Icon(Icons.bar_chart), label: 'التقارير'),
-          NavigationDestination(icon: Icon(Icons.menu), label: 'المزيد'),
-        ],
+  Widget build(BuildContext context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: AjilColors.headerBorder)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 8),
+            child: Row(children: [
+              for (var i = 0; i < _items.length; i++)
+                Expanded(
+                  child: InkWell(
+                    onTap: i == index ? null : () => context.go(_routes[i]),
+                    child: SizedBox(
+                      height: 52,
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Icon(_items[i].$1, size: 25, color: i == index ? AjilColors.primary : AjilColors.textMuted),
+                        const SizedBox(height: 2),
+                        Text(_items[i].$2,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: i == index ? FontWeight.w600 : FontWeight.w400,
+                              color: i == index ? AjilColors.primary : AjilColors.textMuted,
+                            )),
+                      ]),
+                    ),
+                  ),
+                ),
+            ]),
+          ),
+        ),
       );
 }
 

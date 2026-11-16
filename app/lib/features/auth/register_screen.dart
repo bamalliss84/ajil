@@ -59,7 +59,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('إنشاء بقالة جديدة')),
+        appBar: const AjilHeader(title: 'إنشاء بقالة جديدة'),
         body: ListView(padding: const EdgeInsets.all(20), children: [
           const Text('رقم جوالك هو رقم البقالة، وأنت المستخدم رقم 1.', style: TextStyle(color: AjilColors.textMuted)),
           const SizedBox(height: 16),
