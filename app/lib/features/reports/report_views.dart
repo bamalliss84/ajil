@@ -292,7 +292,7 @@ class MonthlyChart extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 3),
                     child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                       if (!future(b.at.month))
-                        Text(thousands(f, b.collected), style: const TextStyle(fontSize: 10, color: AjilColors.textMuted)),
+                        FittedBox(fit: BoxFit.scaleDown, child: Text(thousands(f, b.collected), maxLines: 1, softWrap: false, style: const TextStyle(fontSize: 10, color: AjilColors.textMuted))),
                       const SizedBox(height: 4),
                       Container(
                         height: future(b.at.month) ? 0 : (b.collected.toDouble() / max * 118).clamp(3, 118),
