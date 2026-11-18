@@ -2,7 +2,7 @@
 
 | المجلد | ما هو | التشغيل |
 | --- | --- | --- |
-| `../app` | **صفحة المشترك** = نفس تطبيق Flutter مبنياً للويب. يعمل متصلاً فقط: الكتابة تُمنع بدون اتصال، والبيانات المحلية تُمسح عند الخروج | `cd ../app && flutter run -d chrome --dart-define=SUPABASE_URL=http://127.0.0.1:54321 --dart-define=SUPABASE_ANON_KEY=...` |
+| `../app` | **صفحة المشترك** = نفس تطبيق Flutter مبنياً للويب. يعمل متصلاً فقط: الكتابة تُمنع بدون اتصال، والبيانات المحلية تُمسح عند الخروج | `powershell -ExecutionPolicy Bypass -File scripts/run-web.ps1` ← http://localhost:8091. من الجوال: `adb reverse tcp:8091 tcp:8091` ثم افتحه في Chrome |
 | `admin/` | **لوحة إدارة المنصة**: الملخص، البقالات (تفعيل/تجديد/إيقاف)، أكواد التفعيل، تنبيهات السلامة | `powershell -ExecutionPolicy Bypass -File scripts/run-admin.ps1` ← http://localhost:8090 (أو `-Chrome` للتطوير) |
 | `landing/` | **صفحة التعريف** HTML ثابتة (سريعة وتظهر في Google). عدّل `[رابط المتجر]` و `[رقم الدعم]` | افتح `index.html` أو انشرها على أي استضافة ثابتة |
 

@@ -1,11 +1,11 @@
 {
-    "name": "ajil",
-    "short_name": "ajil",
+    "name": "آجِل — دفتر ديون البقالة",
+    "short_name": "آجِل",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F5F7F6",
+    "theme_color": "#0F6E56",
+    "description": "دفتر ديون البقالة",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
