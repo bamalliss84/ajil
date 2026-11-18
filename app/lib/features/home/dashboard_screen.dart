@@ -137,13 +137,14 @@ class DashboardScreen extends ConsumerWidget {
         child: ListView(padding: EdgeInsets.zero, children: [
           _Header(totals: totals, debtors: debtors, collectedMonth: f.amount(collectedMonth, cur, withSymbol: true), badge: due.length),
           const StatusBanner(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-            child: DebtPayButtons(
-              onDebt: () => context.push('/pick/debt'),
-              onPay: () => context.push('/pick/payment'),
+          if (s.canWrite)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              child: DebtPayButtons(
+                onDebt: () => context.push('/pick/debt'),
+                onPay: () => context.push('/pick/payment'),
+              ),
             ),
-          ),
 
           // مطلوب تحصيله اليوم
           AjilCard(
@@ -166,7 +167,7 @@ class DashboardScreen extends ConsumerWidget {
                 ]),
               ),
               if (customers.isEmpty)
-                _EmptyStart(onAdd: () => context.push('/customers/new'))
+                _EmptyStart(onAdd: s.canWrite ? () => context.push('/customers/new') : null)
               else
                 for (final d in due.take(6)) _DueTile(d),
             ]),
@@ -289,7 +290,7 @@ class _Header extends ConsumerWidget {
 /// متجر جديد بلا زبائن: دعوة لإضافة أول زبون بدل مساحة فارغة
 class _EmptyStart extends StatelessWidget {
   const _EmptyStart({required this.onAdd});
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
   @override
   Widget build(BuildContext context) => Container(
         decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
@@ -307,16 +308,17 @@ class _EmptyStart extends StatelessWidget {
               Text('مع رصيده الافتتاحي من الدفتر الورقي', style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
             ]),
           ),
-          SquareIconButton(
-            icon: Icons.add_rounded,
-            tooltip: 'إضافة زبون',
-            color: Colors.white,
-            bg: AjilColors.primary,
-            borderColor: null,
-            size: 40,
-            radius: 10,
-            onPressed: onAdd,
-          ),
+          if (onAdd != null)
+            SquareIconButton(
+              icon: Icons.add_rounded,
+              tooltip: 'إضافة زبون',
+              color: Colors.white,
+              bg: AjilColors.primary,
+              borderColor: null,
+              size: 40,
+              radius: 10,
+              onPressed: onAdd,
+            ),
         ]),
       );
 }

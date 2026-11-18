@@ -70,7 +70,8 @@ cd app && flutter pub get && flutter test && flutter run
 - 🟡 مطابقة التصميم: الثيم والخط وكل الشاشات أُعيد بناؤها حسب `docs/design` (`widgets/ui.dart`)، وقورنت لقطات الجوال بالتصميم (عدا شاشة الدخول)
 - ✅ شاشة التقارير (يوم/شهر/سنة/فترة + PDF/Excel) حسب `docs/REPORTS_SPEC.md` — منطقها في `ajil_core/src/reports.dart` (ajil_core 44 اختباراً)
 - ✅ لوحة الإدارة (`web/admin`): تُترجم وجُرّبت في المتصفح محلياً — `scripts/run-admin.ps1` (http://localhost:8090)، مدير محلي `scripts/create-platform-admin.ps1`
-- 🟡 المرحلة 3: صفحة التعريف (`web/landing`) لم تكتمل؛ صفحة المشترك = التطبيق نفسه على الويب — تعمل (`scripts/run-web.ps1`، http://localhost:8091)، جُرّب التسجيل حتى شاشة PIN
+- 🟡 المرحلة 3: صفحة التعريف (`web/landing`) لم تكتمل؛ صفحة المشترك = التطبيق نفسه على الويب — ✅ جُرّبت كاملة (`scripts/run-web.ps1`، http://localhost:8091): زبون، حركة متصلة، ومنع الكتابة بدون اتصال. `drift_worker.js` يُترجم من `app/tool/drift_worker.dart`
+- 🔴 خلل معروف: فتح تطبيق الجوال بدون نت بعد إغلاقه يعلق على شاشة البداية — التفاصيل في `docs/NEXT_TASKS.md` §4
 - ⏭️ التفاصيل والخطوات: `docs/NEXT_TASKS.md`
 
 حدّث هذا القسم و `docs/NEXT_TASKS.md` في نهاية كل جلسة عمل.

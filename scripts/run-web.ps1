@@ -7,6 +7,7 @@ Set-Location (Split-Path $PSScriptRoot -Parent)
 
 $raw = (cmd /c "npx supabase status -o json 2>nul") -join "`n"
 $st = $raw.Substring($raw.IndexOf('{')) | ConvertFrom-Json
+if (-not $st.API_URL -or -not $st.ANON_KEY) { Write-Error 'Supabase غير مكتمل التشغيل (API_URL فارغ) — شغّل: npx supabase start'; exit 1 }
 $defines = @("--dart-define=SUPABASE_URL=$($st.API_URL)", "--dart-define=SUPABASE_ANON_KEY=$($st.ANON_KEY)")
 
 Set-Location app

@@ -53,6 +53,8 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
   }
 
   Future<void> _save() async {
+    final w = ref.read(sessionProvider);
+    if (!w.canWrite) return showError(context, w.writeBlockedError);
     if (_name.text.trim().length < 2) return showError(context, 'x: اكتب اسم الزبون');
     final limit = _limit.text.trim().isEmpty ? null : MoneyFormat.parse(_limit.text);
     final opening = _opening.text.trim().isEmpty ? null : MoneyFormat.parse(_opening.text);

@@ -280,6 +280,11 @@ class SessionController extends ChangeNotifier {
   /// الويب يعمل متصلاً فقط: الكتابة ممنوعة بدون اتصال
   bool get canWrite => (!kIsWeb || online) && !subscriptionExpired;
 
+  /// سبب منع الكتابة (بصيغة رسالة الخطأ) — يُعرض إن حاول المستخدم الحفظ
+  String get writeBlockedError => subscriptionExpired
+      ? 'subscription_expired: الاشتراك منتهٍ — البيانات للقراءة فقط'
+      : 'offline: لا يوجد اتصال — التسجيل من صفحة الويب يحتاج إنترنت';
+
   bool get subscriptionExpired {
     final exp = subscription?['expires_at'];
     if (exp == null) return false;

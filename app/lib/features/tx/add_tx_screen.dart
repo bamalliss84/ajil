@@ -53,6 +53,8 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
   }
 
   Future<void> _save(Customer c, Map<String, CurrencyBalance> balances) async {
+    final w = ref.read(sessionProvider);
+    if (!w.canWrite) return showError(context, w.writeBlockedError);
     final cur = _currency ?? c.defaultCurrency;
     final applied = _applied(Currency.of(cur));
     if (applied == null || applied <= Decimal.zero) return showError(context, 'x: أدخل المبلغ${_fx ? ' والسعر' : ''}');

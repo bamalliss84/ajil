@@ -1,6 +1,6 @@
 import 'package:ajil_core/ajil_core.dart';
 import 'package:decimal/decimal.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -87,7 +87,7 @@ class StatusBanner extends ConsumerWidget {
         icon: s.online ? Icons.sync_rounded : Icons.cloud_off_rounded,
         text: s.online
             ? '${s.pending} حركات بانتظار المزامنة'
-            : (s.pending > 0 ? 'غير متصل — ${s.pending} حركات بانتظار المزامنة' : 'غير متصل — تعمل البيانات من الجوال'),
+            : (s.pending > 0 ? 'غير متصل — ${s.pending} حركات بانتظار المزامنة' : (kIsWeb ? 'غير متصل — التسجيل متوقف حتى يعود الاتصال' : 'غير متصل — تعمل البيانات من الجوال')),
         bg: AjilColors.pendingBg,
         fg: AjilColors.pendingText,
         action: s.pending > 0 ? ('عرض', () => context.push('/unsynced')) : null,
@@ -244,6 +244,7 @@ class DebtPayButtons extends StatelessWidget {
 
 void showError(BuildContext context, Object e) {
   final err = AjilError.parse(e);
+  if (err.code == 'server_error') debugPrint('unexpected error: $e');
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.message), backgroundColor: AjilColors.debt));
 }
 

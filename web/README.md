@@ -20,4 +20,6 @@ insert into app.platform_admins (auth_user_id, name) values ('<user id>', 'اس�
 
 ## ملاحظات لوحة الإدارة
 - بعد كل بناء جديد قد يعرض المتصفح النسخة القديمة (service worker): حدّث بـ Ctrl+Shift+R.
+- ابنِ وSupabase شغّال كاملاً: السكربتان يرفضان البناء إن كان `API_URL` فارغاً (وإلا تُرسل الطلبات لخادم الصفحة نفسه ← 501).
+- `app/web/drift_worker.js` يُترجم من `app/tool/drift_worker.dart` (انظر `docs/NEXT_TASKS.md` §5).
 - الإيقاف يمنع تسجيل حركات جديدة للبقالة (trigger `tx_store_active`) ولا يحذف شيئاً.
