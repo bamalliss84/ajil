@@ -62,7 +62,8 @@ cd app && flutter pub get && flutter test && flutter run
 
 ## الحالة الحالية
 - ✅ المرحلة 0: التحليل والتصميم (8 شاشات)
-- ✅ المرحلة 1: قاعدة البيانات — 11 migrations و **98 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
+- ✅ المرحلة 1: قاعدة البيانات — 12 migrations و **132 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
+- ✅ تقوية العزل (migration 12 + `isolation_test.sql`): الوعد يتحقق من الزبون، `created_by` من التوكن، الموظف الموقوف يفقد الوصول فوراً، EXECUTE مسحوبة من public/anon (كل دالة جديدة في `app` تحتاج `revoke execute … from public, anon`)، `current_subscription` لبقالتي فقط، OTP والأكواد بـ `gen_random_bytes`
 - ✅ المرحلة 2.1: Edge Functions — send-otp, register-store, add-employee, reset-password, sync-push — مجرّبة محلياً بـ curl + 6 اختبارات للمنطق المشترك
 - ✅ المرحلة 2.2: `packages/ajil_core` — 46 اختباراً ناجحاً
 - ✅ المرحلة 2.3–2.4: تطبيق Flutter يُترجم: `flutter analyze` بلا أخطاء، `flutter test` 9/9. البيئة Flutter 3.24.5 (لهذا `drift_flutter <0.2.5` و override لـ `app_links`)

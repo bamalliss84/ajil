@@ -6,6 +6,19 @@
 > قاعدة البيانات مختبرة فعلياً (97 اختباراً)، ومنطق Edge Functions المشترك مختبر (6 اختبارات).
 > أول مهمة لك: تشغيل `flutter analyze` وإصلاح أي أخطاء ترجمة أو اختلاف في إصدارات الحزم — **بدون تغيير القواعد في CLAUDE.md**.
 
+## ✅ تقوية العزل بين البقالات (2026-11-18) — `supabase/migrations/20261118000012_isolation_hardening.sql`
+- `app.promises`: trigger `promises_customer_check` يرفض `customer_mismatch` إن لم يتبع الزبون نفس البقالة والفرع.
+- `created_by` في `customers` و `promises` يفرضه الخادم `:= app.app_user_id()` لطلبات API (authenticated/anon)؛ مفتاح الخدمة والاتصال المباشر يحتفظان بالقيمة.
+- `app.has_branch` تشترط أن المستخدم الحالي `is_active` في نفس البقالة ← إيقاف الموظف يقطع وصوله فوراً رغم أن توكنه ساري.
+- فحص المالك `is distinct from 'owner'` في redeem_code / add_employee / add_branch / set_device_state / set_employee (توكن بلا `app_role` كان يمر).
+- EXECUTE: مسحوبة من public و anon لكل دوال `app`، و authenticated يأخذ قائمة صريحة (دوال RLS + التطبيق + الإدارة)، و service_role كل الدوال (+ صلاحية افتراضية للقادمة). خطّاف التوكن لـ supabase_auth_admin فقط.
+  **مهم:** PostgreSQL يمنح public تنفيذ كل دالة جديدة؛ أي migration تضيف دالة في `app` يجب أن تسحبها (`revoke execute on function app.x(...) from public, anon`) وإلا يفشل `isolation_test.sql`.
+- `app.current_subscription` صارت security invoker وترفض `store_mismatch` لبقالة أخرى، إلا لمدير المنصة و service_role والاتصال المباشر (والاستدعاء من دوال security definer مثل الـ triggers).
+- `otp_issue` و `generate_codes` بـ `gen_random_bytes` (pgcrypto في مخطط `extensions`).
+- الاختبارات: `isolation_test.sql` (34) ← المجموع **132 ✓** (ledger 43، services 54، cron 1، isolation 34). جُرّب حياً: send-otp ← register-store ← الدخول (claims من الخطّاف) ← RLS و `pull_changes`، و authenticated مرفوض من `otp_issue`، و anon مرفوض من مخطط app.
+- تشغيل كل الاختبارات (بعد `npx supabase db reset`، لأن إعادة الضبط تعيد تشغيل الحاوية وتمسح /tmp):
+  `docker cp supabase/tests supabase_db_ajil:/tmp/ajtests && for t in ledger services cron isolation; do docker exec supabase_db_ajil psql -U postgres -v ON_ERROR_STOP=1 -f /tmp/ajtests/${t}_test.sql; done`
+
 ## ✅ شاشة التقارير الجديدة (2026-11-17) — `docs/REPORTS_SPEC.md`
 - المنطق في `packages/ajil_core/lib/src/reports.dart` (`ReportPeriod`، `PeriodReport.build`) + 19 اختباراً (ajil_core: 44/44). الشاشة عرض فقط.
 - الشاشة: `app/lib/features/reports/` (reports_screen، report_sections، report_views، period_picker، report_state). الافتراضي الشهر الحالي، يوم/شهر/سنة/من–إلى، الفترة تبقى طوال الجلسة. السنة أو >3000 حركة تُحسب في isolate.
