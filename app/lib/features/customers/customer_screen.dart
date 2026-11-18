@@ -12,6 +12,7 @@ import '../../services/statement_pdf.dart';
 import '../../services/whatsapp.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
+import 'statement_link_sheet.dart';
 
 /// كشف حساب الزبون: رصيد لكل عملة، إجمالي/تحليلي، حالة المزامنة لكل حركة، الوعد، الإلغاء
 class CustomerScreen extends ConsumerStatefulWidget {
@@ -164,6 +165,12 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
             ListTile(leading: const Icon(Icons.picture_as_pdf_outlined), title: const Text('مشاركة الكشف PDF'), onTap: () => Navigator.pop(ctx, 'pdf')),
             ListTile(leading: const Icon(Icons.print_outlined), title: const Text('طباعة الكشف'), onTap: () => Navigator.pop(ctx, 'print')),
             ListTile(
+              leading: const Icon(Icons.link_rounded),
+              title: const Text('رابط كشف الحساب'),
+              subtitle: const Text('صفحة يفتحها الزبون من جواله: نسخ، مشاركة، تجديد'),
+              onTap: () => Navigator.pop(ctx, 'link'),
+            ),
+            ListTile(
               leading: Icon(Icons.date_range_outlined, color: _range == null ? null : AjilColors.primary),
               title: const Text('فترة الكشف'),
               subtitle: Text(_range == null
@@ -211,6 +218,8 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
           showOk(context, 'تنبيه: توجد حركات غير متزامنة — الرصيد محسوب من هذا الجوال');
         }
         v == 'pdf' ? await StatementPdf.share(bytes, 'كشف-${customer.name}.pdf') : await StatementPdf.printDoc(bytes);
+      case 'link':
+        if (context.mounted) await showStatementLinkSheet(context, customer);
       case 'range':
         final r = await showDateRangePicker(context: context, firstDate: DateTime(2015), lastDate: DateTime.now(), initialDateRange: _range);
         setState(() => _range = r);

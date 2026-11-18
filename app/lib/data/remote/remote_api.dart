@@ -350,6 +350,15 @@ class SupabaseRemoteApi implements RemoteApi {
     }
   }
 
+  /// رابط كشف الحساب العام: يرجع الـ token الحالي أو ينشئه (regenerate يُبطل القديم)
+  Future<String> statementLink(String customerId, {bool regenerate = false}) async {
+    try {
+      return await _rpc<String>('statement_link', {'p_customer': customerId, 'p_regenerate': regenerate});
+    } catch (e) {
+      _rethrow(e);
+    }
+  }
+
   /// قناة Realtime: أي حركة جديدة في الفرع ← مزامنة فورية
   RealtimeChannel subscribeBranch(String branchId, void Function() onChange) {
     final ch = client.channel('branch:$branchId');

@@ -22,6 +22,17 @@
         "scripts/run-web.ps1"
       ],
       "port": 8091
+    },
+    {
+      "name": "statement",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/run-statement.ps1"
+      ],
+      "port": 8092
     }
   ]
 }

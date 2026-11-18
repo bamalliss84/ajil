@@ -5,9 +5,10 @@
 #   ... run-phone.ps1 -Phone 192.168.0.100:34279                            # جوال لاسلكي (Wireless debugging)
 #   ... run-phone.ps1 -Lan                                                   # بدل adb reverse: IP الكمبيوتر على الشبكة
 #   ... run-phone.ps1 -Reverse                                               # إجبار adb reverse حتى لو قاعدة الجدار موجودة
+#   ... run-phone.ps1 -StatementUrl https://x/statement/                     # عنوان صفحة كشف الحساب (افتراضياً run-statement.ps1 عبر adb reverse 8092)
 # ملاحظة: adb reverse يضيع عند انقطاع التصحيح اللاسلكي فتبقى الحركات «بانتظار المزامنة».
 # الحل الثابت: شغّل scripts\open-firewall.ps1 مرة واحدة (كمسؤول) — بعدها يُستخدم IP الكمبيوتر تلقائياً.
-param([switch]$Apk, [switch]$Lan, [switch]$Reverse, [string]$Device, [string]$Phone)
+param([switch]$Apk, [switch]$Lan, [switch]$Reverse, [string]$Device, [string]$Phone, [string]$StatementUrl = '')
 . "$PSScriptRoot\_common.ps1"
 Connect-WirelessPhone $Phone
 if ($Phone -and -not $Device) { $Device = $Phone }
@@ -34,7 +35,12 @@ if ($Lan) {
   Write-Warning 'وضع adb reverse: إذا انقطع التصحيح اللاسلكي لن تتزامن الحركات حتى تعيد تشغيل هذا السكربت. للحل الثابت: scripts\open-firewall.ps1'
 }
 
-$defines = @("--dart-define=SUPABASE_URL=$url", "--dart-define=SUPABASE_ANON_KEY=$anon")
+# صفحة كشف الحساب (scripts/run-statement.ps1 على المنفذ 8092) — للتجربة من نفس الجوال
+if (-not $StatementUrl) {
+  & (Get-Adb) -s $Device reverse tcp:8092 tcp:8092 | Out-Null
+  $StatementUrl = 'http://127.0.0.1:8092/statement/'
+}
+$defines = @("--dart-define=SUPABASE_URL=$url", "--dart-define=SUPABASE_ANON_KEY=$anon", "--dart-define=STATEMENT_BASE_URL=$StatementUrl")
 Set-Location (Join-Path $Root 'app')
 Write-Host "الجهاز: $Device   الخادم: $url" -ForegroundColor Cyan
 

@@ -49,6 +49,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
         'employees_can_send_notices': _s!['employees_can_send_notices'] == true,
       });
       s.settings?['employees_can_send_notices'] = _s!['employees_can_send_notices'] == true;
+      s.settings?['reminder_template'] = _tpl.text.trim(); // يستخدمه زر التذكير بواتساب فوراً
       if (mounted) showOk(context, 'تم حفظ الإعدادات');
     } catch (e) {
       if (mounted) showError(context, e);

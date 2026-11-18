@@ -62,17 +62,18 @@ cd app && flutter pub get && flutter test && flutter run
 
 ## الحالة الحالية
 - ✅ المرحلة 0: التحليل والتصميم (8 شاشات)
-- ✅ المرحلة 1: قاعدة البيانات — 12 migrations و **132 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
+- ✅ المرحلة 1: قاعدة البيانات — 13 migrations و **166 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
 - ✅ تقوية العزل (migration 12 + `isolation_test.sql`): الوعد يتحقق من الزبون، `created_by` من التوكن، الموظف الموقوف يفقد الوصول فوراً، EXECUTE مسحوبة من public/anon (كل دالة جديدة في `app` تحتاج `revoke execute … from public, anon`)، `current_subscription` لبقالتي فقط، OTP والأكواد بـ `gen_random_bytes`
 - ✅ المرحلة 2.1: Edge Functions — send-otp, register-store, add-employee, reset-password, sync-push — مجرّبة محلياً بـ curl + 6 اختبارات للمنطق المشترك
 - ✅ المرحلة 2.2: `packages/ajil_core` — 46 اختباراً ناجحاً
-- ✅ المرحلة 2.3–2.4: تطبيق Flutter يُترجم: `flutter analyze` بلا أخطاء، `flutter test` 9/9. البيئة Flutter 3.24.5 (لهذا `drift_flutter <0.2.5` و override لـ `app_links`)
+- ✅ المرحلة 2.3–2.4: تطبيق Flutter يُترجم: `flutter analyze` بلا أخطاء، `flutter test` 12/12. البيئة Flutter 3.24.5 (لهذا `drift_flutter <0.2.5` و override لـ `app_links`)
 - ✅ التجربة على جوال حقيقي (لاسلكياً): `scripts/dev-up.ps1 -Phone ip:port` ثم `scripts/run-phone.ps1 -Phone ip:port` (adb reverse ← `SUPABASE_URL=http://127.0.0.1:54321`). مُتحقَّق حتى شاشة PIN؛ بقية السيناريو يدوي
 - 🟡 مطابقة التصميم: الثيم والخط وكل الشاشات أُعيد بناؤها حسب `docs/design` (`widgets/ui.dart`)، وقورنت لقطات الجوال بالتصميم (عدا شاشة الدخول)
 - ✅ شاشة التقارير (يوم/شهر/سنة/فترة + PDF/Excel) حسب `docs/REPORTS_SPEC.md` — منطقها في `ajil_core/src/reports.dart` (ajil_core 46 اختباراً)
 - ✅ لوحة الإدارة (`web/admin`): تُترجم وجُرّبت في المتصفح محلياً — `scripts/run-admin.ps1` (http://localhost:8090)، مدير محلي `scripts/create-platform-admin.ps1`
 - 🟡 المرحلة 3: صفحة التعريف (`web/landing`) لم تكتمل؛ صفحة المشترك = التطبيق نفسه على الويب — ✅ جُرّبت كاملة (`scripts/run-web.ps1`، http://localhost:8091): زبون، حركة متصلة، ومنع الكتابة بدون اتصال. `drift_worker.js` يُترجم من `app/tool/drift_worker.dart`
 - ✅ فتح تطبيق الجوال بدون نت بعد إغلاقه: يفتح من آخر جلسة محفوظة (كان يعلق على شاشة البداية) — مُتحقَّق على الجوال
+- ✅ رابط كشف الحساب العام: `app.statement_links` + `app.public_statement` (الدالة الوحيدة لـ anon)، الصفحة `web/statement/index.html` (`scripts/run-statement.ps1`، http://localhost:8092/statement/#token)، وفي التطبيق: الزبون ← الكشف والمزيد ← «رابط كشف الحساب»، و`{الرابط}` في التذكير ورسائل الأرصدة (`STATEMENT_BASE_URL`)
 - ⏭️ التفاصيل والخطوات: `docs/NEXT_TASKS.md`
 
 حدّث هذا القسم و `docs/NEXT_TASKS.md` في نهاية كل جلسة عمل.

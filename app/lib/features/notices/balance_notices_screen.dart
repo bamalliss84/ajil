@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme.dart';
+import '../../services/statement_links.dart';
 import '../../services/whatsapp.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
@@ -118,12 +119,28 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
     });
   }
 
+  /// روابط الكشف لزبائن الدفعة (null = لا رابط: بدون نت ولا رابط محفوظ)
+  final Map<String, String?> _links = {};
+  final Map<String, Future<String?>> _linkFetches = {};
+
+  bool get _wantsLink => _batch!.template.contains('{الرابط}');
+
+  /// رابط الكشف: المحفوظ على الجوال أو يُجلب إن وُجد نت، وإلا تُرسل الرسالة بدون سطر الرابط
+  Future<void> _ensureLink(NoticeRecipient r) async {
+    final id = r.customer.id;
+    if (!_wantsLink || _links.containsKey(id)) return;
+    final pending = _linkFetches[id] ??= StatementLinks.linkFor(ref.read(sessionProvider), id);
+    final link = await pending;
+    if (mounted) setState(() => _links[id] = link);
+  }
+
   String _message(NoticeRecipient r) => BalanceNotices.render(
         _batch!.template,
         r: r,
         store: sessionOf(ref).storeName,
         asOf: _batch!.asOf,
         f: ref.read(moneyFormatProvider),
+        link: _links[r.customer.id],
       );
 
   /// أول زبون في الدور ما زال له رصيد (لو تغيّر رصيده بمزامنة متأخرة يُتخطى تلقائياً)
@@ -141,6 +158,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
   Future<void> _send(NoticeRecipient r) async {
     setState(() => _awaitingConfirm = true);
     try {
+      await _ensureLink(r);
       await Whatsapp.send(r.customer.phone!, _message(r));
     } catch (e) {
       if (mounted) {
@@ -233,7 +251,8 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
     final preview = sel == null || sel.recipients.isEmpty
         ? null
         : BalanceNotices.render(_tpl.text.trim().isEmpty ? BalanceNotices.defaultTemplate : _tpl.text,
-            r: sel.recipients.first, store: w.storeName, asOf: _asOf, f: f);
+            r: sel.recipients.first, store: w.storeName, asOf: _asOf, f: f,
+            link: StatementLinks.configured ? StatementLinks.url('…') : null);
 
     return Column(children: [
       Expanded(
@@ -344,7 +363,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
               TextField(controller: _tpl, maxLines: 5, onChanged: (_) => setState(() {})),
               const SizedBox(height: 6),
               Wrap(spacing: 6, children: [
-                for (final p in BalanceNotices.placeholders.where((p) => p != '{الرابط}'))
+                for (final p in BalanceNotices.placeholders)
                   ActionChip(
                     label: Text(p, style: const TextStyle(fontSize: 12)),
                     onPressed: () {
@@ -437,6 +456,9 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
     final b = _batch!;
     final r = _current();
     if (r == null) return _done();
+    if (_wantsLink && !_links.containsKey(r.customer.id)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _ensureLink(r)); // المعاينة تُحدَّث بالرابط
+    }
     final f = ref.watch(moneyFormatProvider);
     final total = b.queue.length;
     final upcoming = b.queue

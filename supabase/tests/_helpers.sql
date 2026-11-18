@@ -1,6 +1,6 @@
 -- دوال مساعدة مشتركة للاختبارات
 create schema if not exists test;
-grant usage on schema test to authenticated;
+grant usage on schema test to authenticated, anon;
 
 create or replace function test.ok(cond boolean, msg text) returns void
 language plpgsql as $$
@@ -23,7 +23,7 @@ begin
   end;
   raise exception 'FAIL: % — نجح الأمر وكان يجب أن يفشل', msg;
 end $$;
-grant execute on all functions in schema test to authenticated;
+grant execute on all functions in schema test to authenticated, anon;
 
 create or replace function test.login(p_store uuid, p_user uuid, p_role text) returns void
 language sql as $$

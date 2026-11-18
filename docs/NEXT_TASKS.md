@@ -6,6 +6,22 @@
 > قاعدة البيانات مختبرة فعلياً (97 اختباراً)، ومنطق Edge Functions المشترك مختبر (6 اختبارات).
 > أول مهمة لك: تشغيل `flutter analyze` وإصلاح أي أخطاء ترجمة أو اختلاف في إصدارات الحزم — **بدون تغيير القواعد في CLAUDE.md**.
 
+## ✅ رابط كشف الحساب العام للزبون (2026-11-19)
+- **القاعدة:** `migrations/…13_statement_links.sql` — جدول `app.statement_links` (رابط واحد لكل زبون: customer_id PK، token فريد 128 بت base64url، revoked_at، last_viewed_at، view_count). القراءة بـ RLS لمن له `has_branch`، ولا insert/update مباشر.
+  - `app.statement_link(p_customer, p_regenerate)`: يرجع الـ token أو ينشئه؛ التجديد (وإعادة تفعيل رابط ملغى) للمالك أو للموظف إن كان `employees_can_send_notices`. `app.revoke_statement_link(p_customer)` للإلغاء بدون بديل (غير مستخدمة في التطبيق بعد).
+  - `app.public_statement(p_token)`: لـ anon فقط (`grant usage on schema app to anon`، بلا أي صلاحية على الجداول). ترجع اسم البقالة والفرع والزبون، الأرصدة لكل عملة (الإجماليات بدون الملغاة وقيودها)، آخر 50 حركة بدون الملغاة، الوعود المفتوحة (تاريخ ومبلغ فقط)، ووقت الاستعلام — بلا جوال ولا ملاحظات ولا سقف ولا معرّفات. `null` موحّد لأي رابط غير صالح/ملغى/زبون مؤرشف/بقالة موقوفة. تحدّث المشاهدات.
+  - `statement_link_test.sql` (33) + تحديث `isolation_test.sql` (anon مسموح له `public_statement` فقط، ولا صلاحية لـ anon/public على جداول app) ← **166 ✓**. `_helpers.sql` يمنح anon مخطط `test` (للاختبارات فقط).
+- **الصفحة:** `web/statement/index.html` ملف واحد بلا framework (RTL، IBM Plex Sans Arabic، ألوان DESIGN.md، للجوال أولاً). الـ token في `location.hash` فلا يصل للخادم. `noindex` و `referrer=no-referrer` و CSP. عند النشر استبدل `__SUPABASE_URL__` و `__SUPABASE_ANON_KEY__` و `__LANDING_URL__`، وأضف ترويستي `Referrer-Policy: no-referrer` و `X-Robots-Tag: noindex` في الاستضافة.
+  - محلياً: `scripts/run-statement.ps1` (أو preview «statement») ← http://localhost:8092/statement/#token. جُرّبت: الكشف، و«الرابط غير صالح»، وبعرض 375px.
+- **التطبيق:** `services/statement_links.dart` (الـ token يُحفظ في `KeyValues` بعد أول جلب)، `features/customers/statement_link_sheet.dart` (نسخ، مشاركة، تجديد بتأكيد؛ رسالة واضحة بدون نت)، المدخل: شاشة الزبون ← «الكشف والمزيد» ← «رابط كشف الحساب».
+  - `Whatsapp.remind` يستخدم الآن قالب البقالة `reminder_template` ويملأ `{الرابط}`؛ بدون رابط تُحذف جملة الرابط كاملة (`whatsapp_fill_test.dart`، 3 اختبارات).
+  - `balance_notices_screen`: شريحة `{الرابط}` مفعّلة، والرابط يُجلب لكل زبون قبل المعاينة/الإرسال (المحفوظ أو من الخادم، وإلا بدون سطر الرابط).
+  - `STATEMENT_BASE_URL`: `run-web.ps1` يضبطه على http://localhost:8092/statement/، و `run-phone.ps1` على http://127.0.0.1:8092/statement/ مع `adb reverse tcp:8092` (أو `-StatementUrl`).
+  - جُرّب في الويب (بناء منفصل): القائمة ← الرابط يُنشأ ← التجديد يبطل القديم ← الرابط الجديد يفتح الكشف. `flutter analyze` بلا أخطاء، `flutter test` 12/12.
+- [ ] لم يُجرَّب على الجوال: المشاركة الأصلية، ورسالة «لا يوجد اتصال» في نافذة الرابط، ورسالة واتساب بالرابط من جوال حقيقي.
+- [ ] الدومين النهائي لـ STATEMENT_BASE_URL والاستضافة (قرار معلّق مع اسم الشركة والدومين).
+- [ ] زر «إلغاء الرابط» في التطبيق (الدالة جاهزة)، وعرض عدد المشاهدات وآخرها للمالك.
+
 ## ✅ تقوية العزل بين البقالات (2026-11-18) — `supabase/migrations/20261118000012_isolation_hardening.sql`
 - `app.promises`: trigger `promises_customer_check` يرفض `customer_mismatch` إن لم يتبع الزبون نفس البقالة والفرع.
 - `created_by` في `customers` و `promises` يفرضه الخادم `:= app.app_user_id()` لطلبات API (authenticated/anon)؛ مفتاح الخدمة والاتصال المباشر يحتفظان بالقيمة.
@@ -17,7 +33,7 @@
 - `otp_issue` و `generate_codes` بـ `gen_random_bytes` (pgcrypto في مخطط `extensions`).
 - الاختبارات: `isolation_test.sql` (34) ← المجموع **132 ✓** (ledger 43، services 54، cron 1، isolation 34). جُرّب حياً: send-otp ← register-store ← الدخول (claims من الخطّاف) ← RLS و `pull_changes`، و authenticated مرفوض من `otp_issue`، و anon مرفوض من مخطط app.
 - تشغيل كل الاختبارات (بعد `npx supabase db reset`، لأن إعادة الضبط تعيد تشغيل الحاوية وتمسح /tmp):
-  `docker cp supabase/tests supabase_db_ajil:/tmp/ajtests && for t in ledger services cron isolation; do docker exec supabase_db_ajil psql -U postgres -v ON_ERROR_STOP=1 -f /tmp/ajtests/${t}_test.sql; done`
+  `docker cp supabase/tests supabase_db_ajil:/tmp/ajtests && for t in ledger services cron isolation statement_link; do docker exec supabase_db_ajil psql -U postgres -v ON_ERROR_STOP=1 -f /tmp/ajtests/${t}_test.sql; done`
 
 ## ✅ شاشة التقارير الجديدة (2026-11-17) — `docs/REPORTS_SPEC.md`
 - المنطق في `packages/ajil_core/lib/src/reports.dart` (`ReportPeriod`، `PeriodReport.build`) + 19 اختباراً (ajil_core: 44/44). الشاشة عرض فقط.
@@ -98,7 +114,7 @@
 - [ ] صفحة التعريف: `web/landing/index.html` — ضع رابط المتجر ورقم الدعم
 
 ## 6. ميزات لم تُنفّذ بعد (حسب الأولوية)
-- [ ] **رابط كشف الحساب العام للزبون**: جدول `statement_links` (token عشوائي طويل، يُلغى) + Edge Function `public-statement` تعرض صفحة HTML للقراءة فقط. الإعداد `STATEMENT_BASE_URL` جاهز في التطبيق
+- [x] ✅ **رابط كشف الحساب العام للزبون** — نُفّذ بدالة `app.public_statement` (anon) وصفحة ثابتة `web/statement` بدل Edge Function (انظر القسم أعلاه)
 - [ ] **شاشة قائمة التحصيل الشهرية**: في يوم المطالبة، كل زبون عليه أكثر من الحد مع زر واتساب لكل واحد (الإعدادات والتنبيه موجودان)
 - [ ] **استيراد الزبائن** من جهات الاتصال أو Excel مع الرصيد الافتتاحي
 - [ ] **تشفير القاعدة المحلية** بـ SQLCipher (`sqlcipher_flutter_libs` + مفتاح في التخزين الآمن)
@@ -135,5 +151,5 @@
   - المداخل: بطاقة في الرئيسية، زر في «التنبيهات والتحصيل» (مع مفتاح صلاحية الموظفين)، و**تنبيه يوم المطالبة الشهري يفتح الشاشة مباشرة** (payload `/notices` عبر `Notifications.tapRoute`).
   - صفحة الزبون ← القائمة ← «رسائل الرصيد المرسلة» (مرجع عند الخلاف).
   - اختبار مزامنة جديد في `test/sync_engine_test.dart` (استئناف الدفعة + عدم تكرار الإرسال من جوال ثانٍ).
-- **لاحقاً (غير منفّذ):** `{الرابط}` لكشف الحساب العام (ينتظر ميزة الرابط العام)، وقنوات مدفوعة SMS/WhatsApp API للباقة الأعلى.
+- ✅ `{الرابط}` لكشف الحساب العام مفعّل (2026-11-19). **لاحقاً (غير منفّذ):** قنوات مدفوعة SMS/WhatsApp API للباقة الأعلى.
 - **تحقق يدوي على جهاز حقيقي:** الرجوع من واتساب يُظهر «هل وصلت الرسالة؟»، والضغط على تنبيه المطالبة وهو مقفل يفتح الشاشة بعد إدخال PIN.

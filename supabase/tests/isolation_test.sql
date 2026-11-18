@@ -114,8 +114,12 @@ select set_config('request.jwt.claims', '', false);
 select test.ok(not exists (
   select 1 from pg_proc p, aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
   where p.pronamespace = 'app'::regnamespace and a.privilege_type = 'EXECUTE'
-    and (a.grantee = 0 or a.grantee = 'anon'::regrole)),
-  'لا توجد دالة في app يستطيع public أو anon تنفيذها');
+    and (a.grantee = 0 or (a.grantee = 'anon'::regrole and p.proname <> 'public_statement'))),
+  'لا توجد دالة في app يستطيع public أو anon تنفيذها (عدا public_statement لـ anon)');
+select test.ok(not exists (
+  select 1 from information_schema.role_table_grants
+  where table_schema = 'app' and grantee in ('anon', 'PUBLIC')),
+  'anon و public بلا أي صلاحية على جداول app');
 select test.ok(not has_function_privilege('authenticated', 'app.otp_issue(text,text)', 'execute')
            and not has_function_privilege('authenticated', 'app.otp_verify(text,text,text)', 'execute')
            and not has_function_privilege('authenticated', 'app.create_store(text,text,text,uuid,text,text)', 'execute')

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0F6E56">
+<!--
+  كشف الحساب العام للزبون (قراءة فقط).
+  الرابط: https://<الدومين>/statement/#<token> — الـ token في الـ hash فلا يصل لأي خادم ولا يُسجَّل في السجلات.
+  قبل النشر استبدل القيم الثلاث في CONFIG (scripts/run-statement.ps1 يفعل ذلك محلياً)،
+  وأضف في الاستضافة الترويسات: Referrer-Policy: no-referrer و X-Robots-Tag: noindex.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src __SUPABASE_URL__; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; base-uri 'none'; form-action 'none'">
+<title>كشف الحساب — آجِل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#0F6E56;--gd:#085041;--gl:#E1F5EE;--t:#1F2A2E;--m:#5B6B70;--bg:#F5F7F6;
+  --line:#EEF2F1;--border:#D5DDDB;
+  --debt:#B03224;--debt-bg:#FCEDEB;--pay:#1E7A43;--pay-bg:#E3F3E9;
+  --warn:#7A4A07;--warn-bg:#FBEFD9;--warn-dot:#E0962A;--info:#1D4F86;--info-bg:#E6EEF8;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;color:var(--t);background:var(--bg);line-height:1.6;
+  -webkit-text-size-adjust:100%;min-height:100vh;display:flex;flex-direction:column}
+.num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{background:var(--g);color:#fff;padding:20px 16px 56px}
+.head{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.mark{flex:none;width:44px;height:44px;border-radius:12px;background:#fff;color:var(--g);display:grid;place-items:center;font-size:24px;font-weight:600}
+.store{font-size:19px;font-weight:600;margin:0;line-height:1.35}
+.branch{font-size:13px;opacity:.85;margin:0}
+main{flex:1;width:100%;max-width:560px;margin:-40px auto 0;padding:0 16px 24px}
+.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(15,40,35,.06)}
+.who{display:flex;align-items:center;gap:12px}
+.avatar{flex:none;width:48px;height:48px;border-radius:50%;background:var(--gl);color:var(--gd);display:grid;place-items:center;font-weight:600;font-size:20px}
+.cname{font-size:18px;font-weight:600;margin:0}
+.sub{font-size:13px;color:var(--m);margin:0}
+.bal{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.bal:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.bal-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.bal-label{font-size:14px;color:var(--m)}
+.bal-amount{font-size:26px;font-weight:600}
+.debt{color:var(--debt)} .pay{color:var(--pay)} .zero{color:var(--m)}
+.pill{display:inline-block;font-size:12px;border-radius:6px;padding:1px 8px;font-weight:500}
+.pill.debt{background:var(--debt-bg)} .pill.pay{background:var(--pay-bg)} .pill.zero{background:var(--line)}
+.totals{display:flex;gap:16px;font-size:13px;color:var(--m);margin-top:4px;flex-wrap:wrap}
+h2{font-size:15px;font-weight:600;margin:0 0 8px;color:var(--t)}
+.promise{display:flex;align-items:center;gap:10px;background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:14px}
+.dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--warn-dot)}
+.tx{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.tx:first-of-type{border-top:0}
+.tx-main{min-width:0}
+.tx-kind{font-weight:500;font-size:15px}
+.tx-desc{font-size:13px;color:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-date{font-size:12px;color:var(--m)}
+.tx-amt{flex:none;font-weight:600;font-size:16px;text-align:left}
+.note{font-size:12px;color:var(--m);text-align:center;margin:12px 0 0}
+.state{text-align:center;padding:32px 16px}
+.state .icon{width:56px;height:56px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:var(--line);color:var(--m)}
+.state h1{font-size:18px;margin:0 0 6px}
+.state p{margin:0;color:var(--m);font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;margin-top:16px;border:0;border-radius:14px;background:var(--g);color:#fff;font:inherit;font-weight:600;font-size:16px;cursor:pointer}
+.sk{background:linear-gradient(90deg,var(--line),#F7F9F8,var(--line));background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px;height:14px;margin:10px 0}
+@keyframes sk{to{background-position:-200% 0}}
+footer{text-align:center;padding:16px 16px calc(16px + env(safe-area-inset-bottom));font-size:13px;color:var(--m)}
+footer a{color:var(--g);font-weight:600;text-decoration:none}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="mark" aria-hidden="true">آ</div>
+    <div>
+      <p class="store" id="store">كشف الحساب</p>
+      <p class="branch" id="branch"></p>
+    </div>
+  </div>
+</header>
+
+<main id="main" aria-live="polite">
+  <div class="card" id="loading">
+    <div class="sk" style="width:40%;height:20px"></div><div class="sk" style="width:70%"></div>
+    <div class="sk" style="width:55%;height:28px;margin-top:24px"></div><div class="sk" style="width:85%"></div>
+  </div>
+</main>
+
+<footer>بواسطة <a id="brand" href="__LANDING_URL__" rel="noopener noreferrer">آجِل</a> — دفتر ديون البقالة على الجوال</footer>
+
+<script>
+'use strict';
+const CONFIG = {
+  supabaseUrl: '__SUPABASE_URL__',
+  anonKey: '__SUPABASE_ANON_KEY__',
+};
+
+const KINDS = {
+  opening: ['رصيد افتتاحي', true], debt: ['دين', true], payment: ['سداد', false],
+  payment_fx: ['سداد بعملة أخرى', false], return: ['مرتجع', false], discount: ['خصم / مسامحة', false],
+};
+const CURRENCIES = { YER: ['ر.ي', 0], SAR: ['ر.س', 2], USD: ['$', 2], AED: ['د.إ', 2], OMR: ['ر.ع', 3], KWD: ['د.ك', 3] };
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;   // textContent فقط: لا HTML من البيانات
+  return e;
+};
+
+function money(value, currency) {
+  const [sym, dec] = CURRENCIES[currency] || [currency, 2];
+  const n = Math.abs(Number(value));
+  const s = n.toLocaleString('en-US', { minimumFractionDigits: Number.isInteger(n) ? 0 : dec, maximumFractionDigits: dec });
+  return s + ' ' + sym;
+}
+const dateFmt = new Intl.DateTimeFormat('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' });
+const timeFmt = new Intl.DateTimeFormat('ar-u-nu-latn', { day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit' });
+function fmtDate(v) {
+  // الوعد تاريخ بدون وقت (YYYY-MM-DD): نقرؤه محلياً حتى لا يتأخر يوماً بسبب المنطقة الزمنية
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(v + 'T00:00:00') : new Date(v);
+  return dateFmt.format(d);
+}
+const numSpan = (cls, text) => { const s = el('span', 'num ' + (cls || ''), text); return s; };
+
+function showState(title, body, retry) {
+  $('store').textContent = 'كشف الحساب';
+  $('branch').textContent = '';
+  document.title = 'كشف الحساب — آجِل';
+  const main = $('main');
+  main.replaceChildren();
+  const card = el('div', 'card state');
+  const icon = el('div', 'icon');
+  icon.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>';
+  card.append(icon, el('h1', null, title), el('p', null, body));
+  if (retry) {
+    const b = el('button', 'btn', 'إعادة المحاولة');
+    b.type = 'button';
+    b.onclick = load;
+    card.append(b);
+  }
+  main.append(card);
+}
+
+function render(d) {
+  $('store').textContent = d.store_name;
+  $('branch').textContent = d.branch_name || '';
+  document.title = 'كشف حساب ' + d.customer_name + ' — ' + d.store_name;
+  const main = $('main');
+  main.replaceChildren();
+
+  // الزبون والأرصدة
+  const head = el('div', 'card');
+  const who = el('div', 'who');
+  const info = el('div');
+  info.append(el('p', 'cname', d.customer_name), el('p', 'sub', 'كشف حساب حتى ' + timeFmt.format(new Date(d.generated_at))));
+  who.append(el('div', 'avatar', (d.customer_name || '؟').trim().charAt(0)), info);
+  head.append(who);
+
+  const balances = (d.balances || []).filter((b) => Number(b.balance) !== 0 || Number(b.total_debit) !== 0);
+  const balWrap = el('div');
+  balWrap.style.marginTop = '16px';
+  if (balances.length === 0) {
+    const row = el('div', 'bal');
+    row.append(el('div', 'bal-label', 'لا يوجد رصيد'), el('div', 'bal-amount zero', 'الحساب صافٍ'));
+    balWrap.append(row);
+  }
+  for (const b of balances) {
+    const v = Number(b.balance);
+    const cls = v > 0 ? 'debt' : v < 0 ? 'pay' : 'zero';
+    const row = el('div', 'bal');
+    const top = el('div', 'bal-row');
+    const label = el('div', 'bal-label');
+    label.append(el('span', 'pill ' + cls, v > 0 ? 'عليك' : v < 0 ? 'لك' : 'صافٍ'));
+    top.append(label, numSpan('bal-amount ' + cls, money(v, b.currency)));
+    const totals = el('div', 'totals');
+    const t1 = el('span', null, 'إجمالي الديون: '); t1.append(numSpan('', money(b.total_debit, b.currency)));
+    const t2 = el('span', null, 'المسدد: '); t2.append(numSpan('', money(b.total_credit, b.currency)));
+    totals.append(t1, t2);
+    row.append(top, totals);
+    balWrap.append(row);
+  }
+  head.append(balWrap);
+  main.append(head);
+
+  // الوعود المفتوحة
+  if ((d.promises || []).length) {
+    const card = el('div', 'card');
+    card.append(el('h2', null, 'وعود السداد'));
+    for (const p of d.promises) {
+      const row = el('div', 'promise');
+      const text = el('span', null, 'وعد بالسداد في ' + fmtDate(p.date));
+      if (p.amount != null) { text.append(' — '); text.append(numSpan('', money(p.amount, p.currency || (balances[0] || {}).currency || 'YER'))); }
+      row.append(el('span', 'dot'), text);
+      card.append(row);
+    }
+    main.append(card);
+  }
+
+  // آخر الحركات
+  const txCard = el('div', 'card');
+  txCard.append(el('h2', null, 'آخر الحركات'));
+  const txs = d.transactions || [];
+  if (txs.length === 0) txCard.append(el('p', 'sub', 'لا توجد حركات بعد.'));
+  for (const t of txs) {
+    const [label, isDebit] = KINDS[t.kind] || [t.kind, true];
+    const row = el('div', 'tx');
+    const m = el('div', 'tx-main');
+    m.append(el('div', 'tx-kind', label));
+    if (t.description) m.append(el('div', 'tx-desc', t.description));
+    m.append(el('div', 'tx-date', fmtDate(t.date)));
+    row.append(m, numSpan('tx-amt ' + (isDebit ? 'debt' : 'pay'), (isDebit ? '+' : '−') + money(t.amount, t.currency)));
+    txCard.append(row);
+  }
+  if (txs.length >= 50) txCard.append(el('p', 'note', 'تظهر آخر 50 حركة فقط. للكشف الكامل اطلبه من البقالة.'));
+  main.append(txCard);
+  main.append(el('p', 'note', 'هذا الكشف للاطلاع فقط. عند أي اختلاف تواصل مع البقالة.'));
+}
+
+async function load() {
+  const token = decodeURIComponent(location.hash.replace(/^#/, '')).trim();
+  if (!/^[A-Za-z0-9_-]{22}$/.test(token)) {
+    showState('الرابط غير صالح', 'تأكد من نسخ الرابط كاملاً، أو اطلب رابطاً جديداً من البقالة.');
+    return;
+  }
+  const headers = { 'apikey': CONFIG.anonKey, 'Content-Type': 'application/json', 'Content-Profile': 'app', 'Accept-Profile': 'app' };
+  if (CONFIG.anonKey.startsWith('eyJ')) headers['Authorization'] = 'Bearer ' + CONFIG.anonKey;   // مفتاح anon القديم (JWT)
+  try {
+    const res = await fetch(CONFIG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/rpc/public_statement', {
+      method: 'POST', headers, body: JSON.stringify({ p_token: token }),
+      referrerPolicy: 'no-referrer', cache: 'no-store', credentials: 'omit',
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data) {
+      showState('الرابط غير صالح', 'ربما انتهت صلاحية الرابط أو جدّدته البقالة. اطلب رابطاً جديداً منها.');
+      return;
+    }
+    render(data);
+  } catch (e) {
+    showState('تعذّر تحميل الكشف', 'تحقق من اتصالك بالإنترنت ثم أعد المحاولة.', true);
+  }
+}
+
+window.addEventListener('hashchange', load);
+load();
+</script>
+</body>
+</html>
