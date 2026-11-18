@@ -5,7 +5,6 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,7 +43,7 @@ class AdminApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: _green, primary: _green),
-          textTheme: GoogleFonts.ibmPlexSansArabicTextTheme(),
+          fontFamily: 'IBMPlexSansArabic',
           scaffoldBackgroundColor: const Color(0xFFF5F7F6),
         ),
         home: StreamBuilder<AuthState>(
@@ -167,6 +166,20 @@ class SummaryPage extends StatelessWidget {
       );
 }
 
+String _planName(Object? code) => switch (code) {
+      'trial' => 'تجربة',
+      'basic' => 'أساسية',
+      'advanced' => 'متقدمة',
+      'premium' => 'مميزة',
+      null => '—',
+      _ => '$code',
+    };
+
+/// كود التفعيل بمقاطع رباعية كما يُطبع للمندوب: ABCD-EFGH-IJKL
+String _dashed(String c) => c.contains('-')
+    ? c
+    : [for (var i = 0; i < c.length; i += 4) c.substring(i, i + 4 > c.length ? c.length : i + 4)].join('-');
+
 class StoresPage extends StatefulWidget {
   const StoresPage({super.key});
   @override
@@ -191,6 +204,34 @@ class _StoresPageState extends State<StoresPage> {
   void initState() {
     super.initState();
     _load();
+  }
+
+  Future<void> _toggleStatus(Map<String, dynamic> r) async {
+    final suspend = r['status'] != 'suspended';
+    if (suspend) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('إيقاف ${r['name']}؟'),
+          content: const Text('لن يستطيع مستخدمو البقالة تسجيل حركات حتى تعيد تفعيلها. البيانات لا تُحذف.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('رجوع')),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: _red),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('إيقاف'),
+            ),
+          ],
+        ),
+      );
+      if (ok != true) return;
+    }
+    try {
+      await _rpc('admin_set_store_status', {'p_store': r['store_id'], 'p_status': suspend ? 'suspended' : 'active'});
+      await _load();
+    } catch (e) {
+      if (mounted) _err(context, e);
+    }
   }
 
   Future<void> _activate(Map<String, dynamic> s) async {
@@ -288,16 +329,30 @@ class _StoresPageState extends State<StoresPage> {
                       DataColumn(label: Text('زبائن')),
                       DataColumn(label: Text('مستخدمون')),
                       DataColumn(label: Text('آخر حركة')),
-                      DataColumn(label: Text('')),
                     ],
                     rows: [
                       for (final r in rows)
                         DataRow(
                           color: WidgetStatePropertyAll(r['status'] == 'suspended' ? const Color(0xFFFCEDEB) : null),
                           cells: [
-                            DataCell(Text('${r['name']}${r['status'] == 'suspended' ? ' (موقوفة)' : ''}')),
+                            DataCell(Row(mainAxisSize: MainAxisSize.min, children: [
+                              PopupMenuButton<String>(
+                                tooltip: 'إجراءات',
+                                icon: const Icon(Icons.more_vert, size: 20),
+                                onSelected: (a) => a == 'activate' ? _activate(r) : _toggleStatus(r),
+                                itemBuilder: (_) => [
+                                  const PopupMenuItem(value: 'activate', child: Text('تفعيل / تجديد الاشتراك')),
+                                  PopupMenuItem(
+                                    value: 'status',
+                                    child: Text(r['status'] == 'suspended' ? 'إعادة تفعيل البقالة' : 'إيقاف البقالة',
+                                        style: TextStyle(color: r['status'] == 'suspended' ? _green : _red)),
+                                  ),
+                                ],
+                              ),
+                              Text('${r['name']}${r['status'] == 'suspended' ? ' (موقوفة)' : ''}'),
+                            ])),
                             DataCell(SelectableText('${r['owner_phone']}')),
-                            DataCell(Text('${r['plan_code'] ?? '—'}')),
+                            DataCell(Text(_planName(r['plan_code']))),
                             DataCell(Text(
                               r['expires_at'] == null ? '—' : _dt.format(DateTime.parse(r['expires_at']).toLocal()),
                               style: TextStyle(
@@ -307,24 +362,6 @@ class _StoresPageState extends State<StoresPage> {
                             DataCell(Text('${r['customers']}')),
                             DataCell(Text('${r['users']}')),
                             DataCell(Text(r['last_tx_at'] == null ? '—' : _dt.format(DateTime.parse(r['last_tx_at']).toLocal()))),
-                            DataCell(Row(children: [
-                              TextButton(onPressed: () => _activate(r), child: const Text('تفعيل/تجديد')),
-                              TextButton(
-                                onPressed: () async {
-                                  try {
-                                    await _rpc('admin_set_store_status', {
-                                      'p_store': r['store_id'],
-                                      'p_status': r['status'] == 'suspended' ? 'active' : 'suspended',
-                                    });
-                                    await _load();
-                                  } catch (e) {
-                                    if (context.mounted) _err(context, e);
-                                  }
-                                },
-                                child: Text(r['status'] == 'suspended' ? 'إعادة تفعيل' : 'إيقاف',
-                                    style: TextStyle(color: r['status'] == 'suspended' ? _green : _red)),
-                              ),
-                            ])),
                           ],
                         ),
                     ],
@@ -436,7 +473,7 @@ class _CodesPageState extends State<CodesPage> {
         for (final c in _all)
           ListTile(
             dense: true,
-            title: Text('${c['code']} · ${c['plan_code']} · ${c['months']} شهر', style: const TextStyle(fontFamily: 'monospace')),
+            title: Text('${_dashed('${c['code']}')} · ${_planName(c['plan_code'])} · ${c['months']} شهر', style: const TextStyle(fontFamily: 'monospace')),
             subtitle: Text('${c['agent'] ?? ''}'),
             trailing: Text(c['redeemed_at'] == null ? 'متاح' : 'مستخدم',
                 style: TextStyle(color: c['redeemed_at'] == null ? _green : const Color(0xFF5B6B70))),

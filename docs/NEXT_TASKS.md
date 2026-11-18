@@ -75,7 +75,8 @@
 
 ## 5. الويب
 - [ ] صفحة المشترك: `cd app && flutter run -d chrome ...` (انسخ `sqlite3.wasm` و `drift_worker.js` إلى `app/web/` — راجع android-overrides/README.md)
-- [ ] لوحة الإدارة: `cd web/admin && flutter create --platforms web . && flutter run -d chrome ...` — أنشئ مدير المنصة كما في `web/README.md`
+- [x] لوحة الإدارة: تُترجم (analyze 0 أخطاء، اختبار 1/1) وجُرّبت في المتصفح على Supabase المحلي: الدخول، الملخص، تفعيل/تجديد (يمدد من تاريخ الانتهاء)، إيقاف/إعادة تفعيل بتأكيد، توليد أكواد، تنبيهات السلامة. التشغيل `scripts/run-admin.ps1`، ومدير محلي بـ `scripts/create-platform-admin.ps1`
+  - [ ] لم يُجرَّب: استخدام كود التفعيل من التطبيق، ودخول مستخدم غير مدير (يُفترض أن ترفضه دوال `platform_admin_only`)
 - [ ] صفحة التعريف: `web/landing/index.html` — ضع رابط المتجر ورقم الدعم
 
 ## 6. ميزات لم تُنفّذ بعد (حسب الأولوية)
