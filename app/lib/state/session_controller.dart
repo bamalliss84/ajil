@@ -69,12 +69,16 @@ class SessionController extends ChangeNotifier {
   AjilError? lastSyncError;
   Map<String, dynamic>? subscription;
 
+  /// فُتح من النسخة المحفوظة لأن الخادم لم يُوصل إليه — تُحدَّث البيانات بعد أول مزامنة ناجحة
+  bool openedOffline = false;
+
   Timer? _timer;
   RealtimeChannel? _channel;
   StreamSubscription? _conn;
   StreamSubscription? _syncSub;
 
   static const _kMemory = 'ajil.login_memory';
+  static const _kSession = 'ajil.session_cache';
 
   void _onLock() {
     if (stage == SessionStage.ready && lock.locked) {
@@ -92,7 +96,8 @@ class SessionController extends ChangeNotifier {
     if (raw != null) memory = LoginMemory.fromJson(jsonDecode(raw));
     if (supabase.auth.currentSession != null && memory?.lastBranchId != null) {
       try {
-        await _openSession(memory!.lastBranchId!);
+        // الجوال يعمل بدون نت: إن لم يُوصل للخادم نفتح من آخر جلسة محفوظة
+        await _openSession(memory!.lastBranchId!, allowCache: !kIsWeb);
         lock.attach(session!.appUserId);
         stage = await lock.hasPin() ? SessionStage.locked : SessionStage.needsPin;
       } catch (_) {
@@ -122,7 +127,33 @@ class SessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _openSession(String branchId) async {
+  Future<void> _openSession(String branchId, {bool allowCache = false}) async {
+    ({WorkSession session, Map<String, dynamic>? subscription, Map<String, dynamic>? settings}) o;
+    try {
+      final f = _fetchSession(branchId);
+      o = await (allowCache ? f.timeout(AppConfig.openTimeout) : f);
+      openedOffline = false;
+      if (!kIsWeb) await _writeCachedSession(o);
+    } catch (e) {
+      if (!allowCache || !AjilError.isConnectivity(e)) rethrow;
+      final cached = await _readCachedSession(branchId);
+      if (cached == null) rethrow;
+      o = cached;
+      openedOffline = true;
+      online = false;
+    }
+    session = o.session;
+    subscription = o.subscription;
+    settings = o.settings;
+    await db?.close();
+    db = AppDatabase.forStore(o.session.storeId);
+    repo = LedgerRepository(db!, o.session);
+    await _startSync();
+  }
+
+  /// يجلب بيانات الجلسة من الخادم بلا أي أثر محلي (حتى لا يتداخل طلب انتهت مهلته مع الفتح من النسخة المحفوظة)
+  Future<({WorkSession session, Map<String, dynamic>? subscription, Map<String, dynamic>? settings})> _fetchSession(
+      String branchId) async {
     final claims = await api.claims();
     final storeId = claims['store_id'] as String?;
     final userId = claims['app_user_id'] as String?;
@@ -134,29 +165,69 @@ class SessionController extends ChangeNotifier {
     final branches = await api.myBranches();
     final branch = branches.firstWhere((b) => b.id == branchId, orElse: () => branches.first);
     final device = await api.registerDevice(kIsWeb ? 'متصفح' : 'جوال ${me['display_name']}');
-    subscription = await api.currentSubscription(storeId);
+    final sub = await api.currentSubscription(storeId);
+    Map<String, dynamic>? st;
     try {
-      settings = await api.settings(storeId);
+      st = await api.settings(storeId);
     } catch (_) {}
 
-    session = WorkSession(
-      storeId: storeId,
-      storeName: store['name'],
-      storePhone: store['owner_phone'],
-      appUserId: userId,
-      userNo: me['user_no'],
-      displayName: me['display_name'],
-      isOwner: me['role'] == 'owner',
-      branch: branch,
-      deviceId: device['approved'] == true ? device['id'] : '',
-      deviceLetter: device['device_letter'] ?? 'A',
-      enabledCurrencies: List<String>.from(store['enabled_currencies'] ?? const ['YER']),
-      defaultCurrency: store['default_currency'] ?? 'YER',
+    return (
+      session: WorkSession(
+        storeId: storeId,
+        storeName: store['name'],
+        storePhone: store['owner_phone'],
+        appUserId: userId,
+        userNo: me['user_no'],
+        displayName: me['display_name'],
+        isOwner: me['role'] == 'owner',
+        branch: branch,
+        deviceId: device['approved'] == true ? device['id'] : '',
+        deviceLetter: device['device_letter'] ?? 'A',
+        enabledCurrencies: List<String>.from(store['enabled_currencies'] ?? const ['YER']),
+        defaultCurrency: store['default_currency'] ?? 'YER',
+      ),
+      subscription: sub,
+      settings: st,
     );
-    await db?.close();
-    db = AppDatabase.forStore(storeId);
-    repo = LedgerRepository(db!, session!);
-    await _startSync();
+  }
+
+  Future<void> _writeCachedSession(
+          ({WorkSession session, Map<String, dynamic>? subscription, Map<String, dynamic>? settings}) o) =>
+      storage.write(
+        key: _kSession,
+        value: jsonEncode({'session': o.session.toJson(), 'subscription': o.subscription, 'settings': o.settings}),
+      );
+
+  /// آخر جلسة ناجحة لنفس المستخدم والفرع (تُمسح عند الخروج)
+  Future<({WorkSession session, Map<String, dynamic>? subscription, Map<String, dynamic>? settings})?>
+      _readCachedSession(String branchId) async {
+    try {
+      final raw = await storage.read(key: _kSession);
+      if (raw == null) return null;
+      final j = jsonDecode(raw) as Map<String, dynamic>;
+      final w = WorkSession.fromJson(Map<String, dynamic>.from(j['session']));
+      final claims = await api.claims();
+      if (w.branch.id != branchId || w.appUserId != claims['app_user_id'] || w.deviceId.isEmpty) return null;
+      Map<String, dynamic>? m(Object? v) => v == null ? null : Map<String, dynamic>.from(v as Map);
+      return (session: w, subscription: m(j['subscription']), settings: m(j['settings']));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// بعد فتح بدون نت: أول مزامنة ناجحة تعني عودة الاتصال، فنحدّث الاشتراك والإعدادات
+  Future<void> _refreshAfterOffline() async {
+    final w = session;
+    if (w == null) return;
+    try {
+      final o = await _fetchSession(w.branch.id);
+      if (session?.appUserId != w.appUserId) return;
+      subscription = o.subscription;
+      settings = o.settings;
+      openedOffline = false;
+      await _writeCachedSession(o);
+      notifyListeners();
+    } catch (_) {}
   }
 
   Future<void> _startSync() async {
@@ -177,6 +248,7 @@ class SessionController extends ChangeNotifier {
       if (r.ok) {
         lastSync = DateTime.now();
         unawaited(_reschedule());
+        if (openedOffline) unawaited(_refreshAfterOffline());
       }
       online = r.error?.code != 'offline';
       pending = await sync!.pendingCount();
@@ -271,6 +343,8 @@ class SessionController extends ChangeNotifier {
     repo = null;
     sync = null;
     session = null;
+    openedOffline = false;
+    await storage.delete(key: _kSession);
     lock.detach();
     await supabase.auth.signOut();
     stage = SessionStage.loggedOut;

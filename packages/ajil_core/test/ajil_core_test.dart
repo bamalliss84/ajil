@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ajil_core/ajil_core.dart';
 import 'package:decimal/decimal.dart';
 import 'package:test/test.dart';
@@ -244,6 +246,30 @@ void main() {
       expect(back.asOf, asOf);
       back.sent.add('c');
       expect(back.finished, isTrue);
+    });
+  });
+
+  group('الفتح بدون نت', () {
+    test('الجلسة تُحفظ وتُستعاد كما هي', () {
+      const w = WorkSession(
+        storeId: 's1', storeName: 'بقالة', storePhone: '777000111', appUserId: 'u1', userNo: 2,
+        displayName: 'خالد', isOwner: false, branch: Branch('b1', 'B1', 'الرئيسي'), deviceId: 'd1',
+        deviceLetter: 'B', enabledCurrencies: ['YER', 'SAR'], defaultCurrency: 'YER',
+      );
+      final back = WorkSession.fromJson(Map<String, dynamic>.from(w.toJson()));
+      expect(back.toJson(), w.toJson());
+      expect(back.invoicePrefix(), 'B1-B-');
+    });
+
+    test('أخطاء الوصول تُميَّز عن رفض الخادم', () {
+      expect(AjilError.isConnectivity(TimeoutException('x')), isTrue);
+      expect(
+          AjilError.isConnectivity(
+              'AuthRetryableFetchException(message: ClientException with SocketException: Connection refused)'),
+          isTrue);
+      expect(AjilError.isConnectivity('Failed host lookup: x.supabase.co'), isTrue);
+      expect(AjilError.isConnectivity('device_invalid: الجهاز ملغى'), isFalse);
+      expect(AjilError.isConnectivity('JWT expired'), isFalse);
     });
   });
 }

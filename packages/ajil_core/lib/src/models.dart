@@ -333,5 +333,36 @@ class WorkSession {
 
   /// بادئة أرقام الفواتير: فرع + جهاز (B1-A-0001)
   String invoicePrefix() => '${branch.code}-$deviceLetter-';
+
+  /// يُحفظ محلياً بعد كل فتح ناجح ليعمل الجوال عند فتحه بدون نت
+  Map<String, dynamic> toJson() => {
+        'store_id': storeId,
+        'store_name': storeName,
+        'store_phone': storePhone,
+        'app_user_id': appUserId,
+        'user_no': userNo,
+        'display_name': displayName,
+        'is_owner': isOwner,
+        'branch': branch.toJson(),
+        'device_id': deviceId,
+        'device_letter': deviceLetter,
+        'currencies': enabledCurrencies,
+        'default_currency': defaultCurrency,
+      };
+
+  factory WorkSession.fromJson(Map<String, dynamic> j) => WorkSession(
+        storeId: j['store_id'],
+        storeName: j['store_name'],
+        storePhone: j['store_phone'],
+        appUserId: j['app_user_id'],
+        userNo: j['user_no'],
+        displayName: j['display_name'],
+        isOwner: j['is_owner'],
+        branch: Branch.fromJson(Map<String, dynamic>.from(j['branch'])),
+        deviceId: j['device_id'],
+        deviceLetter: j['device_letter'],
+        enabledCurrencies: List<String>.from(j['currencies']),
+        defaultCurrency: j['default_currency'],
+      );
 }
 

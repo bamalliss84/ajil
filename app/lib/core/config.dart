@@ -12,6 +12,9 @@ class AppConfig {
   static const idleLock = Duration(minutes: 5);
   static const backgroundLock = Duration(seconds: 30);
 
+  /// مهلة جلب بيانات الجلسة عند فتح التطبيق — بعدها يفتح الجوال من النسخة المحفوظة
+  static const openTimeout = Duration(seconds: 6);
+
   /// المزامنة الاحتياطية الدورية
   static const syncInterval = Duration(minutes: 1);
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 /// أخطاء الخادم بصيغة «رمز: رسالة عربية»
 class AjilError implements Exception {
   final String code;
@@ -31,6 +33,9 @@ class AjilError implements Exception {
     }
     return const AjilError('server_error', 'حدث خطأ غير متوقع — حاول مرة أخرى');
   }
+
+  /// فشل وصول (لا نت، الخادم لا يرد، انتهت المهلة) — لا رفض حقيقي من الخادم
+  static bool isConnectivity(Object? e) => e is TimeoutException || AjilError.parse(e).code == 'offline';
 
   /// أخطاء تعني أن الحركة لن تُقبل أبداً (لا تُعاد محاولتها تلقائياً)
   bool get isPermanent => !{'offline', 'server_error', 'timestamp_skew', 'not_authenticated'}.contains(code);
