@@ -59,7 +59,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: context.ajil.surface,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -68,7 +68,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
               Text(_confirming ? 'أعد إدخال رمز PIN' : 'اختر رمز PIN لفتح التطبيق',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
-              const Text('4 إلى 6 أرقام، خاص بك على هذا الجوال', style: TextStyle(color: AjilColors.textMuted)),
+              Text('4 إلى 6 أرقام، خاص بك على هذا الجوال', style: TextStyle(color: context.ajil.textMuted)),
               const SizedBox(height: 24),
               PinDots(length: _entry.length, max: 6),
               const Spacer(),

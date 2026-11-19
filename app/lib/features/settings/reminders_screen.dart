@@ -61,14 +61,14 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     final s = _s;
     final owner = sessionOf(ref).isOwner;
     final cur = Currency.of(sessionOf(ref).defaultCurrency).symbolAr;
-    const dd = TextStyle(fontFamily: ajilFont, fontSize: 15, color: AjilColors.text);
+    final dd = TextStyle(fontFamily: ajilFont, fontSize: 15, color: context.ajil.text);
     const ddPad = EdgeInsets.symmetric(horizontal: 10, vertical: 12);
     Widget compactDrop(int value, List<(int, String)> items, ValueChanged<int?>? onChanged) => SizedBox(
           width: 124,
           child: DropdownButtonFormField<int>(
             value: value,
             isExpanded: true,
-            style: const TextStyle(fontFamily: ajilFont, fontSize: 14, color: AjilColors.text),
+            style: TextStyle(fontFamily: ajilFont, fontSize: 14, color: context.ajil.text),
             icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
             decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 9)),
             items: [for (final (v, l) in items) DropdownMenuItem(value: v, child: Text(l))],
@@ -78,7 +78,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
     Widget inlineRow(String label, Widget trailing, {bool divider = true}) => Container(
           constraints: const BoxConstraints(minHeight: 56),
           padding: const EdgeInsets.symmetric(vertical: 6),
-          decoration: divider ? const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.divider))) : null,
+          decoration: divider ? BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.divider))) : null,
           child: Row(children: [
             Expanded(child: Text(label, style: const TextStyle(fontSize: 15))),
             const SizedBox(width: 8),
@@ -154,9 +154,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
-                    child: const Text('في يوم المطالبة يجهّز التطبيق قائمة تحصيل مع رسالة واتساب جاهزة لكل زبون.',
-                        style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                    decoration: BoxDecoration(color: context.ajil.background, borderRadius: BorderRadius.circular(12)),
+                    child: Text('في يوم المطالبة يجهّز التطبيق قائمة تحصيل مع رسالة واتساب جاهزة لكل زبون.',
+                        style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
                   ),
                 ]),
               ),
@@ -183,8 +183,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen> {
                   const CardTitle('رسالة التذكير للزبون', divider: false),
                   TextField(controller: _tpl, enabled: owner, maxLines: 4, style: const TextStyle(fontSize: 14, height: 1.7)),
                   const SizedBox(height: 8),
-                  const Text('{الاسم} {البقالة} {المبلغ} {الرابط} — تُرسل من واتساب جوالك بضغطة، ولا تُرسل تلقائياً.',
-                      style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+                  Text('{الاسم} {البقالة} {المبلغ} {الرابط} — تُرسل من واتساب جوالك بضغطة، ولا تُرسل تلقائياً.',
+                      style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
                 ]),
               ),
               AjilCard(

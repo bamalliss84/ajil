@@ -21,34 +21,34 @@ class DayKpis extends StatelessWidget {
     Widget kpi(String label, Decimal v, Color c, int n) => Expanded(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(color: context.ajil.surface, borderRadius: BorderRadius.circular(16)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(label, style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+              Text(label, style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
               const SizedBox(height: 2),
               Text(f.amount(v, r.currency), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: c)),
               const SizedBox(height: 2),
-              Text('$sym · ${ops(f, n)}', style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              Text('$sym · ${ops(f, n)}', style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
             ]),
           ),
         );
     final net = r.net;
     final (netLabel, netColor) = net > Decimal.zero
-        ? ('الديون انخفضت', AjilColors.paid)
+        ? ('الديون انخفضت', context.ajil.paid)
         : net < Decimal.zero
-            ? ('الديون زادت', AjilColors.debt)
-            : ('بدون تغيير', AjilColors.text);
+            ? ('الديون زادت', context.ajil.debt)
+            : ('بدون تغيير', context.ajil.text);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       child: Column(children: [
         Row(children: [
-          kpi(isToday ? 'تحصيل اليوم' : 'التحصيل', r.collected, AjilColors.paid, r.collectedCount),
+          kpi(isToday ? 'تحصيل اليوم' : 'التحصيل', r.collected, context.ajil.paid, r.collectedCount),
           const SizedBox(width: 10),
-          kpi(isToday ? 'ديون اليوم' : 'الديون', r.newDebt, AjilColors.debt, r.debtCount),
+          kpi(isToday ? 'ديون اليوم' : 'الديون', r.newDebt, context.ajil.debt, r.debtCount),
         ]),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: context.ajil.surface, borderRadius: BorderRadius.circular(16)),
           child: Row(children: [
             Expanded(child: Text('صافي اليوم: $netLabel', style: const TextStyle(fontSize: 14))),
             Text(f.amount(net.abs(), r.currency, withSymbol: true),
@@ -105,7 +105,7 @@ class HourlyChart extends StatelessWidget {
                     heightFactor: b.count == 0 ? 0.08 : (b.count / max).clamp(0.08, 1.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: b.count >= max * 0.7 && b.count > 0 ? AjilColors.primary : AjilColors.chartLight,
+                        color: b.count >= max * 0.7 && b.count > 0 ? context.ajil.accent : context.ajil.chartLight,
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                       ),
                     ),
@@ -118,12 +118,12 @@ class HourlyChart extends StatelessWidget {
       Directionality(
         textDirection: TextDirection.ltr,
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          for (final t in ticks) Text(label(t), style: const TextStyle(fontSize: 11, color: AjilColors.textMuted)),
+          for (final t in ticks) Text(label(t), style: TextStyle(fontSize: 11, color: context.ajil.textMuted)),
         ]),
       ),
       Text(
         peak < 0 ? 'لا حركات في هذا اليوم' : 'الذروة بين ${hour12(f, peak)} و ${hour12(f, peak + 2)} ${part(peak + 1)}',
-        style: const TextStyle(fontSize: 13, color: AjilColors.textMuted),
+        style: TextStyle(fontSize: 13, color: context.ajil.textMuted),
       ),
     ]);
   }
@@ -151,14 +151,14 @@ class _DayTxListState extends State<DayTxList> {
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
         child: Row(children: [
           const Expanded(child: Text('حركات اليوم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-          Text(counted(f, txs.length, 'حركة', 'حركتان', 'حركات'), style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+          Text(counted(f, txs.length, 'حركة', 'حركتان', 'حركات'), style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
         ]),
       ),
       if (txs.isEmpty)
         Container(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
-          decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
-          child: const Text('لا حركات في هذا اليوم', style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
+          child: Text('لا حركات في هذا اليوم', style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
         ),
       for (final t in shown) _row(t),
       if (!_all && txs.length > 6)
@@ -167,9 +167,9 @@ class _DayTxListState extends State<DayTxList> {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             alignment: Alignment.center,
-            decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
             child: Text('عرض كل الحركات (${f.digits('${txs.length}')})',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AjilColors.primary)),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: context.ajil.primary)),
           ),
         ),
     ]);
@@ -179,12 +179,12 @@ class _DayTxListState extends State<DayTxList> {
     final f = widget.f;
     final c = widget.customers[t.customerId];
     final (name, bg, fg, color) = switch (t.kind) {
-      TxKind.debt => ('دين', AjilColors.debtBg, AjilColors.debtTag, AjilColors.debt),
-      TxKind.payment || TxKind.paymentFx => ('سداد', AjilColors.paidBg, AjilColors.paid, AjilColors.paid),
-      TxKind.opening => ('افتتاحي', AjilColors.infoBg, AjilColors.infoText, AjilColors.infoText),
-      TxKind.voided => ('إلغاء', AjilColors.pendingBg, AjilColors.pendingText, AjilColors.pendingText),
-      TxKind.returned => ('مرتجع', AjilColors.track, AjilColors.text, AjilColors.text),
-      TxKind.discount => ('خصم', AjilColors.track, AjilColors.text, AjilColors.text),
+      TxKind.debt => ('دين', context.ajil.debtBg, context.ajil.debtTag, context.ajil.debt),
+      TxKind.payment || TxKind.paymentFx => ('سداد', context.ajil.paidBg, context.ajil.paid, context.ajil.paid),
+      TxKind.opening => ('افتتاحي', context.ajil.infoBg, context.ajil.infoText, context.ajil.infoText),
+      TxKind.voided => ('إلغاء', context.ajil.pendingBg, context.ajil.pendingText, context.ajil.pendingText),
+      TxKind.returned => ('مرتجع', context.ajil.track, context.ajil.text, context.ajil.text),
+      TxKind.discount => ('خصم', context.ajil.track, context.ajil.text, context.ajil.text),
     };
     final h = t.createdAt.hour;
     final time = '${hour12(f, h)}:${f.digits(t.createdAt.minute.toString().padLeft(2, '0'))} ${ampm(h)}';
@@ -195,14 +195,14 @@ class _DayTxListState extends State<DayTxList> {
       child: Container(
         constraints: const BoxConstraints(minHeight: 56),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
         child: Row(children: [
           SizedBox(width: 58, child: Align(alignment: AlignmentDirectional.centerStart, child: FittedBox(fit: BoxFit.scaleDown, child: TypeBadge(name, bg: bg, fg: fg)))),
           const SizedBox(width: 10),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(c?.name ?? 'زبون', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15)),
-              Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
             ]),
           ),
           Text(f.amount(t.amount, t.currency), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color)),
@@ -229,19 +229,19 @@ class YearSummary extends StatelessWidget {
 
     Widget cell(String label, String value, [String? sub]) => Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label, style: const TextStyle(fontSize: 13, color: AjilColors.onPrimaryMuted)),
+            Text(label, style: TextStyle(fontSize: 13, color: context.ajil.onHeaderMuted)),
             const SizedBox(height: 2),
-            Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white)),
+            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: context.ajil.onPrimary)),
             if (sub != null && sub.isNotEmpty) ...[
               const SizedBox(height: 2),
-              Text(sub, style: const TextStyle(fontSize: 12, color: AjilColors.onPrimaryMuted)),
+              Text(sub, style: TextStyle(fontSize: 12, color: context.ajil.onHeaderMuted)),
             ],
           ]),
         );
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AjilColors.primary, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: context.ajil.header, borderRadius: BorderRadius.circular(16)),
       child: Column(children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           cell('تحصيل السنة', f.amount(r.collected, r.currency), change(r.collectedChange)),
@@ -292,12 +292,12 @@ class MonthlyChart extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 3),
                     child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                       if (!future(b.at.month))
-                        FittedBox(fit: BoxFit.scaleDown, child: Text(thousands(f, b.collected), maxLines: 1, softWrap: false, style: const TextStyle(fontSize: 10, color: AjilColors.textMuted))),
+                        FittedBox(fit: BoxFit.scaleDown, child: Text(thousands(f, b.collected), maxLines: 1, softWrap: false, style: TextStyle(fontSize: 10, color: context.ajil.textMuted))),
                       const SizedBox(height: 4),
                       Container(
                         height: future(b.at.month) ? 0 : (b.collected.toDouble() / max * 118).clamp(3, 118),
                         decoration: BoxDecoration(
-                          color: b.at.month == highlight ? AjilColors.primary : AjilColors.chartLight,
+                          color: b.at.month == highlight ? context.ajil.accent : context.ajil.chartLight,
                           borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
                         ),
                       ),
@@ -315,7 +315,7 @@ class MonthlyChart extends StatelessWidget {
             Expanded(
               child: Text(monthShort[m - 1],
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 10, color: future(m) ? RC.disabled : AjilColors.textMuted)),
+                  style: TextStyle(fontSize: 10, color: future(m) ? context.ajil.axis : context.ajil.textMuted)),
             ),
         ]),
       ),
@@ -348,7 +348,7 @@ class MonthList extends StatelessWidget {
           child: Container(
             constraints: const BoxConstraints(minHeight: 52),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
             child: Row(children: [
               Expanded(
                 child: Text(
@@ -357,15 +357,15 @@ class MonthList extends StatelessWidget {
                 ),
               ),
               Text(f.amount(b.collected, r.currency),
-                  style: const TextStyle(fontSize: 13, color: AjilColors.paid, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 13, color: context.ajil.paid, fontWeight: FontWeight.w600)),
               SizedBox(
                 width: 84,
                 child: Text(f.amount(b.debt, r.currency),
                     textAlign: TextAlign.left,
-                    style: const TextStyle(fontSize: 13, color: AjilColors.debt, fontWeight: FontWeight.w600)),
+                    style: TextStyle(fontSize: 13, color: context.ajil.debt, fontWeight: FontWeight.w600)),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.chevron_right_rounded, size: 20, color: AjilColors.textMuted),
+              Icon(Icons.chevron_right_rounded, size: 20, color: context.ajil.textMuted),
             ]),
           ),
         ),

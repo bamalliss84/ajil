@@ -5,16 +5,14 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
+import '../core/theme.dart';
+import 'pdf_palette.dart';
 import '../features/receipt/receipt_data.dart';
 
 /// الإشعار/السند PDF — نفس تصميم شاشة المعاينة (A5)، أو نسخة مختصرة للطابعة الحرارية 58mm
 class ReceiptPdf {
-  static const _green = PdfColor.fromInt(0xFF0F6E56);
-  static const _greenDark = PdfColor.fromInt(0xFF085041);
-  static const _red = PdfColor.fromInt(0xFFB03224);
-  static const _paid = PdfColor.fromInt(0xFF1E7A43);
-  static const _muted = PdfColor.fromInt(0xFF5B6B70);
-  static const _border = PdfColor.fromInt(0xFFB9C4C1);
+  static PdfPalette _p = PdfPalette.of(AjilTheme.classic);
+
 
   static Future<pw.ThemeData> _theme() async {
     try {
@@ -31,18 +29,19 @@ class ReceiptPdf {
   }
 
   static pw.BoxDecoration get _box => pw.BoxDecoration(
-        border: pw.Border.all(color: _border),
+        border: pw.Border.all(color: _p.paperBorder),
         borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
       );
 
-  static Future<Uint8List> build(ReceiptData d, {bool thermal = false}) async {
+  static Future<Uint8List> build(ReceiptData d, {bool thermal = false, AjilTheme theme = AjilTheme.classic}) async {
+    _p = PdfPalette.of(theme);
     final doc = pw.Document(theme: await _theme(), title: '${d.title} ${d.reference}', author: d.storeName);
-    final accent = d.isCredit ? _paid : _red;
+    final accent = d.isCredit ? _p.paid : _p.debt;
     doc.addPage(thermal ? _thermal(d, accent) : _a5(d, accent));
     return doc.save();
   }
 
-  static pw.Widget _label(String t) => pw.Text(t, style: const pw.TextStyle(fontSize: 9, color: _muted));
+  static pw.Widget _label(String t) => pw.Text(t, style: pw.TextStyle(fontSize: 9, color: _p.muted));
 
   static pw.Widget _field(String label, String value, {PdfColor? color, bool boxed = false}) => pw.Padding(
         padding: const pw.EdgeInsets.only(bottom: 6),
@@ -63,7 +62,7 @@ class ReceiptPdf {
         textDirection: pw.TextDirection.rtl,
         margin: const pw.EdgeInsets.all(22),
         build: (_) => pw.Container(
-          decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColor.fromInt(0xFF9AA6A3), width: 1.2)),
+          decoration: pw.BoxDecoration(border: pw.Border.all(color: _p.paperMuted, width: 1.2)),
           padding: const pw.EdgeInsets.all(14),
           child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: [
             pw.Row(children: [
@@ -71,24 +70,24 @@ class ReceiptPdf {
                 width: 38,
                 height: 38,
                 alignment: pw.Alignment.center,
-                decoration: const pw.BoxDecoration(color: _green, borderRadius: pw.BorderRadius.all(pw.Radius.circular(9))),
-                child: pw.Text(d.storeMark, style: pw.TextStyle(color: PdfColors.white, fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                decoration: pw.BoxDecoration(color: _p.primary, borderRadius: pw.BorderRadius.all(pw.Radius.circular(9))),
+                child: pw.Text(d.storeMark, style: pw.TextStyle(color: _p.onPrimary, fontSize: 20, fontWeight: pw.FontWeight.bold)),
               ),
               pw.SizedBox(width: 8),
               pw.Expanded(
                 child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                  pw.Text(d.storeName, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: _greenDark)),
-                  pw.Text(d.branchName, style: const pw.TextStyle(fontSize: 9, color: _muted)),
+                  pw.Text(d.storeName, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: _p.primaryDark)),
+                  pw.Text(d.branchName, style: pw.TextStyle(fontSize: 9, color: _p.muted)),
                 ]),
               ),
               pw.Text(d.title, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: accent)),
             ]),
-            pw.Divider(color: _border, height: 18),
+            pw.Divider(color: _p.paperBorder, height: 18),
             pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
               pw.Expanded(
                 child: pw.Column(children: [
                   _field('التاريخ', '${d.date}  ${d.time}'),
-                  _field('المرجع', d.reference, color: _red, boxed: true),
+                  _field('المرجع', d.reference, color: _p.debt, boxed: true),
                   _field('السيد/ة', d.customerName),
                   if (d.customerPhone != null) _field('الجوال', d.customerPhone!),
                 ]),
@@ -135,14 +134,14 @@ class ReceiptPdf {
             pw.Container(
               padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               decoration: pw.BoxDecoration(
-                color: d.owes ? PdfColor.fromInt(0xFFFCEDEB) : PdfColor.fromInt(0xFFE3F3E9),
+                color: d.owes ? _p.debtBg : _p.paidBg,
                 borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
               ),
               child: pw.Row(children: [
                 pw.Text('الرصيد المتبقي: ', style: const pw.TextStyle(fontSize: 10)),
                 pw.Expanded(
                   child: pw.Text(d.balances.isEmpty ? 'مسدد بالكامل' : d.balances.join(' و '),
-                      style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold, color: d.owes ? _red : _paid)),
+                      style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold, color: d.owes ? _p.debt : _p.paid)),
                 ),
               ]),
             ),
@@ -151,13 +150,13 @@ class ReceiptPdf {
               pw.Expanded(
                 child: pw.Text(
                   d.pending ? 'سُجّل على الجوال وسيُعتمد عند المزامنة' : 'هذا الإشعار آلي ولا يحتاج إلى ختم أو توقيع',
-                  style: const pw.TextStyle(fontSize: 8, color: _muted),
+                  style: pw.TextStyle(fontSize: 8, color: _p.muted),
                 ),
               ),
-              pw.Text('بواسطة: ${d.recordedBy}', style: const pw.TextStyle(fontSize: 8, color: _muted)),
+              pw.Text('بواسطة: ${d.recordedBy}', style: pw.TextStyle(fontSize: 8, color: _p.muted)),
             ]),
             pw.SizedBox(height: 4),
-            pw.Center(child: pw.Text('آجِل — دفتر ديون البقالة', style: const pw.TextStyle(fontSize: 7, color: _border))),
+            pw.Center(child: pw.Text('آجِل — دفتر ديون البقالة', style: pw.TextStyle(fontSize: 7, color: _p.paperBorder))),
           ]),
         ),
       );

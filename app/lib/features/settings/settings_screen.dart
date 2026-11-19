@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config.dart';
 import '../../core/theme.dart';
+import 'theme_screen.dart' show Swatch;
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
 
@@ -36,8 +37,8 @@ class SettingsScreen extends ConsumerWidget {
             Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(color: AjilColors.primaryLight, borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.workspace_premium_outlined, color: AjilColors.primaryDark),
+              decoration: BoxDecoration(color: context.ajil.primaryLight, borderRadius: BorderRadius.circular(12)),
+              child: Icon(Icons.workspace_premium_outlined, color: context.ajil.primaryDark),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -45,7 +46,7 @@ class SettingsScreen extends ConsumerWidget {
                 Text('الباقة: $plan', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                 if (exp != null)
                   Text('تنتهي: ${intl.DateFormat('d MMMM y', 'ar').format(exp)}',
-                      style: TextStyle(fontSize: 13, color: s.subscriptionExpired ? AjilColors.debt : AjilColors.textMuted)),
+                      style: TextStyle(fontSize: 13, color: s.subscriptionExpired ? context.ajil.debt : context.ajil.textMuted)),
               ]),
             ),
             if (w.isOwner)
@@ -53,15 +54,50 @@ class SettingsScreen extends ConsumerWidget {
           ]),
         ),
         if (w.isOwner)
-          _group([
-            _tile(Icons.notifications_active_outlined, 'التنبيهات والتحصيل', () => context.push('/settings/reminders')),
-            _tile(Icons.people_alt_outlined, 'الموظفون', () => context.push('/settings/employees')),
-            _tile(Icons.phonelink_setup_outlined, 'الأجهزة', () => context.push('/settings/devices')),
-            _tile(Icons.store_outlined, 'الفروع والعملات', () => _storeSheet(context, ref)),
+          _group(context, [
+            _tile(context, Icons.notifications_active_outlined, 'التنبيهات والتحصيل', () => context.push('/settings/reminders')),
+            _tile(context, Icons.people_alt_outlined, 'الموظفون', () => context.push('/settings/employees')),
+            _tile(context, Icons.phonelink_setup_outlined, 'الأجهزة', () => context.push('/settings/devices')),
+            _tile(context, Icons.store_outlined, 'الفروع والعملات', () => _storeSheet(context, ref)),
           ]),
-        _group([
-          _tile(Icons.sync_outlined, 'حركات غير متزامنة', () => context.push('/unsynced'), trailing: s.pending > 0 ? '${s.pending}' : null),
-          _row(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+          child: Text('المظهر', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: context.ajil.textMuted)),
+        ),
+        SectionCard(
+          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          padding: EdgeInsets.zero,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => context.push('/settings/theme'),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 68),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                child: Row(children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(color: context.ajil.primaryLight, borderRadius: BorderRadius.circular(12)),
+                    child: Icon(Icons.palette_outlined, size: 20, color: context.ajil.primaryDark),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('مظهر التطبيق', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.ajil.text)),
+                      Text(context.ajil.nameAr, style: TextStyle(fontSize: 12.5, color: context.ajil.textMuted)),
+                    ]),
+                  ),
+                  for (final c in context.ajil.swatches.take(2)) ...[Swatch(c), const SizedBox(width: 4)],
+                  Icon(Icons.chevron_right_rounded, color: context.ajil.border),
+                ]),
+              ),
+            ),
+          ),
+        ),
+        _group(context, [
+          _tile(context, Icons.sync_outlined, 'حركات غير متزامنة', () => context.push('/unsynced'), trailing: s.pending > 0 ? '${s.pending}' : null),
+          _row(context, 
             Icons.translate_outlined,
             'الأرقام الهندية (١٢٣)',
             null,
@@ -73,27 +109,27 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
           ),
-          _tile(Icons.password_outlined, 'تغيير كلمة المرور', () => _changePassword(context, ref)),
+          _tile(context, Icons.password_outlined, 'تغيير كلمة المرور', () => _changePassword(context, ref)),
           if (AppConfig.supportWhatsapp.isNotEmpty)
-            _tile(Icons.support_agent_outlined, 'الدعم الفني (واتساب)',
+            _tile(context, Icons.support_agent_outlined, 'الدعم الفني (واتساب)',
                 () => launchUrl(Uri.parse('https://wa.me/${AppConfig.supportWhatsapp}'), mode: LaunchMode.externalApplication)),
         ]),
-        _group([_tile(Icons.logout, 'خروج (لتبديل الفرع أو المستخدم)', () => s.logout(), color: AjilColors.debt)]),
+        _group(context, [_tile(context, Icons.logout, 'خروج (لتبديل الفرع أو المستخدم)', () => s.logout(), color: context.ajil.debt)]),
       ]),
     );
   }
 
-  Widget _group(List<Widget> rows) => SectionCard(
+  Widget _group(BuildContext context, List<Widget> rows) => SectionCard(
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Column(children: [
           for (var i = 0; i < rows.length; i++) ...[
             rows[i],
-            if (i < rows.length - 1) const Divider(height: 1, color: AjilColors.divider),
+            if (i < rows.length - 1) Divider(height: 1, color: context.ajil.divider),
           ],
         ]),
       );
 
-  Widget _tile(IconData icon, String title, VoidCallback onTap, {String? trailing, Color? color}) => _row(
+  Widget _tile(BuildContext context, IconData icon, String title, VoidCallback onTap, {String? trailing, Color? color}) => _row(context, 
         icon,
         title,
         onTap,
@@ -104,20 +140,20 @@ class SettingsScreen extends ConsumerWidget {
                 height: 22,
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: AjilColors.pendingDot, borderRadius: BorderRadius.circular(11)),
-                child: Text(trailing, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AjilColors.badgeText)),
+                decoration: BoxDecoration(color: context.ajil.pendingDot, borderRadius: BorderRadius.circular(11)),
+                child: Text(trailing, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: context.ajil.badgeText)),
               )
-            : (color == null ? const Icon(Icons.chevron_right_rounded, color: AjilColors.textMuted) : null),
+            : (color == null ? Icon(Icons.chevron_right_rounded, color: context.ajil.textMuted) : null),
       );
 
-  Widget _row(IconData icon, String title, VoidCallback? onTap, {Widget? trailingWidget, Color? color}) => InkWell(
+  Widget _row(BuildContext context, IconData icon, String title, VoidCallback? onTap, {Widget? trailingWidget, Color? color}) => InkWell(
         onTap: onTap,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 56),
           child: Row(children: [
-            Icon(icon, size: 22, color: color ?? AjilColors.textSoft),
+            Icon(icon, size: 22, color: color ?? context.ajil.textSoft),
             const SizedBox(width: 12),
-            Expanded(child: Text(title, style: TextStyle(fontSize: 15, color: color ?? AjilColors.text))),
+            Expanded(child: Text(title, style: TextStyle(fontSize: 15, color: color ?? context.ajil.text))),
             if (trailingWidget != null) trailingWidget,
           ]),
         ),

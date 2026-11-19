@@ -21,9 +21,9 @@ class UnsyncedScreen extends ConsumerWidget {
       appBar: const AjilHeader(title: 'حركات غير متزامنة'),
       body: Column(children: [
         ListTile(
-          tileColor: Colors.white,
+          tileColor: context.ajil.surface,
           leading: Icon(s.online ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
-              color: s.online ? AjilColors.paid : AjilColors.pendingText),
+              color: s.online ? context.ajil.paid : context.ajil.pendingText),
           title: Text(s.online ? 'متصل' : 'غير متصل'),
           subtitle: Text(s.lastSync == null
               ? 'لم تتم مزامنة بعد'
@@ -37,14 +37,14 @@ class UnsyncedScreen extends ConsumerWidget {
         const Divider(),
         Expanded(
           child: list.isEmpty
-              ? const Center(child: Text('كل الحركات متزامنة ✓', style: TextStyle(color: AjilColors.paid, fontSize: 16)))
+              ? Center(child: Text('كل الحركات متزامنة ✓', style: TextStyle(color: context.ajil.paid, fontSize: 16)))
               : ListView.separated(
                   itemCount: list.length,
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (_, i) {
                     final t = list[i];
                     return ListTile(
-                      tileColor: Colors.white,
+                      tileColor: context.ajil.surface,
                       title: Text('${customers[t.customerId] ?? ''} · ${t.kind.labelAr}'),
                       subtitle: Text(t.sync == SyncState.failed
                           ? 'مرفوضة: ${t.syncError ?? ''}'

@@ -50,7 +50,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         if (r == null)
           report.hasError
               ? Padding(padding: const EdgeInsets.all(24), child: Text('تعذّر حساب التقرير: ${report.error}'))
-              : const ReportSkeleton()
+              : ReportSkeleton()
         else
           ..._body(w, f, r, names, customers),
       ]),
@@ -106,24 +106,24 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   Widget _header(WorkSession w, MoneyFormat f, ReportPeriod period, String currency, DateTime today, PeriodReport? r) {
     final hasNext = period.hasNext(today);
     return Material(
-      color: Colors.white,
+      color: context.ajil.surface,
       child: SafeArea(
         bottom: false,
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.headerBorder))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.headerBorder))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Row(children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('التقارير', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
-                  Text('${w.storeName} · ${w.branch.name}', style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                  Text('${w.storeName} · ${w.branch.name}', style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
                 ]),
               ),
               SquareIconButton(
                 icon: Icons.ios_share_rounded,
                 tooltip: 'مشاركة التقرير PDF أو Excel',
-                color: AjilColors.text,
+                color: context.ajil.text,
                 onPressed: r == null || _busy ? null : () => _exportSheet(r),
               ),
             ]),
@@ -132,7 +132,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               options: const [(PeriodKind.day, 'يوم'), (PeriodKind.month, 'شهر'), (PeriodKind.year, 'سنة')],
               value: period.kind,
               fontSize: 15,
-              selectedFg: AjilColors.primaryDark,
+              selectedFg: context.ajil.primaryDark,
               shadow: true,
               onChanged: (k) => _set(ReportPeriod.of(k, period.effectiveEnd(today))),
             ),
@@ -141,13 +141,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               SquareIconButton(
                 icon: Icons.chevron_left_rounded,
                 tooltip: 'الفترة السابقة',
-                color: AjilColors.text,
+                color: context.ajil.text,
                 onPressed: () => _set(period.prev()),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Material(
-                  color: AjilColors.primaryLight,
+                  color: context.ajil.primaryLight,
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
@@ -155,16 +155,16 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     child: SizedBox(
                       height: 44,
                       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        const Icon(Icons.calendar_today_outlined, size: 18, color: AjilColors.primaryDark),
+                        Icon(Icons.calendar_today_outlined, size: 18, color: context.ajil.primaryDark),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(periodLabel(f, period, today),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: AjilColors.primaryDark)),
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: context.ajil.primaryDark)),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: AjilColors.primaryDark),
+                        Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: context.ajil.primaryDark),
                       ]),
                     ),
                   ),
@@ -174,8 +174,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               SquareIconButton(
                 icon: Icons.chevron_right_rounded,
                 tooltip: hasNext ? 'الفترة التالية' : 'الفترة التالية (غير متاحة، هذه الفترة الحالية)',
-                color: hasNext ? AjilColors.text : RC.disabled,
-                borderColor: hasNext ? AjilColors.border : AjilColors.divider,
+                color: hasNext ? context.ajil.text : context.ajil.axis,
+                borderColor: hasNext ? context.ajil.border : context.ajil.divider,
                 onPressed: hasNext ? () => _set(period.next()) : null,
               ),
             ]),
@@ -184,7 +184,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             const SizedBox(height: 12),
             Row(children: [
               Expanded(
-                child: Text(_info(f, period, today, r), style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                child: Text(_info(f, period, today, r), style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
               ),
               if (w.enabledCurrencies.length > 1)
                 _CurrencyMini(
@@ -214,7 +214,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           return PillChip(
             label: '${monthNames[m.month - 1]}${m.year == today.year ? '' : ' ${f.digits('${m.year}')}'}',
             selected: sel,
-            selectedColor: AjilColors.primary,
+            selectedColor: context.ajil.primary,
             fontSize: 14,
             onTap: () => _set(ReportPeriod.month(m.year, m.month)),
           );
@@ -240,10 +240,10 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   }
 
   Widget _dayTile(MoneyFormat f, DateTime day, bool sel, bool future, bool active) {
-    final bg = sel ? AjilColors.primary : Colors.white;
-    final fg = sel ? Colors.white : (future ? RC.disabled : AjilColors.text);
-    final border = sel ? AjilColors.primary : (future ? AjilColors.divider : AjilColors.border);
-    final dot = !active ? Colors.transparent : (sel ? RC.progress : AjilColors.paid);
+    final bg = sel ? context.ajil.primary : context.ajil.surface;
+    final fg = sel ? context.ajil.onPrimary : (future ? context.ajil.axis : context.ajil.text);
+    final border = sel ? context.ajil.primary : (future ? context.ajil.divider : context.ajil.border);
+    final dot = !active ? Colors.transparent : (sel ? context.ajil.chartProgress : context.ajil.paid);
     return Material(
       color: bg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: border)),
@@ -300,13 +300,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       builder: (ctx) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ListTile(
-            leading: const Icon(Icons.description_outlined, color: AjilColors.primary),
+            leading: Icon(Icons.description_outlined, color: context.ajil.primary),
             title: const Text('تقرير PDF'),
             subtitle: const Text('نفس أقسام الشاشة — للمشاركة أو الطباعة'),
             onTap: () => Navigator.pop(ctx, true),
           ),
           ListTile(
-            leading: const Icon(Icons.grid_on_rounded, color: AjilColors.primary),
+            leading: Icon(Icons.grid_on_rounded, color: context.ajil.primary),
             title: const Text('Excel'),
             subtitle: const Text('ورقة لكل قسم + كل حركات الفترة'),
             onTap: () => Navigator.pop(ctx, false),
@@ -329,7 +329,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         showOk(context, 'تنبيه: توجد حركات غير متزامنة — التقرير محسوب من هذا الجوال');
       }
       pdf
-          ? await ReportExport.sharePdf(r, session: w, users: names)
+          ? await ReportExport.sharePdf(r, session: w, users: names, theme: context.ajil)
           : await ReportExport.shareExcel(r, session: w, users: names, customerNames: customers);
     } catch (e) {
       if (mounted) showError(context, e);
@@ -364,7 +364,7 @@ class _CurrencyMini extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(color: AjilColors.track, borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: context.ajil.track, borderRadius: BorderRadius.circular(10)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           for (final c in currencies)
             GestureDetector(
@@ -373,12 +373,12 @@ class _CurrencyMini extends StatelessWidget {
                 height: 30,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: c == value ? Colors.white : Colors.transparent, borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(color: c == value ? context.ajil.surface : Colors.transparent, borderRadius: BorderRadius.circular(8)),
                 child: Text(Currency.of(c).symbolAr,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: c == value ? FontWeight.w600 : FontWeight.w400,
-                      color: c == value ? AjilColors.primaryDark : AjilColors.textMuted,
+                      color: c == value ? context.ajil.primaryDark : context.ajil.textMuted,
                     )),
               ),
             ),

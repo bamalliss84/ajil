@@ -48,8 +48,8 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
             Text('رقم المستخدم: $userNo'),
             SelectableText('كلمة المرور المؤقتة: $password', style: const TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            const Text('سيُطلب منه تغييرها، وجهازه يحتاج اعتمادك من «الأجهزة».',
-                style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+            Text('سيُطلب منه تغييرها، وجهازه يحتاج اعتمادك من «الأجهزة».',
+                style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
           ]),
           actions: [
             TextButton(
@@ -115,8 +115,8 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
                 final active = u['is_active'] == true;
                 final branches = ((u['user_branches'] as List?) ?? const []).map((b) => branchName[b['branch_id']] ?? '').join('، ');
                 return ListTile(
-                  tileColor: Colors.white,
-                  leading: CircleAvatar(backgroundColor: AjilColors.primaryLight, child: Text('${u['user_no']}')),
+                  tileColor: context.ajil.surface,
+                  leading: CircleAvatar(backgroundColor: context.ajil.primaryLight, child: Text('${u['user_no']}')),
                   title: Text('${u['display_name']}${isOwner ? ' (المالك)' : ''}'),
                   subtitle: Text(isOwner ? 'كل الفروع' : '${active ? '' : 'موقوف · '}$branches'),
                   trailing: isOwner

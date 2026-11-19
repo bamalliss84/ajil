@@ -20,8 +20,8 @@ class PinDots extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: i < length ? AjilColors.primary : Colors.transparent,
-                  border: Border.all(color: i < length ? AjilColors.primary : AjilColors.dotEmpty, width: 2),
+                  color: i < length ? context.ajil.primary : Colors.transparent,
+                  border: Border.all(color: i < length ? context.ajil.primary : context.ajil.dotEmpty, width: 2),
                 ),
               ),
           ],
@@ -35,11 +35,11 @@ class PinPad extends StatelessWidget {
   final ValueChanged<String> onKey;
   final Widget? leading;
 
-  Widget _key(String k) => SizedBox(
+  Widget _key(BuildContext context, String k) => SizedBox(
         width: 68,
         height: 68,
         child: Material(
-          color: AjilColors.keyBg,
+          color: context.ajil.keyBg,
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
@@ -47,7 +47,7 @@ class PinPad extends StatelessWidget {
               HapticFeedback.selectionClick();
               onKey(k);
             },
-            child: Center(child: Text(k, style: const TextStyle(fontSize: 26, color: AjilColors.text))),
+            child: Center(child: Text(k, style: TextStyle(fontSize: 26, color: context.ajil.text))),
           ),
         ),
       );
@@ -63,17 +63,17 @@ class PinPad extends StatelessWidget {
           ])
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 7),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [for (final k in row) _key(k)]),
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [for (final k in row) _key(context, k)]),
             ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             SizedBox(width: 68, height: 68, child: leading),
-            _key('0'),
+            _key(context, '0'),
             SizedBox(
               width: 68,
               height: 68,
               child: IconButton(
                 onPressed: () => onKey('del'),
-                icon: const Icon(Icons.backspace_outlined, color: AjilColors.textSoft, size: 28),
+                icon: Icon(Icons.backspace_outlined, color: context.ajil.textSoft, size: 28),
                 tooltip: 'حذف',
               ),
             ),

@@ -111,7 +111,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
     final applied = _applied(Currency.of(cur));
     final before = balances[cur]?.balance ?? Decimal.zero;
     final after = applied == null ? before : (widget.kind.isDebit ? before + applied : before - applied);
-    final color = widget.kind.isDebit ? AjilColors.debt : AjilColors.paid;
+    final color = widget.kind.isDebit ? context.ajil.debt : context.ajil.paid;
     final displayCur = _fx ? (_paidCurrency ?? cur) : cur;
 
     // لوحة الأرقام تظهر فقط عند إدخال المبلغ؛ إذا كان المؤشر في حقل نصي (الوصف…) تختفي ويظهر كيبورد الجوال
@@ -119,7 +119,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
     final now = DateTime.now();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.ajil.surface,
       appBar: AjilHeader(close: true, title: 'تسجيل ${widget.kind.labelAr}', subtitle: '${c.name} · ${w.branch.name}'),
       body: Column(children: [
         Expanded(
@@ -137,20 +137,20 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
             const SizedBox(height: 12),
             Center(
               child: _fx
-                  ? Text('المدفوع بـ ${Currency.of(displayCur).nameAr}', style: const TextStyle(fontSize: 13, color: AjilColors.textMuted))
+                  ? Text('المدفوع بـ ${Currency.of(displayCur).nameAr}', style: TextStyle(fontSize: 13, color: context.ajil.textMuted))
                   : CurrencyToggle(currencies: w.enabledCurrencies, value: cur, onChanged: (v) => setState(() => _currency = v)),
             ),
             if (!_fx && cur == c.defaultCurrency && w.enabledCurrencies.length > 1) ...[
               const SizedBox(height: 12),
               Center(
                 child: Text('العملة الافتراضية للزبون: ${Currency.of(c.defaultCurrency).nameAr}',
-                    style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                    style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
               ),
             ],
             if (_fx) ...[
               const SizedBox(height: 14),
               Row(children: [
-                const Expanded(child: Text('الدين بعملة', style: TextStyle(fontSize: 13, color: AjilColors.textSoft))),
+                Expanded(child: Text('الدين بعملة', style: TextStyle(fontSize: 13, color: context.ajil.textSoft))),
                 CurrencyToggle(
                     currencies: w.enabledCurrencies,
                     value: cur,
@@ -176,7 +176,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text('ينقص الدين: ${f.amount(applied, cur, withSymbol: true)}',
-                      style: const TextStyle(fontWeight: FontWeight.w600, color: AjilColors.paid)),
+                      style: TextStyle(fontWeight: FontWeight.w600, color: context.ajil.paid)),
                 ),
             ],
             const SizedBox(height: 16),
@@ -208,7 +208,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
                     height: 46,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     alignment: AlignmentDirectional.centerStart,
-                    decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: context.ajil.background, borderRadius: BorderRadius.circular(12)),
                     child: Text('اليوم ${intl.DateFormat('h:mm a', 'ar').format(now)}', style: const TextStyle(fontSize: 15)),
                   ),
                 ),
@@ -216,7 +216,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
             ]),
             if (_isDebt) ...[
               const SizedBox(height: 10),
-              const Text('موعد السداد (اختياري — للتنبيه)', style: TextStyle(fontSize: 13, color: AjilColors.textSoft)),
+              Text('موعد السداد (اختياري — للتنبيه)', style: TextStyle(fontSize: 13, color: context.ajil.textSoft)),
               const SizedBox(height: 6),
               Wrap(spacing: 6, runSpacing: 6, children: [
                 for (final (label, date) in [
@@ -247,16 +247,16 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: context.ajil.background, borderRadius: BorderRadius.circular(12)),
               child: Row(children: [
-                const Expanded(child: Text('الرصيد بعد العملية', style: TextStyle(fontSize: 14, color: AjilColors.textMuted))),
+                Expanded(child: Text('الرصيد بعد العملية', style: TextStyle(fontSize: 14, color: context.ajil.textMuted))),
                 MoneyText(after, cur, size: 14),
               ]),
             ),
           ]),
         ),
         Container(
-          color: AjilColors.background,
+          color: context.ajil.background,
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: SafeArea(
             top: false,

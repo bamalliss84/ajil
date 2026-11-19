@@ -110,7 +110,7 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
     final w = sessionOf(ref);
     final editing = widget.editId != null;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.ajil.surface,
       appBar: AjilHeader(close: true, title: editing ? 'تعديل بيانات الزبون' : 'زبون جديد'),
       body: Column(children: [
         Expanded(
@@ -165,13 +165,13 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
               const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: AjilColors.infoBg, borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: context.ajil.infoBg, borderRadius: BorderRadius.circular(14)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const Text('رصيد سابق من الدفتر (اختياري)',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AjilColors.infoText)),
+                  Text('رصيد سابق من الدفتر (اختياري)',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: context.ajil.infoText)),
                   const SizedBox(height: 2),
-                  const Text('ما كان على الزبون قبل استخدام التطبيق — يظهر أول سطر في الكشف',
-                      style: TextStyle(fontSize: 13, color: AjilColors.infoText)),
+                  Text('ما كان على الزبون قبل استخدام التطبيق — يظهر أول سطر في الكشف',
+                      style: TextStyle(fontSize: 13, color: context.ajil.infoText)),
                   const SizedBox(height: 12),
                   Row(children: [
                     Expanded(
@@ -179,14 +179,14 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                         controller: _opening,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         style: const TextStyle(fontSize: 16),
-                        decoration: const InputDecoration(hintText: 'المبلغ', fillColor: Colors.white),
+                        decoration: InputDecoration(hintText: 'المبلغ', fillColor: context.ajil.surface),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Material(
-                      color: Colors.white,
+                      color: context.ajil.surface,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AjilColors.border)),
+                          borderRadius: BorderRadius.circular(12), side: BorderSide(color: context.ajil.border)),
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
                         onTap: () async {
@@ -199,7 +199,7 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           alignment: Alignment.center,
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
-                            const Icon(Icons.event_outlined, size: 18, color: AjilColors.textSoft),
+                            Icon(Icons.event_outlined, size: 18, color: context.ajil.textSoft),
                             const SizedBox(width: 6),
                             Text(intl.DateFormat('yyyy/MM/dd').format(_openingDate), style: const TextStyle(fontSize: 14)),
                           ]),
@@ -211,7 +211,7 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                   TextField(
                     controller: _openingNote,
                     style: const TextStyle(fontSize: 15),
-                    decoration: const InputDecoration(hintText: 'ملاحظة (مثل: صفحة 12 في الدفتر)', fillColor: Colors.white),
+                    decoration: InputDecoration(hintText: 'ملاحظة (مثل: صفحة 12 في الدفتر)', fillColor: context.ajil.surface),
                   ),
                 ]),
               ),
@@ -235,7 +235,7 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
           ]),
         ),
         Container(
-          decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.headerBorder))),
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.headerBorder))),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: SafeArea(
             top: false,

@@ -12,6 +12,7 @@ import 'security/app_lock.dart';
 import 'services/notifications.dart';
 import 'state/providers.dart';
 import 'state/session_controller.dart';
+import 'state/theme_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,10 @@ Future<void> main() async {
   final identity = DeviceIdentity(storage);
   await identity.ensure();
 
+  // المظهر يُطبَّق قبل أول إطار، من التخزين المحلي (بدون نت)
+  final theme = ThemeController(storage);
+  await theme.init();
+
   final notifications = Notifications();
   await notifications.init();
 
@@ -33,6 +38,7 @@ Future<void> main() async {
     identity: identity,
     lock: AppLock(storage),
     notifications: notifications,
+    theme: theme,
   );
   await session.restore();
 
@@ -40,6 +46,7 @@ Future<void> main() async {
     overrides: [
       sessionProvider.overrideWith((ref) => session),
       notificationsProvider.overrideWithValue(notifications),
+      themeProvider.overrideWith((ref) => theme),
     ],
     child: const AjilApp(),
   ));

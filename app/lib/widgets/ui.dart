@@ -12,19 +12,19 @@ class AjilSegmented<T> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.fontSize = 14,
-    this.selectedFg = AjilColors.text,
+    this.selectedFg,
     this.shadow = false,
   });
   final List<(T, String)> options;
   final T value;
   final ValueChanged<T> onChanged;
   final double fontSize;
-  final Color selectedFg;
+  final Color? selectedFg;
   final bool shadow;
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(color: AjilColors.track, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: context.ajil.track, borderRadius: BorderRadius.circular(12)),
         child: Row(children: [
           for (final (v, label) in options)
             Expanded(
@@ -39,17 +39,17 @@ class AjilSegmented<T> extends StatelessWidget {
                     height: 38,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: v == value ? Colors.white : Colors.transparent,
+                      color: v == value ? context.ajil.surface : Colors.transparent,
                       borderRadius: BorderRadius.circular(9),
                       boxShadow: shadow && v == value
-                          ? const [BoxShadow(color: Color(0x1F0F2823), blurRadius: 2, offset: Offset(0, 1))]
+                          ? [BoxShadow(color: context.ajil.shadow, blurRadius: 2, offset: Offset(0, 1))]
                           : null,
                     ),
                     child: Text(label,
                         style: TextStyle(
                           fontSize: fontSize,
                           fontWeight: v == value ? FontWeight.w600 : FontWeight.w400,
-                          color: v == value ? selectedFg : AjilColors.textMuted,
+                          color: v == value ? (selectedFg ?? context.ajil.text) : context.ajil.textMuted,
                         )),
                   ),
                 ),
@@ -66,7 +66,7 @@ class PillChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
-    this.selectedColor = AjilColors.chipSelected,
+    this.selectedColor,
     this.height = 34,
     this.fontSize = 13,
     this.icon,
@@ -74,14 +74,14 @@ class PillChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  final Color selectedColor;
+  final Color? selectedColor;
   final double height;
   final double fontSize;
   final IconData? icon;
   @override
   Widget build(BuildContext context) => Material(
-        color: selected ? selectedColor : Colors.white,
-        shape: StadiumBorder(side: selected ? BorderSide.none : const BorderSide(color: AjilColors.border)),
+        color: selected ? (selectedColor ?? context.ajil.chipSelected) : context.ajil.surface,
+        shape: StadiumBorder(side: selected ? BorderSide.none : BorderSide(color: context.ajil.border)),
         child: InkWell(
           customBorder: const StadiumBorder(),
           onTap: onTap,
@@ -90,10 +90,10 @@ class PillChip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               if (icon != null) ...[
-                Icon(icon, size: 16, color: selected ? Colors.white : AjilColors.textSoft),
+                Icon(icon, size: 16, color: selected ? context.ajil.onPrimary : context.ajil.textSoft),
                 const SizedBox(width: 4),
               ],
-              Text(label, style: TextStyle(fontSize: fontSize, color: selected ? Colors.white : AjilColors.textSoft)),
+              Text(label, style: TextStyle(fontSize: fontSize, color: selected ? context.ajil.onPrimary : context.ajil.textSoft)),
             ]),
           ),
         ),
@@ -108,10 +108,10 @@ class OptionTile extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => Material(
-        color: selected ? AjilColors.primaryLight : Colors.white,
+        color: selected ? context.ajil.primaryLight : context.ajil.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: selected ? AjilColors.primary : AjilColors.border, width: selected ? 2 : 1),
+          side: BorderSide(color: selected ? context.ajil.primary : context.ajil.border, width: selected ? 2 : 1),
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
@@ -123,7 +123,7 @@ class OptionTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                    color: selected ? AjilColors.primaryDark : AjilColors.textSoft,
+                    color: selected ? context.ajil.primaryDark : context.ajil.textSoft,
                   )),
             ),
           ),
@@ -144,12 +144,12 @@ class LabeledField extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: labelStyle ?? const TextStyle(fontSize: 13, color: AjilColors.textSoft)),
+          Text(label, style: labelStyle ?? TextStyle(fontSize: 13, color: context.ajil.textSoft)),
           SizedBox(height: gap),
           child,
           if (helper != null) ...[
             const SizedBox(height: 4),
-            Text(helper!, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+            Text(helper!, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
           ],
         ],
       );
@@ -165,7 +165,7 @@ class UnitBox extends StatelessWidget {
         height: height,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: AjilColors.track, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: context.ajil.track, borderRadius: BorderRadius.circular(12)),
         child: Text(text, style: const TextStyle(fontSize: 15)),
       );
 }
@@ -194,12 +194,12 @@ class CheckRow extends StatelessWidget {
         onTap: onChanged == null ? null : () => onChanged!(!value),
         child: Container(
           constraints: BoxConstraints(minHeight: minHeight),
-          decoration: divider ? const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.divider))) : null,
+          decoration: divider ? BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.divider))) : null,
           child: Row(children: [
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                 Text(label, style: TextStyle(fontSize: bold ? 16 : 15, fontWeight: bold ? FontWeight.w600 : FontWeight.w400)),
-                if (subtitle != null) Text(subtitle!, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+                if (subtitle != null) Text(subtitle!, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
               ]),
             ),
             Transform.scale(
@@ -218,9 +218,10 @@ class SquareIconButton extends StatelessWidget {
     required this.icon,
     required this.onPressed,
     required this.tooltip,
-    this.color = AjilColors.textSoft,
-    this.bg = Colors.white,
-    this.borderColor = AjilColors.border,
+    this.color,
+    this.bg,
+    this.borderColor,
+    this.noBorder = false,
     this.size = 44,
     this.iconSize = 20,
     this.radius = 12,
@@ -229,9 +230,11 @@ class SquareIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onPressed;
   final String tooltip;
-  final Color color;
-  final Color bg;
+  final Color? color;
+  final Color? bg;
   final Color? borderColor;
+  /// بلا حدود (بدل borderColor: null سابقاً)
+  final bool noBorder;
   final double size;
   final double iconSize;
   final double radius;
@@ -241,10 +244,10 @@ class SquareIconButton extends StatelessWidget {
         message: tooltip,
         child: Stack(clipBehavior: Clip.none, children: [
           Material(
-            color: bg,
+            color: bg ?? context.ajil.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radius),
-              side: borderColor == null ? BorderSide.none : BorderSide(color: borderColor!),
+              side: noBorder ? BorderSide.none : BorderSide(color: borderColor ?? context.ajil.border),
             ),
             child: InkWell(
               borderRadius: BorderRadius.circular(radius),
@@ -262,8 +265,8 @@ class SquareIconButton extends StatelessWidget {
                   height: 18,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(color: AjilColors.pendingDot, borderRadius: BorderRadius.circular(9)),
-                  child: Text('$badge', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AjilColors.badgeText, height: 1.1)),
+                  decoration: BoxDecoration(color: context.ajil.pendingDot, borderRadius: BorderRadius.circular(9)),
+                  child: Text('$badge', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: context.ajil.badgeText, height: 1.1)),
                 ),
               ),
             ),
@@ -298,13 +301,13 @@ class AjilHeader extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final canBack = onBack != null || Navigator.of(context).canPop();
     return Material(
-      color: Colors.white,
+      color: context.ajil.surface,
       child: SafeArea(
         bottom: false,
         child: Container(
           height: 73,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.headerBorder))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.headerBorder))),
           child: Row(children: [
             if (showLeading && canBack) ...[
               SizedBox(
@@ -328,7 +331,7 @@ class AjilHeader extends StatelessWidget implements PreferredSizeWidget {
                       overflow: TextOverflow.ellipsis,
                       textDirection: subtitleLtr ? TextDirection.ltr : null,
                       textAlign: subtitleLtr ? TextAlign.right : null,
-                      style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                      style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
               ]),
             ),
             for (final a in actions) ...[const SizedBox(width: 10), a],
@@ -348,17 +351,17 @@ class AjilLogo extends StatelessWidget {
         width: size,
         height: size,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: AjilColors.primary, borderRadius: BorderRadius.circular(size * 0.28)),
-        child: Text('آ', style: TextStyle(color: Colors.white, fontSize: size * 0.55, fontWeight: FontWeight.w600, height: 1.25)),
+        decoration: BoxDecoration(color: context.ajil.primary, borderRadius: BorderRadius.circular(size * 0.28)),
+        child: Text('آ', style: TextStyle(color: context.ajil.onPrimary, fontSize: size * 0.55, fontWeight: FontWeight.w600, height: 1.25)),
       );
 }
 
 /// رابط نصي بخط سفلي
 class LinkText extends StatelessWidget {
-  const LinkText(this.text, {super.key, required this.onTap, this.color = AjilColors.primary, this.size = 15, this.weight = FontWeight.w400});
+  const LinkText(this.text, {super.key, required this.onTap, this.color, this.size = 15, this.weight = FontWeight.w400});
   final String text;
   final VoidCallback? onTap;
-  final Color color;
+  final Color? color;
   final double size;
   final FontWeight weight;
   @override
@@ -369,7 +372,7 @@ class LinkText extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
           child: Text(text,
               style: TextStyle(
-                color: color,
+                color: color ?? context.ajil.primary,
                 fontSize: size,
                 fontWeight: weight,
                 decoration: TextDecoration.underline,
@@ -385,21 +388,24 @@ class InfoStrip extends StatelessWidget {
     super.key,
     required this.text,
     this.icon,
-    this.bg = AjilColors.infoBg,
-    this.fg = AjilColors.infoText,
+    this.bg,
+    this.fg,
     this.action,
     this.margin,
     this.onTap,
   });
   final String text;
   final IconData? icon;
-  final Color bg;
-  final Color fg;
+  final Color? bg;
+  final Color? fg;
   final (String, VoidCallback)? action;
   final EdgeInsets? margin;
   final VoidCallback? onTap;
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) {
+    final bg = this.bg ?? context.ajil.infoBg;
+    final fg = this.fg ?? context.ajil.infoText;
+    return Padding(
         padding: margin ?? EdgeInsets.zero,
         child: Material(
           color: bg,
@@ -418,6 +424,7 @@ class InfoStrip extends StatelessWidget {
           ),
         ),
       );
+  }
 }
 
 /// بطاقة بيضاء بزوايا 16 وعنوان اختياري
@@ -430,7 +437,7 @@ class AjilCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         margin: margin,
         padding: padding,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(color: context.ajil.surface, borderRadius: BorderRadius.circular(16)),
         child: child,
       );
 }
@@ -444,7 +451,7 @@ class CardTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         constraints: const BoxConstraints(minHeight: 52),
-        decoration: divider ? const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.divider))) : null,
+        decoration: divider ? BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.divider))) : null,
         child: Row(children: [
           Expanded(child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
           if (trailing != null) trailing!,

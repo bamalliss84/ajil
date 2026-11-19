@@ -63,7 +63,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     final s = ref.watch(sessionProvider);
     final w = s.session;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.ajil.surface,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, box) => SingleChildScrollView(
@@ -77,9 +77,9 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                     const SizedBox(height: 24),
                     Text('أهلاً ${w?.displayName ?? ''}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
-                    Text('المستخدم ${w?.userNo ?? ''} · ${w?.branch.name ?? ''}', style: const TextStyle(fontSize: 14, color: AjilColors.textMuted)),
+                    Text('المستخدم ${w?.userNo ?? ''} · ${w?.branch.name ?? ''}', style: TextStyle(fontSize: 14, color: context.ajil.textMuted)),
                     const SizedBox(height: 24),
-                    const Text('أدخل رمز PIN', style: TextStyle(fontSize: 15, color: AjilColors.textSoft)),
+                    Text('أدخل رمز PIN', style: TextStyle(fontSize: 15, color: context.ajil.textSoft)),
                     const SizedBox(height: 24),
                     PinDots(length: _pin.length, max: _len),
                     const SizedBox(height: 36),
@@ -87,12 +87,12 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                       onKey: _onKey,
                       leading: _bio
                           ? Material(
-                              color: AjilColors.primaryLight,
+                              color: context.ajil.primaryLight,
                               shape: const CircleBorder(),
                               child: InkWell(
                                 customBorder: const CircleBorder(),
                                 onTap: () => s.lock.unlockWithBiometric(),
-                                child: const Icon(Icons.fingerprint_rounded, size: 30, color: AjilColors.primary, semanticLabel: 'الدخول بالبصمة'),
+                                child: Icon(Icons.fingerprint_rounded, size: 30, color: context.ajil.primary, semanticLabel: 'الدخول بالبصمة'),
                               ),
                             )
                           : null,
@@ -102,7 +102,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                     LinkText('الدخول بكلمة المرور', onTap: () => s.logout()),
                     LinkText('تبديل المستخدم', onTap: () => s.logout()),
                     const SizedBox(height: 4),
-                    const Text('يُقفل التطبيق بعد 5 دقائق بدون استخدام', style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                    Text('يُقفل التطبيق بعد 5 دقائق بدون استخدام', style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
                   ]),
                 ),
               ),

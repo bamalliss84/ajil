@@ -10,13 +10,14 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 
+import '../core/theme.dart';
+import 'pdf_palette.dart';
 import '../features/reports/report_state.dart';
 
 /// تصدير التقرير: PDF بنفس الأقسام، وExcel بورقة لكل قسم. المشاركة عبر نافذة النظام.
 class ReportExport {
-  static const _green = PdfColor.fromInt(0xFF0F6E56);
-  static const _red = PdfColor.fromInt(0xFFB03224);
-  static const _grey = PdfColor.fromInt(0xFF5B6B70);
+  static PdfPalette _p = PdfPalette.of(AjilTheme.classic);
+
 
   static String _title(PeriodReport r) => periodLabel(const MoneyFormat(), r.period, r.today);
   static String _file(PeriodReport r, String ext) =>
@@ -57,7 +58,9 @@ class ReportExport {
 
   // ------------------------------------------------------------------ PDF
 
-  static Future<Uint8List> pdf(PeriodReport r, {required WorkSession session, required Map<String, String> users}) async {
+  static Future<Uint8List> pdf(PeriodReport r,
+      {required WorkSession session, required Map<String, String> users, AjilTheme theme = AjilTheme.classic}) async {
+    _p = PdfPalette.of(theme);
     final regular = pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-Regular.ttf'));
     final bold = pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-SemiBold.ttf'));
     final doc = pw.Document(theme: pw.ThemeData.withFont(base: regular, bold: bold));
@@ -65,17 +68,17 @@ class ReportExport {
 
     pw.Widget h(String t) => pw.Padding(
           padding: const pw.EdgeInsets.only(top: 14, bottom: 6),
-          child: pw.Text(t, style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold, color: _green)),
+          child: pw.Text(t, style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold, color: _p.primary)),
         );
     pw.Widget table(List<String> head, List<List<String>> rows) => pw.TableHelper.fromTextArray(
           headers: head,
           data: rows,
           headerStyle: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
           cellStyle: const pw.TextStyle(fontSize: 10),
-          headerDecoration: const pw.BoxDecoration(color: PdfColor.fromInt(0xFFEEF2F1)),
+          headerDecoration: pw.BoxDecoration(color: _p.divider),
           cellAlignment: pw.Alignment.centerRight,
           headerAlignment: pw.Alignment.centerRight,
-          border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+          border: pw.TableBorder.all(color: _p.border, width: 0.5),
         );
 
     doc.addPage(pw.MultiPage(
@@ -84,10 +87,10 @@ class ReportExport {
       margin: const pw.EdgeInsets.all(28),
       header: (_) => pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
         pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-          pw.Text(session.storeName, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: _green)),
+          pw.Text(session.storeName, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: _p.primary)),
           pw.Text('تقرير ${_title(r)}', style: const pw.TextStyle(fontSize: 14)),
         ]),
-        pw.Text('${session.branch.name} · ${Currency.of(r.currency).nameAr}', style: const pw.TextStyle(fontSize: 10, color: _grey)),
+        pw.Text('${session.branch.name} · ${Currency.of(r.currency).nameAr}', style: pw.TextStyle(fontSize: 10, color: _p.muted)),
         pw.Divider(),
       ]),
       footer: (c) => pw.Align(
@@ -126,7 +129,7 @@ class ReportExport {
         ]),
         pw.SizedBox(height: 10),
         pw.Text('محسوب من بيانات هذا الجوال — الحركات غير المتزامنة محسوبة، والمرفوضة من الخادم مستبعدة.',
-            style: const pw.TextStyle(fontSize: 9, color: _red)),
+            style: pw.TextStyle(fontSize: 9, color: _p.debt)),
       ],
     ));
     return doc.save();
@@ -197,8 +200,9 @@ class ReportExport {
     await Share.shareXFiles([XFile(file.path, mimeType: mime)], subject: filename);
   }
 
-  static Future<void> sharePdf(PeriodReport r, {required WorkSession session, required Map<String, String> users}) async =>
-      share(await pdf(r, session: session, users: users), _file(r, 'pdf'), 'application/pdf');
+  static Future<void> sharePdf(PeriodReport r,
+          {required WorkSession session, required Map<String, String> users, AjilTheme theme = AjilTheme.classic}) async =>
+      share(await pdf(r, session: session, users: users, theme: theme), _file(r, 'pdf'), 'application/pdf');
 
   static Future<void> shareExcel(PeriodReport r,
           {required WorkSession session, required Map<String, String> users, Map<String, String> customerNames = const {}}) =>

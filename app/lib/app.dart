@@ -22,6 +22,7 @@ import 'features/settings/devices_screen.dart';
 import 'features/settings/employees_screen.dart';
 import 'features/settings/reminders_screen.dart';
 import 'features/settings/settings_screen.dart';
+import 'features/settings/theme_screen.dart';
 import 'features/sync/unsynced_screen.dart';
 import 'features/tx/add_tx_screen.dart';
 import 'services/notifications.dart';
@@ -98,6 +99,7 @@ class _AjilAppState extends ConsumerState<AjilApp> {
         GoRoute(path: '/settings/reminders', builder: (_, __) => const RemindersScreen()),
         GoRoute(path: '/settings/devices', builder: (_, __) => const DevicesScreen()),
         GoRoute(path: '/settings/employees', builder: (_, __) => const EmployeesScreen()),
+        GoRoute(path: '/settings/theme', builder: (_, __) => const ThemeScreen()),
       ],
     );
     Notifications.tapRoute.addListener(_openTapRoute);
@@ -129,7 +131,7 @@ class _AjilAppState extends ConsumerState<AjilApp> {
       child: MaterialApp.router(
         title: 'آجِل',
         debugShowCheckedModeBanner: false,
-        theme: buildTheme(),
+        theme: buildTheme(ref.watch(themeProvider).theme),
         locale: const Locale('ar'),
         supportedLocales: const [Locale('ar')],
         localizationsDelegates: const [

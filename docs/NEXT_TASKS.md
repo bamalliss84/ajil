@@ -186,32 +186,26 @@
 - لوحة الأرقام في أسفل الشاشة دائماً (استخدام بإبهام واحد)، و`00` مفتاح مستقل.
 - سطر «المتبقي بعده» يُحسب محلياً للعرض فقط؛ الرصيد المعتمد من الخادم بعد المزامنة (قاعدة 3).
 
-## 🎨 مظهران قابلان للتبديل (2026-11-19)
+## ✅ مظهران قابلان للتبديل — لكل مستخدم (2026-11-19)
 رمزان لكل لون (الجدول الكامل في `docs/DESIGN.md`): **أ · الأخضر الكلاسيكي** (الافتراضي) و**ب · فيروزي وكحلي**.
 القاعدة: **ممنوع كتابة قيمة لون مباشرة في أي شاشة** — تُستخدم الرموز وإلا لن يتبدّل المظهر.
+`#16A085` (تباين 3.28 مع الأبيض) للأيقونات والرسوم فقط (`accent`)، و`#11856F` للأسطح التي تحمل نصاً أبيض؛ الكحلي `#16324F` للهيدر.
 
-**قرار تباين مهم:** `#16A085` مع نص أبيض تباينه 3.28:1 (يرسب في WCAG AA)، فهو يبقى لوناً للأيقونات
-والتظليل والرسوم (`accent`)، ويُعمَّق إلى `#11856F` (4.56) في الأسطح التي تحمل نصاً أبيض.
-الكحلي `#16324F` (13.1) للهيدر والأرقام الكبيرة — وهذا ما يظهر في المرجع الذي أرسله المالك.
-
-- ✅ منفَّذ: `docs/DESIGN.md` (جدول الرمزين)، `docs/design/Settings.dc.html` (صف «مظهر التطبيق»)،
-  `docs/design/SettingsTheme.dc.html` (شاشة الاختيار بمعاينة)، `web/statement/index.html`
-  (يتبع `theme` القادم من `public_statement`)، `web/landing/index.html` (نفس الرموز، المظهر التسويقي موحّد افتراضياً).
-- ⬜ متبقٍ:
-  1. **migration جديدة:** `alter table app.app_users add column theme text not null default 'classic'
-     check (theme in ('classic','ocean'));` — **المظهر لكل مستخدم لا لكل بقالة**.
-     لا تمنح `update` على الجدول؛ أضف بدلها:
-     `app.set_my_theme(p_theme text)` security definer تحدّث **صف المستخدم الحالي فقط**
-     (`where id = app.app_user_id()`) وترفض أي قيمة غير `classic`/`ocean`،
-     ثم `revoke execute … from public, anon` و`grant execute … to authenticated`.
-  2. **`app.public_statement`**: أضف `'theme'` من **مالك البقالة** (`user_no = 1`) لا من المرسِل:
-     `coalesce((select u.theme from app.app_users u where u.store_id = l.store_id and u.user_no = 1), 'classic')`.
-     صفحة الكشف واجهة البقالة لزبائنها، فلا يصح أن يتغيّر شكلها حسب الموظف الذي أرسل الرابط.
-  3. **اختبارات:** `set_my_theme` تغيّر صف المستخدم نفسه فقط ولا تمسّ غيره؛ قيمة غير مسموحة تُرفض؛
-     الكشف العام يرجع مظهر المالك حتى لو أرسل الرابطَ موظفٌ مظهره مختلف؛ موظف في بقالة أخرى لا يتأثر.
-  4. **Flutter:** حوّل `AjilColors` من ثوابت إلى `AjilTheme` بحقلين (`classic`/`ocean`) مع `ThemeExtension`،
-     و`header` و`accent` رمزان جديدان. استبدل كل قيمة لون مباشرة في `app/lib` و`web/admin/lib` برمز.
-     احفظ الاختيار محلياً مربوطاً بـ `app_user_id` (يعمل بدون نت ويُطبَّق فور الفتح)،
-     وزامنه عبر `set_my_theme` عند الاتصال. كل مستخدم يغيّر مظهره هو فقط.
-  5. **الشاشتان:** صف «مظهر التطبيق» في الإعدادات + شاشة الاختيار حسب `SettingsTheme.dc.html`، والتبديل فوري بلا إعادة تشغيل.
-  6. `flutter analyze` و`flutter test`، ولقطة لكل شاشة بالمظهرين للمقارنة مع `docs/design`.
+- **القاعدة:** `migrations/…14_user_theme.sql` — `app_users.theme text not null default 'classic' check (theme in ('classic','ocean'))`.
+  `app.set_my_theme(p_theme)` security definer تحدّث صف `app.app_user_id()` فقط (وفي نفس `store_id` ونشط)،
+  `theme_invalid` لغير classic/ocean، `not_authenticated` بلا مستخدم في التوكن. EXECUTE لـ authenticated فقط، ولا update مباشر على الجدول.
+  `app.public_statement` ترجع `theme` من **المالك** (`user_no = 1`) لا من مرسل الرابط.
+  `theme_test.sql` (14): الصف نفسه فقط، رفض القيم، رفض UPDATE المباشر وanon، الكشف بمظهر المالك، بقالة أخرى لا تتأثر ← **180 ✓**.
+- **Flutter:** `core/theme.dart` — `AjilTheme extends ThemeExtension` (`classic` و`ocean`، ومعهما `header` و`accent` و`headerMid`
+  وبقية رموز الشاشات والرسوم)، والوصول `context.ajil.<رمز>`؛ `buildTheme(t)` يسجّل الامتداد. لا `Color(0x…)` ولا `Colors.*`
+  خارج `theme.dart` (عدا `transparent`). ملفات PDF (الإشعار، الكشف، التقرير) تأخذ `theme:` وتحوّله عبر `services/pdf_palette.dart`.
+  - الهيدر الملوّن (لوحة التحكم، بطاقات التقارير) = `header`، وأعمدة الرسوم المميزة = `accent`.
+  - `state/theme_controller.dart`: `ajil.theme.<app_user_id>` في التخزين الآمن + `ajil.theme.last_user` ← يُطبَّق في `main()` قبل أول إطار (حتى شاشة القفل بدون نت).
+    الاختيار بدون اتصال يُعلَّم `dirty` ويُرفع عبر `set_my_theme` بعد أول مزامنة ناجحة؛ قيمة الخادم (`me()` يقرأ `theme`) تُعتمد فقط إن لم يكن هناك تغيير معلّق.
+    `test/theme_controller_test.dart` (5): لكل مستخدم، بدون نت، الفتح من المحفوظ، قيمة خادم لمستخدم آخر.
+  - الإعدادات ← قسم «المظهر» ← «مظهر التطبيق» (`features/settings/theme_screen.dart`) حسب `SettingsTheme.dc.html`: بطاقتا اختيار بالعيّنات، ملاحظة المالك عن صفحة الكشف، ومعاينة مصغرة بالمظهرين. التبديل فوري.
+- **web/admin:** `lib/theme.dart` (`AdminTheme` بالمظهرين)، `?theme=ocean` في الرابط أو زر المظهر في الشريط الجانبي (الشريط بلون `header`).
+- `flutter analyze` بلا أخطاء (app و web/admin)، `flutter test` 17/17. لقطات بالمظهرين من بناء الويب.
+- [ ] لم يُجرَّب على الجوال الحقيقي: التبديل ثم إغلاق التطبيق وفتحه بدون نت، ورفع الاختيار المعلّق بعد عودة الاتصال.
+- [ ] ملفات PDF تتبع مظهر **المستخدم** الذي أنشأها؛ إن أردنا أن تتبع مظهر المالك (كصفحة الكشف) نحتاج حفظ مظهر المالك في الجلسة.
+- [ ] اختيار المظهر في `web/admin` لا يُحفظ بين الزيارات (الرابط فقط).

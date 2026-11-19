@@ -61,7 +61,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) => Scaffold(
         appBar: const AjilHeader(title: 'إنشاء بقالة جديدة'),
         body: ListView(padding: const EdgeInsets.all(20), children: [
-          const Text('رقم جوالك هو رقم البقالة، وأنت المستخدم رقم 1.', style: TextStyle(color: AjilColors.textMuted)),
+          Text('رقم جوالك هو رقم البقالة، وأنت المستخدم رقم 1.', style: TextStyle(color: context.ajil.textMuted)),
           const SizedBox(height: 16),
           TextField(
             controller: _phone,

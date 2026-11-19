@@ -24,7 +24,7 @@ class _PromiseScreenState extends ConsumerState<PromiseScreen> {
   bool _remindCustomer = true;
   String? _currency;
 
-  static const _legend = TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AjilColors.text);
+  TextStyle get _legend => TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: context.ajil.text);
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class _PromiseScreenState extends ConsumerState<PromiseScreen> {
     final preset = options.any((o) => same(o.$2, _date));
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.ajil.surface,
       appBar: AjilHeader(
         close: true,
         title: 'وعد بالسداد',
@@ -56,7 +56,7 @@ class _PromiseScreenState extends ConsumerState<PromiseScreen> {
       body: Column(children: [
         Expanded(
           child: ListView(padding: const EdgeInsets.fromLTRB(16, 18, 16, 18), children: [
-            const Text('متى قال بيسدد؟', style: _legend),
+            Text('متى قال بيسدد؟', style: _legend),
             const SizedBox(height: 8),
             GridView.count(
               crossAxisCount: 3,
@@ -82,7 +82,7 @@ class _PromiseScreenState extends ConsumerState<PromiseScreen> {
             ),
             const SizedBox(height: 8),
             Text(intl.DateFormat('EEEE d MMMM y', 'ar').format(_date),
-                style: const TextStyle(fontSize: 14, color: AjilColors.primaryDark)),
+                style: TextStyle(fontSize: 14, color: context.ajil.primaryDark)),
             const SizedBox(height: 18),
             LabeledField(
               label: 'المبلغ الموعود (اختياري)',
@@ -113,7 +113,7 @@ class _PromiseScreenState extends ConsumerState<PromiseScreen> {
               ]),
             ),
             const SizedBox(height: 18),
-            const Text('التنبيهات', style: _legend),
+            Text('التنبيهات', style: _legend),
             const SizedBox(height: 4),
             const CheckRow(label: 'تنبيهي يوم الموعد 9:00 ص', value: true, onChanged: null, minHeight: 48),
             CheckRow(
@@ -146,14 +146,14 @@ class _PromiseScreenState extends ConsumerState<PromiseScreen> {
             const SizedBox(height: 18),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
-              child: const Text('إذا مرّ الموعد بدون سداد يتحول إلى «وعد متأخر»، ويُغلق تلقائياً عند السداد.',
-                  style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+              decoration: BoxDecoration(color: context.ajil.background, borderRadius: BorderRadius.circular(12)),
+              child: Text('إذا مرّ الموعد بدون سداد يتحول إلى «وعد متأخر»، ويُغلق تلقائياً عند السداد.',
+                  style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
             ),
           ]),
         ),
         Container(
-          decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.headerBorder))),
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.headerBorder))),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: SafeArea(
             top: false,

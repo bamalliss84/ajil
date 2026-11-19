@@ -17,6 +17,7 @@ import '../data/sync_engine.dart';
 import '../security/app_lock.dart';
 import '../services/notifications.dart';
 import '../data/local/mappers.dart';
+import 'theme_controller.dart';
 
 /// ما يحفظه الجوال لشاشة الدخول: رقم البقالة، رقم المستخدم، الفروع، آخر فرع
 class LoginMemory {
@@ -44,8 +45,9 @@ enum SessionStage { loggedOut, needsPin, locked, ready, pendingDeviceApproval }
 
 /// يدير: الدخول، اختيار الفرع، تسجيل الجهاز، القاعدة المحلية، المزامنة الدورية، القفل
 class SessionController extends ChangeNotifier {
-  SessionController({required this.supabase, required this.storage, required this.identity, required this.lock, this.notifications}) {
+  SessionController({required this.supabase, required this.storage, required this.identity, required this.lock, this.notifications, this.theme}) {
     lock.addListener(_onLock);
+    theme?.push = (t) => api.setMyTheme(t);
   }
 
   final SupabaseClient supabase;
@@ -53,6 +55,7 @@ class SessionController extends ChangeNotifier {
   final DeviceIdentity identity;
   final AppLock lock;
   final Notifications? notifications;
+  final ThemeController? theme;
   Map<String, dynamic>? settings;
 
   late final SupabaseRemoteApi api = SupabaseRemoteApi(supabase, identity);
@@ -145,6 +148,7 @@ class SessionController extends ChangeNotifier {
     session = o.session;
     subscription = o.subscription;
     settings = o.settings;
+    await theme?.attach(o.session.appUserId);
     await db?.close();
     db = AppDatabase.forStore(o.session.storeId);
     repo = LedgerRepository(db!, o.session);
@@ -162,6 +166,7 @@ class SessionController extends ChangeNotifier {
     }
     final store = await api.myStore();
     final me = await api.me(userId);
+    await theme?.adoptServer(userId, me['theme'] as String?);
     final branches = await api.myBranches();
     final branch = branches.firstWhere((b) => b.id == branchId, orElse: () => branches.first);
     final device = await api.registerDevice(kIsWeb ? 'متصفح' : 'جوال ${me['display_name']}');
@@ -249,6 +254,7 @@ class SessionController extends ChangeNotifier {
         lastSync = DateTime.now();
         unawaited(_reschedule());
         if (openedOffline) unawaited(_refreshAfterOffline());
+        unawaited(theme?.flush());
       }
       online = r.error?.code != 'offline';
       pending = await sync!.pendingCount();

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
 import '../../widgets/common.dart';
-import 'report_sections.dart';
 import 'report_state.dart';
 
 /// نافذة «اختر الفترة»: يوم / شهر / سنة / من – إلى
@@ -18,7 +17,7 @@ Future<ReportPeriod?> showPeriodPicker(
     showModalBottomSheet<ReportPeriod>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: context.ajil.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
       builder: (_) => _Picker(current: current, txs: txs, currency: currency, f: f),
     );
@@ -69,14 +68,14 @@ class _PickerState extends State<_Picker> {
         padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Center(
-            child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AjilColors.border, borderRadius: BorderRadius.circular(2))),
+            child: Container(width: 40, height: 4, decoration: BoxDecoration(color: context.ajil.border, borderRadius: BorderRadius.circular(2))),
           ),
           const SizedBox(height: 8),
           Row(children: [
             const Expanded(child: Text('اختر الفترة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600))),
             IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.close_rounded, color: AjilColors.textMuted),
+              icon: Icon(Icons.close_rounded, color: context.ajil.textMuted),
               tooltip: 'إغلاق',
             ),
           ]),
@@ -84,7 +83,7 @@ class _PickerState extends State<_Picker> {
           AjilSegmented<PeriodKind>(
             options: const [(PeriodKind.day, 'يوم'), (PeriodKind.month, 'شهر'), (PeriodKind.year, 'سنة'), (PeriodKind.range, 'من – إلى')],
             value: _kind,
-            selectedFg: AjilColors.primaryDark,
+            selectedFg: context.ajil.primaryDark,
             shadow: true,
             onChanged: (k) => setState(() => _kind = k),
           ),
@@ -101,8 +100,8 @@ class _PickerState extends State<_Picker> {
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(54),
-                  foregroundColor: AjilColors.primary,
-                  side: const BorderSide(color: AjilColors.borderStrong),
+                  foregroundColor: context.ajil.primary,
+                  side: BorderSide(color: context.ajil.borderStrong),
                   textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 15, fontWeight: FontWeight.w500),
                 ),
                 onPressed: () => Navigator.pop(context, ReportPeriod.currentMonth(today)),
@@ -135,8 +134,8 @@ class _PickerState extends State<_Picker> {
     Widget arrow(IconData icon, VoidCallback? onTap, String tip) => SquareIconButton(
           icon: icon,
           tooltip: tip,
-          color: onTap == null ? RC.disabled : AjilColors.text,
-          borderColor: onTap == null ? AjilColors.divider : AjilColors.border,
+          color: onTap == null ? context.ajil.axis : context.ajil.text,
+          borderColor: onTap == null ? context.ajil.divider : context.ajil.border,
           onPressed: onTap,
         );
     return Row(children: [
@@ -149,7 +148,7 @@ class _PickerState extends State<_Picker> {
               child: PillChip(
                 label: f.digits('$y'),
                 selected: y == _year,
-                selectedColor: AjilColors.primary,
+                selectedColor: context.ajil.primary,
                 height: 40,
                 fontSize: 15,
                 onTap: () => setState(() {
@@ -181,11 +180,11 @@ class _PickerState extends State<_Picker> {
       ),
       const SizedBox(height: 14),
       Row(children: [
-        const Icon(Icons.info_outline_rounded, size: 18, color: AjilColors.textMuted),
+        Icon(Icons.info_outline_rounded, size: 18, color: context.ajil.textMuted),
         const SizedBox(width: 8),
         Expanded(
           child: Text('الرقم تحت كل شهر = التحصيل بالألف $sym · الأشهر القادمة غير متاحة',
-              style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         ),
       ]),
     ];
@@ -195,10 +194,10 @@ class _PickerState extends State<_Picker> {
     final future = DateTime(_year, m).isAfter(today);
     final sel = !future && m == _month;
     final isNow = _year == today.year && m == today.month;
-    final bg = sel ? AjilColors.primary : (future ? AjilColors.background : Colors.white);
-    final fg = sel ? Colors.white : (future ? RC.disabled : AjilColors.text);
-    final subFg = sel ? AjilColors.onPrimaryMuted : (future ? RC.disabled : AjilColors.textMuted);
-    final border = sel ? AjilColors.primary : (future ? AjilColors.divider : AjilColors.border);
+    final bg = sel ? context.ajil.primary : (future ? context.ajil.background : context.ajil.surface);
+    final fg = sel ? context.ajil.onPrimary : (future ? context.ajil.axis : context.ajil.text);
+    final subFg = sel ? context.ajil.onHeaderMuted : (future ? context.ajil.axis : context.ajil.textMuted);
+    final border = sel ? context.ajil.primary : (future ? context.ajil.divider : context.ajil.border);
     return Material(
       color: bg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: BorderSide(color: border)),
@@ -225,17 +224,17 @@ class _PickerState extends State<_Picker> {
                 final sel = y == _year;
                 final total = _paid(y).fold(Decimal.zero, (a, b) => a + b);
                 return Material(
-                  color: sel ? AjilColors.primary : Colors.white,
+                  color: sel ? context.ajil.primary : context.ajil.surface,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14), side: BorderSide(color: sel ? AjilColors.primary : AjilColors.border)),
+                      borderRadius: BorderRadius.circular(14), side: BorderSide(color: sel ? context.ajil.primary : context.ajil.border)),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(14),
                     onTap: () => setState(() => _year = y),
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Text(f.digits('$y'),
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: sel ? Colors.white : AjilColors.text)),
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: sel ? context.ajil.onPrimary : context.ajil.text)),
                       Text('${thousands(f, total)} ألف${y == today.year ? ' · حتى الآن' : ''}',
-                          style: TextStyle(fontSize: 11, color: sel ? AjilColors.onPrimaryMuted : AjilColors.textMuted)),
+                          style: TextStyle(fontSize: 11, color: sel ? context.ajil.onHeaderMuted : context.ajil.textMuted)),
                     ]),
                   ),
                 );
@@ -265,8 +264,8 @@ class _PickerState extends State<_Picker> {
           child: LabeledField(
             label: label,
             child: Material(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AjilColors.border)),
+              color: context.ajil.surface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: context.ajil.border)),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () async {
@@ -277,7 +276,7 @@ class _PickerState extends State<_Picker> {
                   height: 46,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Row(children: [
-                    const Icon(Icons.event_outlined, size: 18, color: AjilColors.textMuted),
+                    Icon(Icons.event_outlined, size: 18, color: context.ajil.textMuted),
                     const SizedBox(width: 8),
                     Text(f.digits('${v.day} ${monthNames[v.month - 1]} ${v.year}'), style: const TextStyle(fontSize: 15)),
                   ]),
@@ -295,7 +294,7 @@ class _PickerState extends State<_Picker> {
       ]),
       const SizedBox(height: 10),
       Text('${counted(f, days, 'يوم', 'يومان', 'أيام', 'يوماً')} · تُقارن بالفترة السابقة بنفس الطول',
-          style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+          style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
     ];
   }
 }

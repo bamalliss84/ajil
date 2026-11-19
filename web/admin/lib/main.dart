@@ -9,10 +9,10 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'theme.dart';
+
 const _url = String.fromEnvironment('SUPABASE_URL', defaultValue: 'http://127.0.0.1:54321');
 const _anon = String.fromEnvironment('SUPABASE_ANON_KEY');
-const _green = Color(0xFF0F6E56);
-const _red = Color(0xFFB03224);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,30 +25,28 @@ SupabaseClient get _sb => Supabase.instance.client;
 PostgrestFilterBuilder<T> _rpc<T>(String fn, [Map<String, dynamic>? p]) => _sb.schema('app').rpc<T>(fn, params: p);
 
 void _err(BuildContext context, Object e) => ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(backgroundColor: _red, content: Text(AjilError.parse(e is PostgrestException ? e.message : e).message)));
+    SnackBar(backgroundColor: context.adm.debt, content: Text(AjilError.parse(e is PostgrestException ? e.message : e).message)));
 
 class AdminApp extends StatelessWidget {
   const AdminApp({super.key});
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'آجِل — إدارة المنصة',
-        debugShowCheckedModeBanner: false,
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: _green, primary: _green),
-          fontFamily: 'IBMPlexSansArabic',
-          scaffoldBackgroundColor: const Color(0xFFF5F7F6),
-        ),
-        home: StreamBuilder<AuthState>(
-          stream: _sb.auth.onAuthStateChange,
-          builder: (_, __) => _sb.auth.currentSession == null ? const LoginPage() : const Shell(),
+  Widget build(BuildContext context) => ValueListenableBuilder<AdminTheme>(
+        valueListenable: adminTheme,
+        builder: (_, t, __) => MaterialApp(
+          title: 'آجِل — إدارة المنصة',
+          debugShowCheckedModeBanner: false,
+          locale: const Locale('ar'),
+          supportedLocales: const [Locale('ar')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: t.toThemeData(),
+          home: StreamBuilder<AuthState>(
+            stream: _sb.auth.onAuthStateChange,
+            builder: (_, __) => _sb.auth.currentSession == null ? const LoginPage() : const Shell(),
+          ),
         ),
       );
 }
@@ -109,7 +107,13 @@ class _ShellState extends State<Shell> {
             selectedIndex: _i,
             labelType: NavigationRailLabelType.all,
             onDestinationSelected: (i) => setState(() => _i = i),
-            trailing: IconButton(onPressed: () => _sb.auth.signOut(), icon: const Icon(Icons.logout), tooltip: 'خروج'),
+            leading: IconButton(
+              onPressed: () => adminTheme.value = adminTheme.value.id == AdminTheme.ocean.id ? AdminTheme.classic : AdminTheme.ocean,
+              icon: Icon(Icons.palette_outlined, color: context.adm.onHeader),
+              tooltip: 'المظهر: ${context.adm.nameAr}',
+            ),
+            trailing:
+                IconButton(onPressed: () => _sb.auth.signOut(), icon: Icon(Icons.logout, color: context.adm.onHeader), tooltip: 'خروج'),
             destinations: const [
               NavigationRailDestination(icon: Icon(Icons.dashboard_outlined), label: Text('الملخص')),
               NavigationRailDestination(icon: Icon(Icons.store_outlined), label: Text('البقالات')),
@@ -155,7 +159,7 @@ class SummaryPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text(k, style: const TextStyle(color: Color(0xFF5B6B70))),
+                      Text(k, style: TextStyle(color: context.adm.textMuted)),
                       Text(v, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w600)),
                     ]),
                   ),
@@ -176,9 +180,8 @@ String _planName(Object? code) => switch (code) {
     };
 
 /// كود التفعيل بمقاطع رباعية كما يُطبع للمندوب: ABCD-EFGH-IJKL
-String _dashed(String c) => c.contains('-')
-    ? c
-    : [for (var i = 0; i < c.length; i += 4) c.substring(i, i + 4 > c.length ? c.length : i + 4)].join('-');
+String _dashed(String c) =>
+    c.contains('-') ? c : [for (var i = 0; i < c.length; i += 4) c.substring(i, i + 4 > c.length ? c.length : i + 4)].join('-');
 
 class StoresPage extends StatefulWidget {
   const StoresPage({super.key});
@@ -217,7 +220,7 @@ class _StoresPageState extends State<StoresPage> {
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('رجوع')),
             FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: _red),
+              style: FilledButton.styleFrom(backgroundColor: context.adm.debt),
               onPressed: () => Navigator.pop(ctx, true),
               child: const Text('إيقاف'),
             ),
@@ -333,7 +336,7 @@ class _StoresPageState extends State<StoresPage> {
                     rows: [
                       for (final r in rows)
                         DataRow(
-                          color: WidgetStatePropertyAll(r['status'] == 'suspended' ? const Color(0xFFFCEDEB) : null),
+                          color: WidgetStatePropertyAll(r['status'] == 'suspended' ? context.adm.debtBg : null),
                           cells: [
                             DataCell(Row(mainAxisSize: MainAxisSize.min, children: [
                               PopupMenuButton<String>(
@@ -345,7 +348,7 @@ class _StoresPageState extends State<StoresPage> {
                                   PopupMenuItem(
                                     value: 'status',
                                     child: Text(r['status'] == 'suspended' ? 'إعادة تفعيل البقالة' : 'إيقاف البقالة',
-                                        style: TextStyle(color: r['status'] == 'suspended' ? _green : _red)),
+                                        style: TextStyle(color: r['status'] == 'suspended' ? context.adm.paid : context.adm.debt)),
                                   ),
                                 ],
                               ),
@@ -356,7 +359,9 @@ class _StoresPageState extends State<StoresPage> {
                             DataCell(Text(
                               r['expires_at'] == null ? '—' : _dt.format(DateTime.parse(r['expires_at']).toLocal()),
                               style: TextStyle(
-                                  color: r['expires_at'] != null && DateTime.parse(r['expires_at']).isBefore(DateTime.now()) ? _red : null),
+                                  color: r['expires_at'] != null && DateTime.parse(r['expires_at']).isBefore(DateTime.now())
+                                      ? context.adm.debt
+                                      : null),
                             )),
                             DataCell(Text('${r['branches']}')),
                             DataCell(Text('${r['customers']}')),
@@ -473,10 +478,11 @@ class _CodesPageState extends State<CodesPage> {
         for (final c in _all)
           ListTile(
             dense: true,
-            title: Text('${_dashed('${c['code']}')} · ${_planName(c['plan_code'])} · ${c['months']} شهر', style: const TextStyle(fontFamily: 'monospace')),
+            title: Text('${_dashed('${c['code']}')} · ${_planName(c['plan_code'])} · ${c['months']} شهر',
+                style: const TextStyle(fontFamily: 'monospace')),
             subtitle: Text('${c['agent'] ?? ''}'),
             trailing: Text(c['redeemed_at'] == null ? 'متاح' : 'مستخدم',
-                style: TextStyle(color: c['redeemed_at'] == null ? _green : const Color(0xFF5B6B70))),
+                style: TextStyle(color: c['redeemed_at'] == null ? context.adm.paid : context.adm.textMuted)),
           ),
       ]);
 }
@@ -503,14 +509,14 @@ class _AlertsPageState extends State<AlertsPage> {
   @override
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(24), children: [
         const Text('تنبيهات سلامة البيانات (الفحص اليومي)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        const Text('سلسلة بصمات مكسورة = تعديل مباشر على قاعدة البيانات. عدم تطابق رصيد = خلل يحتاج مراجعة.',
-            style: TextStyle(color: Color(0xFF5B6B70))),
+        Text('سلسلة بصمات مكسورة = تعديل مباشر على قاعدة البيانات. عدم تطابق رصيد = خلل يحتاج مراجعة.',
+            style: TextStyle(color: context.adm.textMuted)),
         const SizedBox(height: 12),
-        if (_rows.isEmpty) const Text('لا توجد تنبيهات ✓', style: TextStyle(color: _green, fontSize: 16)),
+        if (_rows.isEmpty) Text('لا توجد تنبيهات ✓', style: TextStyle(color: context.adm.paid, fontSize: 16)),
         for (final a in _rows)
           Card(
             child: ListTile(
-              leading: Icon(a['kind'] == 'chain_broken' ? Icons.link_off : Icons.balance, color: _red),
+              leading: Icon(a['kind'] == 'chain_broken' ? Icons.link_off : Icons.balance, color: context.adm.debt),
               title: Text(a['kind'] == 'chain_broken' ? 'سلسلة بصمات مكسورة' : 'رصيد غير مطابق'),
               subtitle: SelectableText('${a['store_id']} · ${a['details']}'),
               trailing: TextButton(

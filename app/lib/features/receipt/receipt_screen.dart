@@ -51,7 +51,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
 
   /// زر المشاركة: PDF عبر نافذة المشاركة في الجوال
   Future<void> _sharePdf(ReceiptData d, Rect? origin) => _run(() async {
-        final bytes = await ReceiptPdf.build(d);
+        final bytes = await ReceiptPdf.build(d, theme: context.ajil);
         await Share.shareXFiles(
           [XFile.fromData(bytes, mimeType: 'application/pdf', name: '${_fileName(d)}.pdf')],
           subject: '${d.title} — ${d.storeName}',
@@ -72,7 +72,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
       });
 
   Future<void> _print(ReceiptData d, {bool thermal = false}) => _run(() async {
-        final bytes = await ReceiptPdf.build(d, thermal: thermal);
+        final bytes = await ReceiptPdf.build(d, thermal: thermal, theme: context.ajil);
         await Printing.layoutPdf(onLayout: (_) async => bytes, name: _fileName(d));
       });
 
@@ -111,7 +111,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
               builder: (ctx) => SquareIconButton(
                 icon: Icons.share_rounded,
                 tooltip: 'مشاركة',
-                color: AjilColors.primary,
+                color: context.ajil.primary,
                 onPressed: _busy ? null : () => _sharePdf(d, _origin(ctx)),
               ),
             ),
@@ -127,18 +127,18 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                     if (d.pending)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-                          Icon(Icons.schedule_rounded, size: 16, color: AjilColors.pendingText),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(Icons.schedule_rounded, size: 16, color: context.ajil.pendingText),
                           SizedBox(width: 6),
-                          Text('بانتظار المزامنة — يمكنك المشاركة الآن', style: TextStyle(color: AjilColors.pendingText, fontSize: 13)),
+                          Text('بانتظار المزامنة — يمكنك المشاركة الآن', style: TextStyle(color: context.ajil.pendingText, fontSize: 13)),
                         ]),
                       ),
                     Container(
                       clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.ajil.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AjilColors.border),
+                        border: Border.all(color: context.ajil.border),
                       ),
                       child: RepaintBoundary(key: _captureKey, child: ReceiptCard(d)),
                     ),
@@ -146,7 +146,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                 ),
               ),
               Container(
-                decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: AjilColors.headerBorder))),
+                decoration: BoxDecoration(color: context.ajil.surface, border: Border(top: BorderSide(color: context.ajil.headerBorder))),
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 child: SafeArea(
                   top: false,
@@ -178,7 +178,7 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                         Expanded(
                           child: TextButton.icon(
                             onPressed: () => Whatsapp.send(customerPhone, d.asText()),
-                            icon: const Icon(Icons.chat_outlined, color: AjilColors.paid),
+                            icon: Icon(Icons.chat_outlined, color: context.ajil.paid),
                             label: const Text('واتساب للزبون مباشرة'),
                           ),
                         ),
@@ -189,10 +189,10 @@ class _ReceiptScreenState extends ConsumerState<ReceiptScreen> {
                             PopupMenuItem(value: false, child: Text('طباعة A5')),
                             PopupMenuItem(value: true, child: Text('طابعة حرارية 58mm')),
                           ],
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 12),
                             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              Icon(Icons.print_outlined, color: AjilColors.textSoft),
+                              Icon(Icons.print_outlined, color: context.ajil.textSoft),
                               SizedBox(width: 6),
                               Text('طباعة'),
                             ]),

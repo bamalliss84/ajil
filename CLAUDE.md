@@ -62,7 +62,7 @@ cd app && flutter pub get && flutter test && flutter run
 
 ## الحالة الحالية
 - ✅ المرحلة 0: التحليل والتصميم (8 شاشات)
-- ✅ المرحلة 1: قاعدة البيانات — 13 migrations و **166 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
+- ✅ المرحلة 1: قاعدة البيانات — 14 migrations و **180 اختباراً ناجحاً** (`supabase/tests/`، تُشغَّل داخل حاوية `supabase_db_ajil` لأن psql غير مثبت على Windows)، pg_cron مفعّل ومجدول
 - ✅ تقوية العزل (migration 12 + `isolation_test.sql`): الوعد يتحقق من الزبون، `created_by` من التوكن، الموظف الموقوف يفقد الوصول فوراً، EXECUTE مسحوبة من public/anon (كل دالة جديدة في `app` تحتاج `revoke execute … from public, anon`)، `current_subscription` لبقالتي فقط، OTP والأكواد بـ `gen_random_bytes`
 - ✅ المرحلة 2.1: Edge Functions — send-otp, register-store, add-employee, reset-password, sync-push — مجرّبة محلياً بـ curl + 6 اختبارات للمنطق المشترك
 - ✅ المرحلة 2.2: `packages/ajil_core` — 46 اختباراً ناجحاً
@@ -74,6 +74,7 @@ cd app && flutter pub get && flutter test && flutter run
 - 🟡 المرحلة 3: صفحة التعريف (`web/landing`) لم تكتمل؛ صفحة المشترك = التطبيق نفسه على الويب — ✅ جُرّبت كاملة (`scripts/run-web.ps1`، http://localhost:8091): زبون، حركة متصلة، ومنع الكتابة بدون اتصال. `drift_worker.js` يُترجم من `app/tool/drift_worker.dart`
 - ✅ فتح تطبيق الجوال بدون نت بعد إغلاقه: يفتح من آخر جلسة محفوظة (كان يعلق على شاشة البداية) — مُتحقَّق على الجوال
 - ✅ رابط كشف الحساب العام: `app.statement_links` + `app.public_statement` (الدالة الوحيدة لـ anon)، الصفحة `web/statement/index.html` (`scripts/run-statement.ps1`، http://localhost:8092/statement/#token)، وفي التطبيق: الزبون ← الكشف والمزيد ← «رابط كشف الحساب»، و`{الرابط}` في التذكير ورسائل الأرصدة (`STATEMENT_BASE_URL`)
+- ✅ مظهران قابلان للتبديل **لكل مستخدم** (migration 14 + `theme_test.sql`): `app_users.theme` (`classic`|`ocean`) و`app.set_my_theme` (صف المستخدم الحالي فقط)، والكشف العام يتبع مظهر **المالك**. في Flutter: `AjilTheme` (ThemeExtension) عبر `context.ajil.<رمز>` — **ممنوع أي لون ثابت خارج `core/theme.dart`** (حتى ملفات PDF عبر `services/pdf_palette.dart`). `state/theme_controller.dart`: محلياً لكل `app_user_id` ويُطبَّق قبل أول إطار بدون نت، والتغيير بدون اتصال يُرفع بعد أول مزامنة ناجحة. الإعدادات ← «مظهر التطبيق». `web/admin` يدعم `?theme=ocean` وزر تبديل. **180 اختبار SQL**، `flutter test` 17/17
 - ⏭️ التفاصيل والخطوات: `docs/NEXT_TASKS.md`
 
 حدّث هذا القسم و `docs/NEXT_TASKS.md` في نهاية كل جلسة عمل.

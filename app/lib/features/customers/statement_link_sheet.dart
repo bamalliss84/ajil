@@ -92,13 +92,13 @@ class _StatementLinkSheetState extends ConsumerState<StatementLinkSheet> {
           const Text('رابط كشف الحساب', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Text('صفحة للقراءة فقط يرى فيها ${widget.customer.name} رصيده وآخر حركاته ووعوده، بدون رقم جواله أو ملاحظاتك.',
-              style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+              style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
           const SizedBox(height: 14),
           if (!StatementLinks.configured)
-            const InfoStrip(
+            InfoStrip(
               icon: Icons.info_outline,
-              bg: AjilColors.pendingBg,
-              fg: AjilColors.pendingText,
+              bg: context.ajil.pendingBg,
+              fg: context.ajil.pendingText,
               text: 'عنوان صفحة الكشف غير مضبوط في هذا الإصدار (STATEMENT_BASE_URL)',
             )
           else if (_loading)
@@ -106,8 +106,8 @@ class _StatementLinkSheetState extends ConsumerState<StatementLinkSheet> {
           else if (url == null)
             InfoStrip(
               icon: _error?.code == 'offline' ? Icons.wifi_off_rounded : Icons.error_outline,
-              bg: AjilColors.pendingBg,
-              fg: AjilColors.pendingText,
+              bg: context.ajil.pendingBg,
+              fg: context.ajil.pendingText,
               text: _error?.code == 'offline'
                   ? 'لا يوجد اتصال — إنشاء رابط الكشف يحتاج إنترنت. حاول عند عودة الاتصال.'
                   : (_error?.message ?? 'تعذّر جلب الرابط'),
@@ -117,12 +117,12 @@ class _StatementLinkSheetState extends ConsumerState<StatementLinkSheet> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               decoration: BoxDecoration(
-                color: AjilColors.background,
+                color: context.ajil.background,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AjilColors.divider),
+                border: Border.all(color: context.ajil.divider),
               ),
               child: SelectableText(url,
-                  textDirection: TextDirection.ltr, maxLines: 2, style: const TextStyle(fontSize: 13, color: AjilColors.text)),
+                  textDirection: TextDirection.ltr, maxLines: 2, style: TextStyle(fontSize: 13, color: context.ajil.text)),
             ),
             const SizedBox(height: 12),
             Row(children: [
@@ -149,8 +149,8 @@ class _StatementLinkSheetState extends ConsumerState<StatementLinkSheet> {
               const SizedBox(height: 6),
               TextButton.icon(
                 onPressed: s.online ? _regenerate : () => showError(context, 'offline: تجديد الرابط يحتاج اتصالاً بالإنترنت'),
-                icon: const Icon(Icons.autorenew_rounded, color: AjilColors.debt),
-                label: const Text('تجديد الرابط (يُبطل القديم)', style: TextStyle(color: AjilColors.debt)),
+                icon: Icon(Icons.autorenew_rounded, color: context.ajil.debt),
+                label: Text('تجديد الرابط (يُبطل القديم)', style: TextStyle(color: context.ajil.debt)),
               ),
             ],
           ],

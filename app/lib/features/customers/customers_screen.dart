@@ -63,11 +63,11 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
       bottomNavigationBar: picking ? null : const AjilNavBar(index: 1),
       body: Column(children: [
         Material(
-          color: Colors.white,
+          color: context.ajil.surface,
           child: SafeArea(
             bottom: false,
             child: Container(
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.headerBorder))),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.headerBorder))),
               padding: EdgeInsets.fromLTRB(16, picking ? 14 : 20, 16, 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 Row(children: [
@@ -91,7 +91,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                       const SizedBox(height: 2),
                       Text(
                         limit == null ? '$active زبون · ${s.session!.branch.name}' : '$active من $limit في باقتك · ${s.session!.branch.name}',
-                        style: const TextStyle(fontSize: 13, color: AjilColors.textMuted),
+                        style: TextStyle(fontSize: 13, color: context.ajil.textMuted),
                       ),
                     ]),
                   ),
@@ -102,9 +102,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                       size: 48,
                       radius: 14,
                       tooltip: 'إضافة زبون',
-                      color: Colors.white,
-                      bg: AjilColors.primary,
-                      borderColor: null,
+                      color: context.ajil.surface,
+                      bg: context.ajil.primary,
+                      noBorder: true,
                       onPressed: () => context.push('/customers/new'),
                     ),
                 ]),
@@ -112,10 +112,10 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                 TextField(
                   autofocus: picking,
                   style: const TextStyle(fontSize: 15),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'بحث بالاسم أو رقم الجوال',
-                    prefixIcon: Icon(Icons.search_rounded, color: AjilColors.textSoft),
-                    fillColor: AjilColors.background,
+                    prefixIcon: Icon(Icons.search_rounded, color: context.ajil.textSoft),
+                    fillColor: context.ajil.background,
                     contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                   ),
                   onChanged: (v) => setState(() => _q = v),
@@ -136,7 +136,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                           child: PillChip(
                             label: label,
                             selected: _filter == f,
-                            selectedColor: AjilColors.primary,
+                            selectedColor: context.ajil.primary,
                             height: 36,
                             fontSize: 14,
                             onTap: () => setState(() => _filter = f),
@@ -182,13 +182,13 @@ class _CustomerTile extends ConsumerWidget {
     final owed = c.balances.values.where((b) => b.balance != Decimal.zero).toList();
     final main = owed.isEmpty ? null : owed.first;
     return Material(
-      color: Colors.white,
+      color: context.ajil.surface,
       child: InkWell(
         onTap: onTap,
         child: Container(
           constraints: const BoxConstraints(minHeight: 68),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.divider))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.divider))),
           child: Row(children: [
             Initials(c.customer.initials),
             const SizedBox(width: 12),
@@ -202,30 +202,30 @@ class _CustomerTile extends ConsumerWidget {
                     const SizedBox(width: 6),
                     Tooltip(
                       message: 'حركات غير متزامنة',
-                      child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: AjilColors.pendingDot, shape: BoxShape.circle)),
+                      child: Container(width: 8, height: 8, decoration: BoxDecoration(color: context.ajil.pendingDot, shape: BoxShape.circle)),
                     ),
                   ],
                   if (c.customer.status == CustomerStatus.suspended) ...[
                     const SizedBox(width: 6),
-                    const Icon(Icons.block, size: 14, color: AjilColors.debt),
+                    Icon(Icons.block, size: 14, color: context.ajil.debt),
                   ],
                 ]),
                 if (c.customer.phone != null)
                   Text(c.customer.phone!,
-                      textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+                      textDirection: TextDirection.ltr, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
               ]),
             ),
             const SizedBox(width: 12),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
               if (main == null) ...[
-                const Text('لا دين', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AjilColors.paid)),
-                const Text('مسدد', style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+                Text('لا دين', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.ajil.paid)),
+                Text('مسدد', style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
               ] else ...[
                 Text(f.amount(main.balance.abs(), main.currency),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: main.balance > Decimal.zero ? AjilColors.debt : AjilColors.paid)),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: main.balance > Decimal.zero ? context.ajil.debt : context.ajil.paid)),
                 Text(
                   owed.length > 1 ? '${Currency.of(main.currency).symbolAr} +${owed.length - 1}' : (main.balance < Decimal.zero ? '${Currency.of(main.currency).symbolAr} · له' : Currency.of(main.currency).symbolAr),
-                  style: const TextStyle(fontSize: 12, color: AjilColors.textMuted),
+                  style: TextStyle(fontSize: 12, color: context.ajil.textMuted),
                 ),
               ],
             ]),
@@ -248,14 +248,14 @@ class _Empty extends StatelessWidget {
             Container(
               width: 72,
               height: 72,
-              decoration: const BoxDecoration(color: AjilColors.primaryLight, shape: BoxShape.circle),
-              child: const Icon(Icons.people_outline_rounded, size: 36, color: AjilColors.primaryDark),
+              decoration: BoxDecoration(color: context.ajil.primaryLight, shape: BoxShape.circle),
+              child: Icon(Icons.people_outline_rounded, size: 36, color: context.ajil.primaryDark),
             ),
             const SizedBox(height: 14),
             Text(hasAny ? 'لا نتائج' : 'أضف أول زبون', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             if (!hasAny) ...[
               const SizedBox(height: 4),
-              const Text('سجّل زبائن دفترك مع رصيدهم السابق', style: TextStyle(color: AjilColors.textMuted)),
+              Text('سجّل زبائن دفترك مع رصيدهم السابق', style: TextStyle(color: context.ajil.textMuted)),
               if (onAdd != null) ...[
                 const SizedBox(height: 18),
                 SizedBox(

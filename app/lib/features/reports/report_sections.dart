@@ -7,16 +7,6 @@ import '../../core/theme.dart';
 import '../../widgets/common.dart';
 import 'report_state.dart';
 
-/// ألوان التقارير (docs/design/Reports*.dc.html)
-class RC {
-  static const tile = Color(0xFF1A7D64);
-  static const progress = Color(0xFF9FE0C6);
-  static const debtBar = Color(0xFFD9776B);
-  static const axis = Color(0xFFB7C2BF);
-  static const axisEmpty = Color(0xFFE3E9E7);
-  static const disabled = Color(0xFFB7C2BF);
-}
-
 /// بطاقة بيضاء بقسم وعنوان
 class ReportCard extends StatelessWidget {
   const ReportCard({super.key, required this.children, this.padded = true, this.gap = 10});
@@ -28,7 +18,7 @@ class ReportCard extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
         padding: padded ? const EdgeInsets.all(14) : EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(color: context.ajil.surface, borderRadius: BorderRadius.circular(16)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           for (var i = 0; i < children.length; i++) ...[if (i > 0 && padded) SizedBox(height: gap), children[i]],
         ]),
@@ -45,7 +35,7 @@ class SectionHead extends StatelessWidget {
         padding: padding,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Expanded(child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-          if (trailing != null) Text(trailing!, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+          if (trailing != null) Text(trailing!, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         ]),
       );
 }
@@ -57,7 +47,7 @@ class BestStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: context.ajil.background, borderRadius: BorderRadius.circular(12)),
         child: Row(children: [
           Expanded(
             child: Text.rich(
@@ -68,7 +58,7 @@ class BestStrip extends StatelessWidget {
               ]),
             ),
           ),
-          Text(value, style: const TextStyle(fontSize: 13, color: AjilColors.paid, fontWeight: FontWeight.w600)),
+          Text(value, style: TextStyle(fontSize: 13, color: context.ajil.paid, fontWeight: FontWeight.w600)),
         ]),
       );
 }
@@ -97,29 +87,29 @@ class SummaryCard extends StatelessWidget {
             : ' · بدون تغيير';
     final vs = comparisonName(r);
     final ratio = r.collectionRatio;
-    const muted = TextStyle(fontSize: 13, color: AjilColors.onPrimaryMuted);
+    final muted = TextStyle(fontSize: 13, color: context.ajil.onHeaderMuted);
 
     Widget tile(String label, Decimal v, int? pct, int count) => Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(color: RC.tile, borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: context.ajil.headerMid, borderRadius: BorderRadius.circular(12)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label, style: muted),
             const SizedBox(height: 2),
-            Text(f.amount(v, r.currency), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
+            Text(f.amount(v, r.currency), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: context.ajil.onPrimary)),
             const SizedBox(height: 2),
             Text([_change(f, pct, vs), ops(f, count)].where((s) => s.isNotEmpty).join(' · '),
-                style: const TextStyle(fontSize: 12, color: AjilColors.onPrimaryMuted)),
+                style: TextStyle(fontSize: 12, color: context.ajil.onHeaderMuted)),
           ]),
         );
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AjilColors.primary, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(color: context.ajil.header, borderRadius: BorderRadius.circular(16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text('الديون عند الزبائن نهاية $unit', style: const TextStyle(fontSize: 14, color: AjilColors.onPrimaryMuted)),
+        Text('الديون عند الزبائن نهاية $unit', style: TextStyle(fontSize: 14, color: context.ajil.onHeaderMuted)),
         const SizedBox(height: 2),
-        Text.rich(TextSpan(style: const TextStyle(color: Colors.white), children: [
+        Text.rich(TextSpan(style: TextStyle(color: context.ajil.onPrimary), children: [
           TextSpan(text: f.amount(r.closingDebt, r.currency), style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600, height: 1.3)),
           TextSpan(text: ' $sym', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         ])),
@@ -135,9 +125,9 @@ class SummaryCard extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Row(children: [
-          const Expanded(child: Text('نسبة التحصيل إلى الديون الجديدة', style: muted)),
+          Expanded(child: Text('نسبة التحصيل إلى الديون الجديدة', style: muted)),
           Text(ratio == null ? '—' : '${f.digits('$ratio')}%',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.ajil.onPrimary)),
         ]),
         const SizedBox(height: 6),
         ClipRRect(
@@ -145,8 +135,8 @@ class SummaryCard extends StatelessWidget {
           child: LinearProgressIndicator(
             value: ratio == null ? 0 : (ratio / 100).clamp(0.0, 1.0),
             minHeight: 8,
-            backgroundColor: RC.tile,
-            color: RC.progress,
+            backgroundColor: context.ajil.headerMid,
+            color: context.ajil.chartProgress,
           ),
         ),
       ]),
@@ -180,12 +170,12 @@ class DailyChart extends StatelessWidget {
     Widget legend(Color c, String t) => Row(mainAxisSize: MainAxisSize.min, children: [
           Container(width: 10, height: 10, decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(3))),
           const SizedBox(width: 6),
-          Text(t, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+          Text(t, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         ]);
 
     return ReportCard(children: [
       const SectionHead('الحركة اليومية', trailing: 'اضغط على يوم لتفاصيله'),
-      Row(children: [legend(AjilColors.paid, 'تحصيل'), const SizedBox(width: 14), legend(RC.debtBar, 'ديون جديدة')]),
+      Row(children: [legend(context.ajil.paid, 'تحصيل'), const SizedBox(width: 14), legend(context.ajil.chartDebt, 'ديون جديدة')]),
       Directionality(
         textDirection: TextDirection.ltr,
         child: SizedBox(
@@ -207,14 +197,14 @@ class DailyChart extends StatelessWidget {
                             widthFactor: 1,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: sameDay(d.at, r.today) ? AjilColors.primary : AjilColors.paid,
+                                color: sameDay(d.at, r.today) ? context.ajil.primary : context.ajil.paid,
                                 borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      Container(height: 1, color: d.at.isAfter(eff) ? RC.axisEmpty : RC.axis),
+                      Container(height: 1, color: d.at.isAfter(eff) ? context.ajil.axisEmpty : context.ajil.axis),
                       Expanded(
                         child: Align(
                           alignment: Alignment.topCenter,
@@ -222,8 +212,8 @@ class DailyChart extends StatelessWidget {
                             heightFactor: d.debt.toDouble() / m,
                             widthFactor: 1,
                             child: Container(
-                              decoration: const BoxDecoration(
-                                color: RC.debtBar,
+                              decoration: BoxDecoration(
+                                color: context.ajil.chartDebt,
                                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(3)),
                               ),
                             ),
@@ -242,7 +232,7 @@ class DailyChart extends StatelessWidget {
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           for (final l in labels)
             Text(f.digits(r.period.kind == PeriodKind.month ? '$l' : '${days[l - 1].at.day}/${days[l - 1].at.month}'),
-                style: const TextStyle(fontSize: 11, color: AjilColors.textMuted)),
+                style: TextStyle(fontSize: 11, color: context.ajil.textMuted)),
         ]),
       ),
       if (best != null)
@@ -265,18 +255,18 @@ class KindsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReportCard(padded: false, children: [
       const SectionHead('ملخص الحركات', padding: EdgeInsets.fromLTRB(14, 14, 14, 6)),
-      for (final k in r.kinds) _row(k),
+      for (final k in r.kinds) _row(context, k),
     ]);
   }
 
-  Widget _row(KindSummary k) {
+  Widget _row(BuildContext context, KindSummary k) {
     final (name, bg, fg, color) = switch (k.kind) {
-      TxKind.payment => ('سداد', AjilColors.paidBg, AjilColors.paid, AjilColors.paid),
-      TxKind.debt => ('دين', AjilColors.debtBg, AjilColors.debtTag, AjilColors.debt),
-      TxKind.returned => ('مرتجع', AjilColors.track, AjilColors.text, AjilColors.text),
-      TxKind.discount => ('خصم', AjilColors.track, AjilColors.text, AjilColors.text),
-      TxKind.opening => ('افتتاحي', AjilColors.infoBg, AjilColors.infoText, AjilColors.infoText),
-      _ => ('إلغاء', AjilColors.pendingBg, AjilColors.pendingText, AjilColors.pendingText),
+      TxKind.payment => ('سداد', context.ajil.paidBg, context.ajil.paid, context.ajil.paid),
+      TxKind.debt => ('دين', context.ajil.debtBg, context.ajil.debtTag, context.ajil.debt),
+      TxKind.returned => ('مرتجع', context.ajil.track, context.ajil.text, context.ajil.text),
+      TxKind.discount => ('خصم', context.ajil.track, context.ajil.text, context.ajil.text),
+      TxKind.opening => ('افتتاحي', context.ajil.infoBg, context.ajil.infoText, context.ajil.infoText),
+      _ => ('إلغاء', context.ajil.pendingBg, context.ajil.pendingText, context.ajil.pendingText),
     };
     final count = switch (k.kind) {
       TxKind.opening => counted(f, k.count, 'زبون جديد', 'زبونان جديدان', 'زبائن جدد', 'زبوناً جديداً'),
@@ -285,11 +275,11 @@ class KindsCard extends StatelessWidget {
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
       child: Row(children: [
         SizedBox(width: 58, child: TypeBadge(name, bg: bg, fg: fg)),
         const SizedBox(width: 10),
-        Expanded(child: Text(count, style: const TextStyle(fontSize: 13, color: AjilColors.textMuted))),
+        Expanded(child: Text(count, style: TextStyle(fontSize: 13, color: context.ajil.textMuted))),
         Text(f.amount(k.amount, r.currency), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color)),
       ]),
     );
@@ -316,22 +306,22 @@ class PromisesCard extends StatelessWidget {
       SectionHead(current ? 'وعود السداد هذا الشهر' : 'وعود السداد في الفترة',
           trailing: counted(f, p.total, 'وعد', 'وعدان', 'وعود', 'وعداً')),
       if (p.total == 0)
-        const Text('لا توجد وعود سداد تاريخها في هذه الفترة', style: TextStyle(fontSize: 13, color: AjilColors.textMuted))
+        Text('لا توجد وعود سداد تاريخها في هذه الفترة', style: TextStyle(fontSize: 13, color: context.ajil.textMuted))
       else ...[
         ClipRRect(
           borderRadius: BorderRadius.circular(6),
           child: SizedBox(
             height: 12,
             child: Row(children: [
-              for (final (n, c) in [(p.kept, AjilColors.paid), (p.overdue, AjilColors.debt), (p.upcoming, AjilColors.pendingDot)])
+              for (final (n, c) in [(p.kept, context.ajil.paid), (p.overdue, context.ajil.debt), (p.upcoming, context.ajil.pendingDot)])
                 if (n > 0) Expanded(flex: n, child: Container(margin: const EdgeInsets.symmetric(horizontal: 1), color: c)),
             ]),
           ),
         ),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          stat(p.kept, AjilColors.paid, 'وُفي بها'),
-          stat(p.overdue, AjilColors.debt, 'متأخرة'),
-          stat(p.upcoming, AjilColors.pendingText, 'قادمة'),
+          stat(p.kept, context.ajil.paid, 'وُفي بها'),
+          stat(p.overdue, context.ajil.debt, 'متأخرة'),
+          stat(p.upcoming, context.ajil.pendingText, 'قادمة'),
         ]),
       ],
     ]);
@@ -367,7 +357,7 @@ class CustomersCard extends StatelessWidget {
             PillChip(
               label: label,
               selected: tab == t,
-              selectedColor: AjilColors.primary,
+              selectedColor: context.ajil.primary,
               fontSize: 14,
               onTap: () => onTab(t),
             ),
@@ -376,14 +366,14 @@ class CustomersCard extends StatelessWidget {
       if (list.isEmpty)
         Container(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
-          decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
           child: Text(
             switch (tab) {
               CustomerTab.payers => 'لا سداد في هذه الفترة',
               CustomerTab.debtors => 'لا ديون جديدة في هذه الفترة',
               CustomerTab.noPayment => 'كل من عليهم رصيد سددوا شيئاً في الفترة',
             },
-            style: const TextStyle(fontSize: 13, color: AjilColors.textMuted),
+            style: TextStyle(fontSize: 13, color: context.ajil.textMuted),
           ),
         ),
       for (var i = 0; i < list.length && i < 5; i++) _row(context, i + 1, list[i]),
@@ -404,24 +394,24 @@ class CustomersCard extends StatelessWidget {
       child: Container(
         constraints: const BoxConstraints(minHeight: 56),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
         child: Row(children: [
           SizedBox(
             width: 24,
-            child: Text(f.digits('$rank'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+            child: Text(f.digits('$rank'), textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Initials(c.customer?.initials ?? '؟', size: 36),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15)),
-              Text(sub, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15)),
+              Text(sub, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
             ]),
           ),
           Text(f.amount(c.amount, r.currency),
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: tab == CustomerTab.payers ? AjilColors.paid : AjilColors.debt)),
+                  fontSize: 15, fontWeight: FontWeight.w600, color: tab == CustomerTab.payers ? context.ajil.paid : context.ajil.debt)),
         ]),
       ),
     );
@@ -438,27 +428,27 @@ class UsersCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReportCard(padded: false, children: [
-      const SectionHead('حسب المستخدم', padding: EdgeInsets.fromLTRB(14, 14, 14, 6)),
+      SectionHead('حسب المستخدم', padding: EdgeInsets.fromLTRB(14, 14, 14, 6)),
       if (r.users.isEmpty)
-        const Padding(
+        Padding(
           padding: EdgeInsets.fromLTRB(14, 6, 14, 16),
-          child: Text('لا حركات في هذه الفترة', style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+          child: Text('لا حركات في هذه الفترة', style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
         ),
       for (final u in r.users)
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Row(children: [
-              Expanded(child: Text(names[u.userId] ?? 'مستخدم', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
-              Text(ops(f, u.ops), style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+              Expanded(child: Text(names[u.userId] ?? 'مستخدم', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
+              Text(ops(f, u.ops), style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
             ]),
-            const SizedBox(height: 6),
-            Text.rich(TextSpan(style: const TextStyle(fontSize: 13), children: [
-              const TextSpan(text: 'تحصيل '),
-              TextSpan(text: f.amount(u.collected, r.currency), style: const TextStyle(color: AjilColors.paid, fontWeight: FontWeight.w600)),
-              const TextSpan(text: '      ديون '),
-              TextSpan(text: f.amount(u.debt, r.currency), style: const TextStyle(color: AjilColors.debt, fontWeight: FontWeight.w600)),
+            SizedBox(height: 6),
+            Text.rich(TextSpan(style: TextStyle(fontSize: 13), children: [
+              TextSpan(text: 'تحصيل '),
+              TextSpan(text: f.amount(u.collected, r.currency), style: TextStyle(color: context.ajil.paid, fontWeight: FontWeight.w600)),
+              TextSpan(text: '      ديون '),
+              TextSpan(text: f.amount(u.debt, r.currency), style: TextStyle(color: context.ajil.debt, fontWeight: FontWeight.w600)),
             ])),
           ]),
         ),
@@ -476,21 +466,21 @@ class AgingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final a = r.aging;
     final parts = [
-      (a.under30, AjilColors.chartLight, 'أقل من 30 يوماً'),
-      (a.d30to60, AjilColors.aging30, '30–60 يوماً'),
-      (a.d60to90, AjilColors.aging60, '60–90 يوماً'),
-      (a.over90, AjilColors.debt, 'أكثر من 90 يوماً'),
+      (a.under30, context.ajil.chartLight, 'أقل من 30 يوماً'),
+      (a.d30to60, context.ajil.aging30, '30–60 يوماً'),
+      (a.d60to90, context.ajil.aging60, '60–90 يوماً'),
+      (a.over90, context.ajil.debt, 'أكثر من 90 يوماً'),
     ];
     final eff = r.effectiveEnd;
     Widget legend((Decimal, Color, String) p) => Row(children: [
           Container(width: 10, height: 10, decoration: BoxDecoration(color: p.$2, borderRadius: BorderRadius.circular(3))),
-          const SizedBox(width: 6),
-          Flexible(child: Text(f.digits('${p.$3} · ${thousands(f, p.$1)} ألف'), style: const TextStyle(fontSize: 13))),
+          SizedBox(width: 6),
+          Flexible(child: Text(f.digits('${p.$3} · ${thousands(f, p.$1)} ألف'), style: TextStyle(fontSize: 13))),
         ]);
     return ReportCard(children: [
       SectionHead('أعمار الديون', trailing: f.digits('كما في ${eff.day} ${monthNames[eff.month - 1]}')),
       if (a.total == Decimal.zero)
-        const Text('لا ديون قائمة', style: TextStyle(fontSize: 13, color: AjilColors.textMuted))
+        Text('لا ديون قائمة', style: TextStyle(fontSize: 13, color: context.ajil.textMuted))
       else ...[
         ClipRRect(
           borderRadius: BorderRadius.circular(6),
@@ -501,13 +491,13 @@ class AgingCard extends StatelessWidget {
                 if (p.$1 > Decimal.zero)
                   Expanded(
                     flex: (p.$1.toDouble() / a.total.toDouble() * 1000).round().clamp(1, 1000),
-                    child: Container(margin: const EdgeInsets.symmetric(horizontal: 1), color: p.$2),
+                    child: Container(margin: EdgeInsets.symmetric(horizontal: 1), color: p.$2),
                   ),
             ]),
           ),
         ),
-        Row(children: [Expanded(child: legend(parts[0])), const SizedBox(width: 12), Expanded(child: legend(parts[1]))]),
-        Row(children: [Expanded(child: legend(parts[2])), const SizedBox(width: 12), Expanded(child: legend(parts[3]))]),
+        Row(children: [Expanded(child: legend(parts[0])), SizedBox(width: 12), Expanded(child: legend(parts[1]))]),
+        Row(children: [Expanded(child: legend(parts[2])), SizedBox(width: 12), Expanded(child: legend(parts[3]))]),
       ],
     ]);
   }
@@ -522,29 +512,29 @@ class ExportButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = OutlinedButton.styleFrom(
-      minimumSize: const Size.fromHeight(50),
-      foregroundColor: AjilColors.primary,
-      side: const BorderSide(color: AjilColors.borderStrong),
-      textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 15, fontWeight: FontWeight.w600),
+      minimumSize: Size.fromHeight(50),
+      foregroundColor: context.ajil.primary,
+      side: BorderSide(color: context.ajil.borderStrong),
+      textStyle: TextStyle(fontFamily: ajilFont, fontSize: 15, fontWeight: FontWeight.w600),
     );
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      padding: EdgeInsets.fromLTRB(16, 14, 16, 16),
       child: Row(children: [
         Expanded(
           child: OutlinedButton.icon(
             style: style,
             onPressed: busy ? null : onPdf,
-            icon: const Icon(Icons.description_outlined, size: 18),
-            label: const Text('تقرير PDF'),
+            icon: Icon(Icons.description_outlined, size: 18),
+            label: Text('تقرير PDF'),
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: OutlinedButton.icon(
             style: style,
             onPressed: busy ? null : onExcel,
-            icon: const Icon(Icons.grid_on_rounded, size: 18),
-            label: const Text('Excel'),
+            icon: Icon(Icons.grid_on_rounded, size: 18),
+            label: Text('Excel'),
           ),
         ),
       ]),
@@ -557,13 +547,13 @@ class ReportSkeleton extends StatelessWidget {
   const ReportSkeleton({super.key});
   @override
   Widget build(BuildContext context) {
-    Widget box(double h, {Color c = Colors.white}) => Container(
+    Widget box(double h, {Color? c}) => Container(
           height: h,
           margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-          decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: c ?? context.ajil.surface, borderRadius: BorderRadius.circular(16)),
         );
     return Column(children: [
-      box(190, c: AjilColors.primary.withOpacity(0.25)),
+      box(190, c: context.ajil.primary.withOpacity(0.25)),
       box(260),
       box(200),
     ]);

@@ -46,11 +46,11 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
     return Scaffold(
       body: Column(children: [
         Material(
-          color: Colors.white,
+          color: context.ajil.surface,
           child: SafeArea(
             bottom: false,
             child: Container(
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: AjilColors.headerBorder))),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.headerBorder))),
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 Row(children: [
@@ -70,20 +70,20 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                       Text(customer.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w600)),
                       if (customer.phone != null)
                         Text(customer.phone!,
-                            textDirection: TextDirection.ltr, style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                            textDirection: TextDirection.ltr, style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
                     ]),
                   ),
                   SquareIconButton(
                     icon: Icons.calendar_today_outlined,
                     tooltip: 'تسجيل وعد سداد',
-                    color: AjilColors.pendingIcon,
+                    color: context.ajil.pendingIcon,
                     onPressed: () => context.push('/customers/${customer.id}/promise'),
                   ),
                   const SizedBox(width: 10),
                   SquareIconButton(
                     icon: Icons.chat_bubble_outline_rounded,
                     tooltip: 'إرسال الرصيد عبر واتساب',
-                    color: AjilColors.paid,
+                    color: context.ajil.paid,
                     onPressed: customer.phone == null ? null : () => Whatsapp.remind(ref, cwb),
                   ),
                   const SizedBox(width: 10),
@@ -97,9 +97,9 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                 if (balances.isEmpty)
                   Container(
                     padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: AjilColors.background, borderRadius: BorderRadius.circular(12)),
-                    child: const Text('لا توجد حركات بعد — سجّل أول دين أو سداد', textAlign: TextAlign.center,
-                        style: TextStyle(color: AjilColors.textMuted, fontSize: 14)),
+                    decoration: BoxDecoration(color: context.ajil.background, borderRadius: BorderRadius.circular(12)),
+                    child: Text('لا توجد حركات بعد — سجّل أول دين أو سداد', textAlign: TextAlign.center,
+                        style: TextStyle(color: context.ajil.textMuted, fontSize: 14)),
                   )
                 else
                   Row(children: [
@@ -112,8 +112,8 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                   const SizedBox(height: 14),
                   InfoStrip(
                     icon: Icons.calendar_today_outlined,
-                    bg: AjilColors.pendingBg,
-                    fg: AjilColors.pendingText,
+                    bg: context.ajil.pendingBg,
+                    fg: context.ajil.pendingText,
                     text: '${promise.isOverdue(DateTime.now()) ? 'وعد متأخر' : 'وعد بالسداد'}: ${intl.DateFormat('EEEE d MMMM', 'ar').format(promise.promisedDate)}'
                         '${promise.amount == null ? '' : ' · ${f.amount(promise.amount!, promise.currency ?? customer.defaultCurrency, withSymbol: true)}'}',
                     action: ('تعديل', () => context.push('/customers/${customer.id}/promise')),
@@ -136,7 +136,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
         ),
         if (s.canWrite && customer.status == CustomerStatus.active)
           Container(
-            decoration: const BoxDecoration(color: Colors.white, border: Border(top: BorderSide(color: AjilColors.headerBorder))),
+            decoration: BoxDecoration(color: context.ajil.surface, border: Border(top: BorderSide(color: context.ajil.headerBorder))),
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: SafeArea(
               top: false,
@@ -171,7 +171,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
               onTap: () => Navigator.pop(ctx, 'link'),
             ),
             ListTile(
-              leading: Icon(Icons.date_range_outlined, color: _range == null ? null : AjilColors.primary),
+              leading: Icon(Icons.date_range_outlined, color: _range == null ? null : context.ajil.primary),
               title: const Text('فترة الكشف'),
               subtitle: Text(_range == null
                   ? 'كل الحركات'
@@ -180,7 +180,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
             ),
             if (balances.length > 1)
               ListTile(
-                leading: Icon(Icons.currency_exchange, color: _currency == null ? null : AjilColors.primary),
+                leading: Icon(Icons.currency_exchange, color: _currency == null ? null : context.ajil.primary),
                 title: const Text('العملة'),
                 subtitle: Text(_currency == null ? 'كل العملات' : Currency.of(_currency!).nameAr),
                 onTap: () => Navigator.pop(ctx, 'currency'),
@@ -197,7 +197,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
             ListTile(leading: const Icon(Icons.mark_chat_read_outlined), title: const Text('رسائل الرصيد المرسلة'), onTap: () => Navigator.pop(ctx, 'notices')),
             if (promise != null)
               ListTile(
-                leading: const Icon(Icons.event_busy_outlined, color: AjilColors.pendingText),
+                leading: Icon(Icons.event_busy_outlined, color: context.ajil.pendingText),
                 title: const Text('إلغاء الوعد'),
                 onTap: () => Navigator.pop(ctx, 'cancel_promise'),
               ),
@@ -213,7 +213,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
     switch (v) {
       case 'pdf':
       case 'print':
-        final bytes = await StatementPdf.statement(session: s.session!, st: st, f: f, detailed: _detailed);
+        final bytes = await StatementPdf.statement(session: s.session!, st: st, f: f, detailed: _detailed, theme: context.ajil);
         if (s.pending > 0 && context.mounted) {
           showOk(context, 'تنبيه: توجد حركات غير متزامنة — الرصيد محسوب من هذا الجوال');
         }
@@ -252,7 +252,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
               if (rows.isEmpty) const ListTile(title: Text('لم تُرسل له رسالة رصيد بعد')),
               for (final n in rows)
                 ListTile(
-                  leading: const Icon(Icons.mark_chat_read_outlined, color: AjilColors.paid),
+                  leading: Icon(Icons.mark_chat_read_outlined, color: context.ajil.paid),
                   title: Text(BalanceNotices.balancesText(n.balanceMap, f)),
                   subtitle: Text('الرصيد حتى ${BalanceNotices.date(n.asOf, f)} · أُرسلت ${intl.DateFormat('yyyy/MM/dd HH:mm').format(n.sentAt)}'),
                 ),
@@ -279,7 +279,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                 .join(' · ')),
           ),
           ListTile(
-            leading: const Icon(Icons.receipt_long_outlined, color: AjilColors.primary),
+            leading: Icon(Icons.receipt_long_outlined, color: context.ajil.primary),
             title: const Text('عرض الإشعار ومشاركته'),
             subtitle: const Text('PDF أو صورة عبر واتساب وغيره، أو طباعة'),
             onTap: () {
@@ -299,7 +299,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
           if (s.canWrite && t.sync != SyncState.failed)
             ListTile(
               enabled: denied == null,
-              leading: const Icon(Icons.undo_rounded, color: AjilColors.debt),
+              leading: Icon(Icons.undo_rounded, color: context.ajil.debt),
               title: const Text('إلغاء الحركة (قيد عكسي)'),
               subtitle: denied == null ? null : Text(denied),
               onTap: () async {
@@ -331,7 +331,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('رجوع')),
           FilledButton(
             onPressed: () => c.text.trim().isEmpty ? null : Navigator.pop(ctx, c.text.trim()),
-            style: FilledButton.styleFrom(backgroundColor: AjilColors.debt, minimumSize: const Size(90, 44)),
+            style: FilledButton.styleFrom(backgroundColor: context.ajil.debt, minimumSize: const Size(90, 44)),
             child: const Text('إلغاء الحركة'),
           ),
         ],
@@ -349,18 +349,18 @@ class _BalanceCard extends ConsumerWidget {
     final owes = b.balance > Decimal.zero;
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: owes ? AjilColors.debtBg : AjilColors.paidBg, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: owes ? context.ajil.debtBg : context.ajil.paidBg, borderRadius: BorderRadius.circular(12)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('المتبقي · ${Currency.of(b.currency).nameAr}',
             maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12, color: owes ? AjilColors.debtText : AjilColors.paidDark)),
+            style: TextStyle(fontSize: 12, color: owes ? context.ajil.debtText : context.ajil.paidDark)),
         const SizedBox(height: 2),
         Text(f.amount(b.balance, b.currency),
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, height: 1.3, color: owes ? AjilColors.debt : AjilColors.paid)),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, height: 1.3, color: owes ? context.ajil.debt : context.ajil.paid)),
         const SizedBox(height: 2),
         Text('ديون ${f.amount(b.debit, b.currency)} · مسدد ${f.amount(b.credit, b.currency)}',
             maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12, color: owes ? AjilColors.debtText : AjilColors.paidDark)),
+            style: TextStyle(fontSize: 12, color: owes ? context.ajil.debtText : context.ajil.paidDark)),
       ]),
     );
   }
@@ -380,22 +380,22 @@ class _Summary extends ConsumerWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Text(Currency.of(cs.currency).nameAr, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
               const Divider(height: 20),
-              if (st.from != null) _kv('رصيد ما قبل الفترة', f.amount(cs.openingBalance, cs.currency, withSymbol: true)),
-              _kv('إجمالي الديون', f.amount(cs.debit, cs.currency, withSymbol: true)),
-              _kv('إجمالي المسدد', f.amount(cs.credit, cs.currency, withSymbol: true)),
-              _kv('الرصيد المتبقي', f.amount(cs.closingBalance, cs.currency, withSymbol: true), bold: true),
-              _kv('عدد الحركات', '${cs.lines.length}'),
+              if (st.from != null) _kv(context, 'رصيد ما قبل الفترة', f.amount(cs.openingBalance, cs.currency, withSymbol: true)),
+              _kv(context, 'إجمالي الديون', f.amount(cs.debit, cs.currency, withSymbol: true)),
+              _kv(context, 'إجمالي المسدد', f.amount(cs.credit, cs.currency, withSymbol: true)),
+              _kv(context, 'الرصيد المتبقي', f.amount(cs.closingBalance, cs.currency, withSymbol: true), bold: true),
+              _kv(context, 'عدد الحركات', '${cs.lines.length}'),
             ]),
           ),
         ),
     ]);
   }
 
-  Widget _kv(String k, String v, {bool bold = false}) => Padding(
+  Widget _kv(BuildContext context, String k, String v, {bool bold = false}) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(children: [
-          Expanded(child: Text(k, style: const TextStyle(color: AjilColors.textMuted))),
-          Text(v, style: TextStyle(fontWeight: bold ? FontWeight.w700 : FontWeight.w500, color: bold ? AjilColors.debt : null)),
+          Expanded(child: Text(k, style: TextStyle(color: context.ajil.textMuted))),
+          Text(v, style: TextStyle(fontWeight: bold ? FontWeight.w700 : FontWeight.w500, color: bold ? context.ajil.debt : null)),
         ]),
       );
 }
@@ -413,7 +413,7 @@ class _Detailed extends ConsumerWidget {
     final f = ref.watch(moneyFormatProvider);
     final sections = st.byCurrency.values.toList();
     if (sections.isEmpty) {
-      return const Center(child: Text('لا توجد حركات', style: TextStyle(color: AjilColors.textMuted)));
+      return Center(child: Text('لا توجد حركات', style: TextStyle(color: context.ajil.textMuted)));
     }
     return ListView(padding: EdgeInsets.zero, children: [
       for (final cs in sections) ...[
@@ -423,10 +423,10 @@ class _Detailed extends ConsumerWidget {
             Expanded(
               child: Text(
                 '${Currency.of(cs.currency).nameAr} · ${range == null ? 'الأحدث أولاً' : '${intl.DateFormat('d/M').format(range!.start)}–${intl.DateFormat('d/M').format(range!.end)}'}',
-                style: const TextStyle(color: AjilColors.textMuted, fontSize: 13),
+                style: TextStyle(color: context.ajil.textMuted, fontSize: 13),
               ),
             ),
-            const Text('الرصيد', style: TextStyle(color: AjilColors.textMuted, fontSize: 13)),
+            Text('الرصيد', style: TextStyle(color: context.ajil.textMuted, fontSize: 13)),
           ]),
         ),
         for (final l in cs.lines)
@@ -434,7 +434,7 @@ class _Detailed extends ConsumerWidget {
             onTap: () => onTap(l.tx),
             child: Container(
               constraints: const BoxConstraints(minHeight: 64),
-              decoration: const BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: AjilColors.divider))),
+              decoration: BoxDecoration(color: context.ajil.surface, border: Border(bottom: BorderSide(color: context.ajil.divider))),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
               child: Row(children: [
                 _KindBadge(l.tx.kind),
@@ -446,15 +446,15 @@ class _Detailed extends ConsumerWidget {
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: l.tx.kind == TxKind.opening || l.tx.kind == TxKind.voided
-                              ? AjilColors.text
-                              : (l.signed > Decimal.zero ? AjilColors.debt : AjilColors.paid),
+                              ? context.ajil.text
+                              : (l.signed > Decimal.zero ? context.ajil.debt : context.ajil.paid),
                           decoration: l.isVoided ? TextDecoration.lineThrough : null,
                         )),
                     Text(
                       [l.tx.description ?? l.tx.voidReason, dt.format(l.tx.createdAt), l.tx.invoiceNo, if (l.isVoided) 'ملغاة']
                           .whereType<String>()
                           .join(' · '),
-                      style: const TextStyle(fontSize: 12, color: AjilColors.textMuted),
+                      style: TextStyle(fontSize: 12, color: context.ajil.textMuted),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -484,10 +484,10 @@ class _KindBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg) = switch (kind) {
-      TxKind.debt => (AjilColors.debtBg, AjilColors.debtTag),
-      TxKind.opening => (AjilColors.infoBg, AjilColors.infoText),
-      TxKind.voided => (AjilColors.divider, AjilColors.textSoft),
-      _ => (AjilColors.paidBg, AjilColors.paidDark),
+      TxKind.debt => (context.ajil.debtBg, context.ajil.debtTag),
+      TxKind.opening => (context.ajil.infoBg, context.ajil.infoText),
+      TxKind.voided => (context.ajil.divider, context.ajil.textSoft),
+      _ => (context.ajil.paidBg, context.ajil.paidDark),
     };
     final label = switch (kind) {
       TxKind.opening => 'افتتاحي',

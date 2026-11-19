@@ -221,7 +221,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
         subtitle: 'للزبائن عبر واتساب — رسالة لكل زبون بضغطة',
         actions: [
           if (_phase == _Phase.sending)
-            LinkText('إنهاء الدفعة', onTap: _abandon, color: AjilColors.debt, size: 14, weight: FontWeight.w500),
+            LinkText('إنهاء الدفعة', onTap: _abandon, color: context.ajil.debt, size: 14, weight: FontWeight.w500),
         ],
       ),
       body: !_allowed
@@ -297,8 +297,8 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
                 ),
               ]),
               const SizedBox(height: 4),
-              const Text('تُحسب الحركات حتى آخر ذلك اليوم فقط؛ ما سُجل بعده لا يدخل في الرصيد.',
-                  style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              Text('تُحسب الحركات حتى آخر ذلك اليوم فقط؛ ما سُجل بعده لا يدخل في الرصيد.',
+                  style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
             ]),
           ),
           SectionCard(
@@ -383,11 +383,11 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
                 ),
               if (preview != null) ...[
                 const SizedBox(height: 6),
-                const Text('معاينة (أول زبون):', style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+                Text('معاينة (أول زبون):', style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
                 const SizedBox(height: 4),
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0xFFE7F6EE), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: context.ajil.chatBubble, borderRadius: BorderRadius.circular(12)),
                   child: Text(preview, style: const TextStyle(height: 1.6)),
                 ),
               ],
@@ -397,7 +397,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
             SectionCard(
               child: ExpansionTile(
                 tilePadding: EdgeInsets.zero,
-                leading: const Icon(Icons.phone_disabled_outlined, color: AjilColors.pendingText),
+                leading: Icon(Icons.phone_disabled_outlined, color: context.ajil.pendingText),
                 title: Text('${sel.noPhone.length} زبون عليهم رصيد بدون رقم جوال'),
                 subtitle: const Text('أضف أرقامهم ليدخلوا في الإرسال'),
                 children: [
@@ -424,7 +424,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
     final n = sel?.recipients.length ?? 0;
     final totals = sel?.totals ?? const <String, Decimal>{};
     return Container(
-      color: Colors.white,
+      color: context.ajil.surface,
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
       child: SafeArea(
         top: false,
@@ -438,7 +438,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
                 if (totals.isNotEmpty) 'المطلوب: ${totals.entries.map((e) => f.amount(e.value, e.key, withSymbol: true)).join(' و ')}',
                 if (sel.recentlySent > 0) 'تخطي ${sel.recentlySent} استلموا مؤخراً',
               ].join(' · '),
-              style: const TextStyle(fontSize: 13, color: AjilColors.textSoft),
+              style: TextStyle(fontSize: 13, color: context.ajil.textSoft),
             ),
           const SizedBox(height: 8),
           FilledButton.icon(
@@ -475,7 +475,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
             Text('${b.done + 1} من $total', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             const Spacer(),
             Text('أُرسل ${b.sent.length} · تُخطي ${b.skipped.length}',
-                style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
           ]),
           const SizedBox(height: 8),
           ClipRRect(
@@ -484,7 +484,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
           ),
           const SizedBox(height: 6),
           Text('الرصيد حتى ${BalanceNotices.date(b.asOf, f)}',
-              style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         ]),
       ),
       SectionCard(
@@ -496,7 +496,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(r.customer.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                 Text(r.customer.phone!, textDirection: TextDirection.ltr,
-                    style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+                    style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
               ]),
             ),
           ]),
@@ -506,20 +506,20 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: e.value > Decimal.zero ? AjilColors.debtBg : AjilColors.paidBg,
+                  color: e.value > Decimal.zero ? context.ajil.debtBg : context.ajil.paidBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${f.amount(e.value.abs(), e.key, withSymbol: true)} ${e.value > Decimal.zero ? 'عليه' : 'له'}',
                   style: TextStyle(
-                      fontWeight: FontWeight.w600, color: e.value > Decimal.zero ? AjilColors.debt : AjilColors.paid),
+                      fontWeight: FontWeight.w600, color: e.value > Decimal.zero ? context.ajil.debt : context.ajil.paid),
                 ),
               ),
           ]),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: const Color(0xFFE7F6EE), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: context.ajil.chatBubble, borderRadius: BorderRadius.circular(12)),
             child: Text(_message(r), style: const TextStyle(height: 1.6)),
           ),
           const SizedBox(height: 14),
@@ -551,7 +551,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
       if (upcoming.isNotEmpty)
         SectionCard(
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('التالي في الدور', style: TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+            Text('التالي في الدور', style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
             for (final u in upcoming)
               Padding(
                 padding: const EdgeInsets.only(top: 6),
@@ -571,15 +571,15 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const Icon(Icons.check_circle_rounded, size: 64, color: AjilColors.paid),
+        Icon(Icons.check_circle_rounded, size: 64, color: context.ajil.paid),
         const SizedBox(height: 12),
         Text('انتهى الإرسال', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 6),
         Text('أُرسل لـ ${b.sent.length} زبون${b.skipped.isEmpty ? '' : ' · تُخطي ${b.skipped.length}'}',
             textAlign: TextAlign.center),
         const SizedBox(height: 4),
-        const Text('سُجل لكل زبون تاريخ الرسالة والرصيد المرسل — يظهر في صفحته.',
-            textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+        Text('سُجل لكل زبون تاريخ الرسالة والرصيد المرسل — يظهر في صفحته.',
+            textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         const SizedBox(height: 24),
         if (b.skipped.isNotEmpty) ...[
           OutlinedButton(onPressed: _retrySkipped, child: Text('أرسل للمتخطين (${b.skipped.length})')),

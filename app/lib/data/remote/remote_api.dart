@@ -89,7 +89,7 @@ class SupabaseRemoteApi implements RemoteApi {
   }
 
   Future<Map<String, dynamic>> me(String appUserId) async =>
-      await _t('app_users').select('id, user_no, display_name, role').eq('id', appUserId).single();
+      await _t('app_users').select('id, user_no, display_name, role, theme').eq('id', appUserId).single();
 
   Future<Map<String, dynamic>?> currentSubscription(String storeId) async {
     final rows = await _t('subscriptions')
@@ -337,6 +337,15 @@ class SupabaseRemoteApi implements RemoteApi {
   Future<void> setEmployee(String id, bool active, {List<String>? branches}) async {
     try {
       await _rpc('set_employee', {'p_user': id, 'p_active': active, 'p_branches': branches});
+    } catch (e) {
+      _rethrow(e);
+    }
+  }
+
+  /// مظهر المستخدم الحالي فقط (classic | ocean) — الخادم يرفض غيرهما
+  Future<void> setMyTheme(String theme) async {
+    try {
+      await _rpc('set_my_theme', {'p_theme': theme});
     } catch (e) {
       _rethrow(e);
     }

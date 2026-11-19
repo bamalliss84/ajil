@@ -159,7 +159,7 @@ class DashboardScreen extends ConsumerWidget {
                       const Text('مطلوب تحصيله اليوم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                       Text(
                         due.isEmpty ? 'لا توجد وعود أو مواعيد مستحقة اليوم' : '${due.length} زبائن · ${f.amount(dueTotal, cur)} $sym',
-                        style: const TextStyle(fontSize: 13, color: AjilColors.textMuted),
+                        style: TextStyle(fontSize: 13, color: context.ajil.textMuted),
                       ),
                     ]),
                   ),
@@ -178,15 +178,15 @@ class DashboardScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
             child: Column(children: [
               Row(children: [
-                Expanded(child: _Kpi('تحصيل اليوم', f.amount(collectedToday, cur), '$sym · $countToday عمليات', AjilColors.paid)),
+                Expanded(child: _Kpi('تحصيل اليوم', f.amount(collectedToday, cur), '$sym · $countToday عمليات', context.ajil.paid)),
                 const SizedBox(width: 12),
-                Expanded(child: _Kpi('ديون اليوم', f.amount(debtToday, cur), '$sym · $countDebtToday عملية', AjilColors.debt)),
+                Expanded(child: _Kpi('ديون اليوم', f.amount(debtToday, cur), '$sym · $countDebtToday عملية', context.ajil.debt)),
               ]),
               const SizedBox(height: 12),
               Row(children: [
-                Expanded(child: _Kpi('وعود هذا الأسبوع', '${openWeek.length}', '${f.amount(weekPromisesAmount, cur)} $sym', AjilColors.text)),
+                Expanded(child: _Kpi('وعود هذا الأسبوع', '${openWeek.length}', '${f.amount(weekPromisesAmount, cur)} $sym', context.ajil.text)),
                 const SizedBox(width: 12),
-                Expanded(child: _Kpi('ديون متأخرة +60 يوماً', '$over60', 'زبوناً · ${thousands(over60Amount)} $sym', AjilColors.debt)),
+                Expanded(child: _Kpi('ديون متأخرة +60 يوماً', '$over60', 'زبوناً · ${thousands(over60Amount)} $sym', context.ajil.debt)),
               ]),
             ]),
           ),
@@ -196,7 +196,7 @@ class DashboardScreen extends ConsumerWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 const Expanded(child: Text('التحصيل آخر 7 أيام', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-                Text('ألف $sym', style: const TextStyle(color: AjilColors.textMuted, fontSize: 13)),
+                Text('ألف $sym', style: TextStyle(color: context.ajil.textMuted, fontSize: 13)),
               ]),
               const SizedBox(height: 12),
               _WeekBars(values: week),
@@ -210,8 +210,8 @@ class DashboardScreen extends ConsumerWidget {
             InfoStrip(
               margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
               icon: Icons.campaign_outlined,
-              bg: AjilColors.primaryLight,
-              fg: AjilColors.primaryDark,
+              bg: context.ajil.primaryLight,
+              fg: context.ajil.primaryDark,
               text: 'إرسال الأرصدة للزبائن عبر واتساب',
               action: ('فتح', () => context.push('/notices')),
             ),
@@ -245,13 +245,13 @@ class _Header extends ConsumerWidget {
     final entries = totals.entries.toList()..sort((a, b) => a.key == w.defaultCurrency ? -1 : (b.key == w.defaultCurrency ? 1 : 0));
     if (entries.isEmpty) entries.add(MapEntry(w.defaultCurrency, Decimal.zero));
     return Container(
-      color: AjilColors.primary,
+      color: context.ajil.header,
       padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 20, 20, 22),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(w.storeName, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600)),
+              Text(w.storeName, style: TextStyle(color: context.ajil.onPrimary, fontSize: 20, fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
               const BranchChip(light: true),
             ]),
@@ -260,15 +260,15 @@ class _Header extends ConsumerWidget {
             icon: Icons.notifications_none_rounded,
             iconSize: 22,
             tooltip: 'التنبيهات',
-            color: Colors.white,
-            bg: AjilColors.primaryMid,
-            borderColor: null,
+            color: context.ajil.surface,
+            bg: context.ajil.headerMid,
+            noBorder: true,
             badge: badge,
             onPressed: () => context.push('/settings/reminders'),
           ),
         ]),
         const SizedBox(height: 14),
-        const Text('إجمالي الديون عند الزبائن', style: TextStyle(color: AjilColors.onPrimaryMuted, fontSize: 14)),
+        Text('إجمالي الديون عند الزبائن', style: TextStyle(color: context.ajil.onHeaderMuted, fontSize: 14)),
         const SizedBox(height: 4),
         Wrap(spacing: 20, crossAxisAlignment: WrapCrossAlignment.end, children: [
           for (final (i, e) in entries.indexed)
@@ -277,11 +277,11 @@ class _Header extends ConsumerWidget {
                 TextSpan(text: f.amount(e.value, e.key), style: TextStyle(fontSize: i == 0 ? 30 : 22, fontWeight: FontWeight.w600)),
                 TextSpan(text: ' ${Currency.of(e.key).symbolAr}', style: TextStyle(fontSize: i == 0 ? 16 : 14, fontWeight: FontWeight.w500)),
               ]),
-              style: const TextStyle(color: Colors.white, height: 1.3),
+              style: TextStyle(color: context.ajil.onPrimary, height: 1.3),
             ),
         ]),
         const SizedBox(height: 4),
-        Text('عند $debtors زبوناً · تحصيل الشهر $collectedMonth', style: const TextStyle(color: AjilColors.onPrimaryMuted, fontSize: 13)),
+        Text('عند $debtors زبوناً · تحصيل الشهر $collectedMonth', style: TextStyle(color: context.ajil.onHeaderMuted, fontSize: 13)),
       ]),
     );
   }
@@ -293,28 +293,28 @@ class _EmptyStart extends StatelessWidget {
   final VoidCallback? onAdd;
   @override
   Widget build(BuildContext context) => Container(
-        decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
         padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
         child: Row(children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 21,
-            backgroundColor: AjilColors.primaryLight,
-            child: Icon(Icons.person_add_alt_1_outlined, color: AjilColors.primaryDark, size: 22),
+            backgroundColor: context.ajil.primaryLight,
+            child: Icon(Icons.person_add_alt_1_outlined, color: context.ajil.primaryDark, size: 22),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('ابدأ بإضافة أول زبون', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-              Text('مع رصيده الافتتاحي من الدفتر الورقي', style: TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+              Text('مع رصيده الافتتاحي من الدفتر الورقي', style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
             ]),
           ),
           if (onAdd != null)
             SquareIconButton(
               icon: Icons.add_rounded,
               tooltip: 'إضافة زبون',
-              color: Colors.white,
-              bg: AjilColors.primary,
-              borderColor: null,
+              color: context.ajil.surface,
+              bg: context.ajil.primary,
+              noBorder: true,
               size: 40,
               radius: 10,
               onPressed: onAdd,
@@ -329,15 +329,15 @@ class _DueTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final (tag, bg, fg) = switch (d.reason) {
-      'promise_overdue' => ('وعد متأخر ${d.daysLate} أيام', AjilColors.debtBg, AjilColors.debtTag),
-      'promise_today' => ('وعد بالسداد اليوم', AjilColors.pendingBg, AjilColors.pendingText),
-      _ => ('موعد سداد فاتورة', AjilColors.infoBg, AjilColors.infoText),
+      'promise_overdue' => ('وعد متأخر ${d.daysLate} أيام', context.ajil.debtBg, context.ajil.debtTag),
+      'promise_today' => ('وعد بالسداد اليوم', context.ajil.pendingBg, context.ajil.pendingText),
+      _ => ('موعد سداد فاتورة', context.ajil.infoBg, context.ajil.infoText),
     };
     final c = d.customer.customer;
     return InkWell(
       onTap: () => context.push('/customers/${c.id}'),
       child: Container(
-        decoration: const BoxDecoration(border: Border(top: BorderSide(color: AjilColors.divider))),
+        decoration: BoxDecoration(border: Border(top: BorderSide(color: context.ajil.divider))),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(children: [
           Expanded(
@@ -369,9 +369,9 @@ class _DueTile extends ConsumerWidget {
               size: 40,
               radius: 10,
               tooltip: 'تذكير عبر واتساب',
-              color: AjilColors.paidDark,
-              bg: AjilColors.paidBg,
-              borderColor: AjilColors.paidBorder,
+              color: context.ajil.paidDark,
+              bg: context.ajil.paidBg,
+              borderColor: context.ajil.paidBorder,
               onPressed: () => Whatsapp.remind(ref, d.customer),
             ),
           ],
@@ -390,13 +390,13 @@ class _Kpi extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+        decoration: BoxDecoration(color: context.ajil.surface, borderRadius: BorderRadius.circular(14)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, color: AjilColors.textMuted)),
+          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
           const SizedBox(height: 2),
           Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: color, height: 1.3)),
           const SizedBox(height: 2),
-          Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: AjilColors.textMuted)),
+          Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         ]),
       );
 }
@@ -421,18 +421,18 @@ class _WeekBars extends StatelessWidget {
           if (i > 0) const SizedBox(width: 10),
           Expanded(
             child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-              Text(values[i] == Decimal.zero ? '0' : k(values[i]), style: const TextStyle(fontSize: 11, color: AjilColors.textSoft)),
+              Text(values[i] == Decimal.zero ? '0' : k(values[i]), style: TextStyle(fontSize: 11, color: context.ajil.textSoft)),
               const SizedBox(height: 4),
               Container(
                 height: max == Decimal.zero ? 4 : 4 + 76 * (values[i].toDouble() / max.toDouble()),
                 decoration: BoxDecoration(
-                  color: i == 6 ? AjilColors.primary : AjilColors.chartLight,
+                  color: i == 6 ? context.ajil.accent : context.ajil.chartLight,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(6), bottom: Radius.circular(2)),
                 ),
               ),
               const SizedBox(height: 4),
               Text(i == 6 ? 'اليوم' : _days[today.subtract(Duration(days: 6 - i)).weekday % 7],
-                  maxLines: 1, style: const TextStyle(fontSize: 11, color: AjilColors.textMuted)),
+                  maxLines: 1, style: TextStyle(fontSize: 11, color: context.ajil.textMuted)),
             ]),
           ),
         ],
@@ -448,10 +448,10 @@ class _AgingBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final parts = [
-      ('أقل من 30 يوماً', aging.under30, AjilColors.chartLight),
-      ('30–60 يوماً', aging.d30to60, AjilColors.aging30),
-      ('60–90 يوماً', aging.d60to90, AjilColors.aging60),
-      ('أكثر من 90 يوماً', aging.over90, AjilColors.debt),
+      ('أقل من 30 يوماً', aging.under30, context.ajil.chartLight),
+      ('30–60 يوماً', aging.d30to60, context.ajil.aging30),
+      ('60–90 يوماً', aging.d60to90, context.ajil.aging60),
+      ('أكثر من 90 يوماً', aging.over90, context.ajil.debt),
     ];
     final total = aging.total;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -462,7 +462,7 @@ class _AgingBar extends StatelessWidget {
         child: SizedBox(
           height: 12,
           child: Row(children: [
-            if (total == Decimal.zero) Expanded(child: Container(color: AjilColors.divider)),
+            if (total == Decimal.zero) Expanded(child: Container(color: context.ajil.divider)),
             for (final p in parts)
               if (p.$2 > Decimal.zero) ...[
                 Expanded(flex: (1000 * (p.$2.toDouble() / total.toDouble())).round().clamp(1, 1000), child: Container(color: p.$3)),

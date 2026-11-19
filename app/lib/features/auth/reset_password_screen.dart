@@ -38,8 +38,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     return Scaffold(
       appBar: const AjilHeader(title: 'استعادة كلمة المرور'),
       body: ListView(padding: const EdgeInsets.all(20), children: [
-        const Text('للمالك فقط. إذا كنت موظفاً اطلب من المالك إعادة تعيين كلمة مرورك.',
-            style: TextStyle(color: AjilColors.textMuted)),
+        Text('للمالك فقط. إذا كنت موظفاً اطلب من المالك إعادة تعيين كلمة مرورك.',
+            style: TextStyle(color: context.ajil.textMuted)),
         const SizedBox(height: 16),
         TextField(
           controller: _phone,

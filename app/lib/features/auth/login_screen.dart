@@ -63,7 +63,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final branches = _branches;
     if (_branchId != null && !branches.any((b) => b.id == _branchId)) _branchId = null;
     final last = branches.where((b) => b.id == _branchId).firstOrNull;
-    const label = TextStyle(fontSize: 14, color: AjilColors.textSoft);
+    final label = TextStyle(fontSize: 14, color: context.ajil.textSoft);
     const big = TextStyle(fontSize: 17);
     const pad = EdgeInsets.symmetric(horizontal: 14, vertical: 15);
     return Scaffold(
@@ -118,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: DropdownButtonFormField<String>(
                             value: _branchId ?? branches.first.id,
                             isExpanded: true,
-                            style: const TextStyle(fontFamily: ajilFont, fontSize: 16, color: AjilColors.text),
+                            style: TextStyle(fontFamily: ajilFont, fontSize: 16, color: context.ajil.text),
                             icon: const Icon(Icons.keyboard_arrow_down_rounded),
                             decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14)),
                             items: [for (final b in branches) DropdownMenuItem(value: b.id, child: Text(b.name, overflow: TextOverflow.ellipsis))],
@@ -140,7 +140,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       decoration: InputDecoration(
                         contentPadding: pad,
                         suffixIcon: IconButton(
-                          icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: AjilColors.textMuted),
+                          icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: context.ajil.textMuted),
                           onPressed: () => setState(() => _obscure = !_obscure),
                           tooltip: 'إظهار',
                         ),
@@ -153,14 +153,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     last != null
                         ? 'آخر دخول: ${last.name} — يُحفظ تلقائياً'
                         : (branches.isEmpty ? 'أول دخول على هذا الجوال: ستختار الفرع بعد التحقق' : 'الفرع يُحفظ تلقائياً'),
-                    style: const TextStyle(color: AjilColors.textMuted, fontSize: 13),
+                    style: TextStyle(color: context.ajil.textMuted, fontSize: 13),
                   ),
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: _busy ? null : _submit,
                     style: FilledButton.styleFrom(textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600)),
                     child: _busy
-                        ? const SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white))
+                        ? SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: context.ajil.onPrimary))
                         : const Text('دخول'),
                   ),
                   const Spacer(),
@@ -182,11 +182,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 class _Logo extends StatelessWidget {
   const _Logo();
   @override
-  Widget build(BuildContext context) => const Column(children: [
+  Widget build(BuildContext context) => Column(children: [
         AjilLogo(size: 72),
         SizedBox(height: 12),
         Text('آجِل', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600)),
         SizedBox(height: 4),
-        Text('دفتر ديون البقالة', style: TextStyle(fontSize: 15, color: AjilColors.textMuted)),
+        Text('دفتر ديون البقالة', style: TextStyle(fontSize: 15, color: context.ajil.textMuted)),
       ]);
 }

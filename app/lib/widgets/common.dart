@@ -28,7 +28,7 @@ class MoneyText extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final f = ref.watch(moneyFormatProvider);
     final c = color ??
-        (value > Decimal.zero ? AjilColors.debt : (value < Decimal.zero ? AjilColors.paid : AjilColors.textMuted));
+        (value > Decimal.zero ? context.ajil.debt : (value < Decimal.zero ? context.ajil.paid : context.ajil.textMuted));
     return Text(
       f.amount(value, currency, withSymbol: symbol, signed: signed),
       style: TextStyle(fontSize: size, fontWeight: weight, color: c),
@@ -46,9 +46,9 @@ class SyncBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, color, label) = switch (state) {
-      SyncState.synced => (Icons.check_rounded, AjilColors.paid, 'متزامن'),
-      SyncState.pending => (Icons.schedule_rounded, AjilColors.pendingIcon, 'بانتظار'),
-      SyncState.failed => (Icons.warning_amber_rounded, AjilColors.debt, 'مرفوضة'),
+      SyncState.synced => (Icons.check_rounded, context.ajil.paid, 'متزامن'),
+      SyncState.pending => (Icons.schedule_rounded, context.ajil.pendingIcon, 'بانتظار'),
+      SyncState.failed => (Icons.warning_amber_rounded, context.ajil.debt, 'مرفوضة'),
     };
     return Row(mainAxisSize: MainAxisSize.min, children: [
       if (!compact) ...[Text(label, style: TextStyle(fontSize: 12, color: color)), const SizedBox(width: 4)],
@@ -68,8 +68,8 @@ class StatusBanner extends ConsumerWidget {
       return _Banner(
         icon: Icons.password_outlined,
         text: 'كلمة مرورك مؤقتة — غيّرها الآن',
-        bg: AjilColors.infoBg,
-        fg: AjilColors.infoText,
+        bg: context.ajil.infoBg,
+        fg: context.ajil.infoText,
         action: ('تغيير', () => context.push('/settings')),
       );
     }
@@ -77,8 +77,8 @@ class StatusBanner extends ConsumerWidget {
       return _Banner(
         icon: Icons.lock_clock_outlined,
         text: 'الاشتراك منتهٍ — البيانات للقراءة فقط',
-        bg: AjilColors.debtBg,
-        fg: const Color(0xFF7A2318),
+        bg: context.ajil.debtBg,
+        fg: context.ajil.debtText,
         action: s.session?.isOwner == true ? ('تجديد', () => context.push('/settings')) : null,
       );
     }
@@ -88,8 +88,8 @@ class StatusBanner extends ConsumerWidget {
         text: s.online
             ? '${s.pending} حركات بانتظار المزامنة'
             : (s.pending > 0 ? 'غير متصل — ${s.pending} حركات بانتظار المزامنة' : (kIsWeb ? 'غير متصل — التسجيل متوقف حتى يعود الاتصال' : 'غير متصل — تعمل البيانات من الجوال')),
-        bg: AjilColors.pendingBg,
-        fg: AjilColors.pendingText,
+        bg: context.ajil.pendingBg,
+        fg: context.ajil.pendingText,
         action: s.pending > 0 ? ('عرض', () => context.push('/unsynced')) : null,
       );
     }
@@ -127,8 +127,8 @@ class Initials extends StatelessWidget {
   @override
   Widget build(BuildContext context) => CircleAvatar(
         radius: size / 2,
-        backgroundColor: AjilColors.primaryLight,
-        child: Text(text, style: TextStyle(color: AjilColors.primaryDark, fontWeight: FontWeight.w600, fontSize: size * .34)),
+        backgroundColor: context.ajil.primaryLight,
+        child: Text(text, style: TextStyle(color: context.ajil.primaryDark, fontWeight: FontWeight.w600, fontSize: size * .34)),
       );
 }
 
@@ -141,7 +141,7 @@ class SectionCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         margin: margin ?? const EdgeInsets.fromLTRB(16, 14, 16, 0),
         padding: padding,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(color: context.ajil.surface, borderRadius: BorderRadius.circular(16)),
         child: child,
       );
 }
@@ -190,7 +190,7 @@ class AmountKeypad extends StatelessWidget {
         children: [
           for (final k in keys)
             Material(
-              color: Colors.white,
+              color: context.ajil.surface,
               borderRadius: BorderRadius.circular(12),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
@@ -200,8 +200,8 @@ class AmountKeypad extends StatelessWidget {
                 },
                 child: Center(
                   child: k == 'del'
-                      ? const Icon(Icons.backspace_outlined, semanticLabel: 'حذف', color: AjilColors.text)
-                      : Text(k, style: const TextStyle(fontSize: 22, color: AjilColors.text)),
+                      ? Icon(Icons.backspace_outlined, semanticLabel: 'حذف', color: context.ajil.text)
+                      : Text(k, style: TextStyle(fontSize: 22, color: context.ajil.text)),
                 ),
               ),
             ),
@@ -225,8 +225,8 @@ class DebtPayButtons extends StatelessWidget {
             icon: icons ? const Icon(Icons.add_rounded, size: 22) : const SizedBox.shrink(),
             label: const Text('تسجيل دين'),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AjilColors.debt,
-              side: const BorderSide(color: AjilColors.debtBorder, width: 1.5),
+              foregroundColor: context.ajil.debt,
+              side: BorderSide(color: context.ajil.debtBorder, width: 1.5),
               textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w600),
             ),
           ),
@@ -245,11 +245,11 @@ class DebtPayButtons extends StatelessWidget {
 void showError(BuildContext context, Object e) {
   final err = AjilError.parse(e);
   if (err.code == 'server_error') debugPrint('unexpected error: $e');
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.message), backgroundColor: AjilColors.debt));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.message), backgroundColor: context.ajil.debt));
 }
 
 void showOk(BuildContext context, String msg) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: AjilColors.primary));
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: context.ajil.primary));
 }
 
 /// نسخة debug فقط: يعرض رمز OTP الراجع من الخادم (OTP_DEV_ECHO) للتجربة بدون SMS
@@ -257,11 +257,11 @@ void showDevOtp(BuildContext context, String? code) {
   if (!kDebugMode || code == null) return;
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text('رمز التحقق (تطوير): $code'),
-    backgroundColor: AjilColors.primary,
+    backgroundColor: context.ajil.primary,
     duration: const Duration(seconds: 30),
     action: SnackBarAction(
       label: 'نسخ',
-      textColor: Colors.white,
+      textColor: context.ajil.onPrimary,
       onPressed: () => Clipboard.setData(ClipboardData(text: code)),
     ),
   ));
@@ -282,9 +282,9 @@ class AjilNavBar extends StatelessWidget {
   /// حسب التصميم: أبيض بخط علوي، المختار أخضر عريض، بلا مؤشر خلفي
   @override
   Widget build(BuildContext context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AjilColors.headerBorder)),
+        decoration: BoxDecoration(
+          color: context.ajil.surface,
+          border: Border(top: BorderSide(color: context.ajil.headerBorder)),
         ),
         child: SafeArea(
           top: false,
@@ -298,13 +298,13 @@ class AjilNavBar extends StatelessWidget {
                     child: SizedBox(
                       height: 52,
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Icon(_items[i].$1, size: 25, color: i == index ? AjilColors.primary : AjilColors.textMuted),
+                        Icon(_items[i].$1, size: 25, color: i == index ? context.ajil.primary : context.ajil.textMuted),
                         const SizedBox(height: 2),
                         Text(_items[i].$2,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: i == index ? FontWeight.w600 : FontWeight.w400,
-                              color: i == index ? AjilColors.primary : AjilColors.textMuted,
+                              color: i == index ? context.ajil.primary : context.ajil.textMuted,
                             )),
                       ]),
                     ),
@@ -325,6 +325,6 @@ class BranchChip extends ConsumerWidget {
     final s = ref.watch(sessionProvider).session;
     if (s == null) return const SizedBox.shrink();
     return Text('${s.branch.name} · ${s.displayName}${s.isOwner ? ' (المالك)' : ''}',
-        style: TextStyle(fontSize: 13, color: light ? const Color(0xFFCFEDE3) : AjilColors.textMuted));
+        style: TextStyle(fontSize: 13, color: light ? context.ajil.onHeaderMuted : context.ajil.textMuted));
   }
 }

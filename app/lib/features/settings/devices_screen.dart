@@ -42,7 +42,7 @@ class _DevicesScreenState extends ConsumerState<DevicesScreen> {
             TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('رجوع')),
             FilledButton(
               onPressed: () => Navigator.pop(ctx, true),
-              style: FilledButton.styleFrom(backgroundColor: AjilColors.debt, minimumSize: const Size(90, 44)),
+              style: FilledButton.styleFrom(backgroundColor: context.ajil.debt, minimumSize: const Size(90, 44)),
               child: const Text('إلغاء الجهاز'),
             ),
           ],
@@ -79,10 +79,10 @@ class _DevicesScreenState extends ConsumerState<DevicesScreen> {
                   final last = d['last_sync_at'] == null ? null : DateTime.parse(d['last_sync_at']).toLocal();
                   final stale = last != null && DateTime.now().difference(last).inDays >= 3;
                   return ListTile(
-                    tileColor: Colors.white,
+                    tileColor: context.ajil.surface,
                     leading: CircleAvatar(
-                      backgroundColor: revoked ? AjilColors.divider : AjilColors.primaryLight,
-                      child: Text(d['device_letter'] ?? '?', style: const TextStyle(color: AjilColors.primaryDark)),
+                      backgroundColor: revoked ? context.ajil.divider : context.ajil.primaryLight,
+                      child: Text(d['device_letter'] ?? '?', style: TextStyle(color: context.ajil.primaryDark)),
                     ),
                     title: Text('${d['label'] ?? 'جهاز'}${d['id'] == mine ? ' (هذا الجهاز)' : ''}'),
                     subtitle: Text(
@@ -93,7 +93,7 @@ class _DevicesScreenState extends ConsumerState<DevicesScreen> {
                               : last == null
                                   ? 'لم يتزامن بعد'
                                   : 'آخر مزامنة: ${dt.format(last)}${stale ? ' — منذ أكثر من 3 أيام' : ''}',
-                      style: TextStyle(color: stale || !approved ? AjilColors.pendingText : null),
+                      style: TextStyle(color: stale || !approved ? context.ajil.pendingText : null),
                     ),
                     trailing: revoked
                         ? null
@@ -107,7 +107,7 @@ class _DevicesScreenState extends ConsumerState<DevicesScreen> {
                             if (d['id'] != mine)
                               IconButton(
                                 onPressed: () => _act(d['id'], revoke: true),
-                                icon: const Icon(Icons.block, color: AjilColors.debt),
+                                icon: Icon(Icons.block, color: context.ajil.debt),
                                 tooltip: 'إلغاء الجهاز',
                               ),
                           ]),
