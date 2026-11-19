@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#0F6E56">
+<meta name="theme-color" content="#0F6E56" id="tc">
 <!--
   كشف الحساب العام للزبون (قراءة فقط).
   الرابط: https://<الدومين>/statement/#<token> — الـ token في الـ hash فلا يصل لأي خادم ولا يُسجَّل في السجلات.
@@ -18,18 +18,25 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{
+:root{   /* أ · الأخضر الكلاسيكي — الافتراضي */
   --g:#0F6E56;--gd:#085041;--gl:#E1F5EE;--t:#1F2A2E;--m:#5B6B70;--bg:#F5F7F6;
-  --line:#EEF2F1;--border:#D5DDDB;
+  --line:#EEF2F1;--border:#D5DDDB;--header:#0F6E56;--accent:#0F6E56;
   --debt:#B03224;--debt-bg:#FCEDEB;--pay:#1E7A43;--pay-bg:#E3F3E9;
   --warn:#7A4A07;--warn-bg:#FBEFD9;--warn-dot:#E0962A;--info:#1D4F86;--info-bg:#E6EEF8;
+}
+/* ب · فيروزي وكحلي — يُطبَّق حين تختاره البقالة (theme=ocean من public_statement) */
+html[data-theme=ocean]{
+  --g:#11856F;--gd:#0D7A66;--gl:#E3F6F1;--t:#16324F;--m:#5B7183;--bg:#F4F7FA;
+  --line:#E8EEF3;--border:#CFDBE4;--header:#16324F;--accent:#16A085;
+  --debt:#C0392B;--debt-bg:#FBEDEB;--pay:#1E7A43;--pay-bg:#E4F3EA;
+  --warn:#7A4A07;--warn-bg:#FBF0DA;--warn-dot:#E0962A;--info:#1F6FB2;--info-bg:#E7F1FA;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
 body{font-family:'Tajawal',system-ui,sans-serif;color:var(--t);background:var(--bg);line-height:1.6;
   -webkit-text-size-adjust:100%;min-height:100vh;display:flex;flex-direction:column}
 .num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
-header{background:var(--g);color:#fff;padding:20px 16px 56px}
+header{background:var(--header);color:#fff;padding:20px 16px 56px}
 .head{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
 .mark{flex:none;width:44px;height:44px;border-radius:12px;background:#fff;color:var(--g);display:grid;place-items:center;font-size:24px;font-weight:700}
 .store{font-size:19px;font-weight:700;margin:0;line-height:1.35}
@@ -148,6 +155,10 @@ function showState(title, body, retry) {
 }
 
 function render(d) {
+  // مظهر البقالة (classic | ocean) — الافتراضي الكلاسيكي إن لم يرسله الخادم
+  if (d.theme === 'ocean') document.documentElement.setAttribute('data-theme', 'ocean');
+  else document.documentElement.removeAttribute('data-theme');
+  const tc = $('tc'); if (tc) tc.setAttribute('content', d.theme === 'ocean' ? '#16324F' : '#0F6E56');
   $('store').textContent = d.store_name;
   $('branch').textContent = d.branch_name || '';
   document.title = 'كشف حساب ' + d.customer_name + ' — ' + d.store_name;

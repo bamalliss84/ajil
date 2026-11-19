@@ -48,6 +48,7 @@
   --pay:#1E7A43; --pay-bg:#E3F3E9;
   --warn:#7A4A07; --warn-bg:#FBEFD9; --warn-dot:#E0962A;
   --info:#1D4F86; --info-bg:#E6EEF8;
+  --header:#0F6E56;--accent:#0F6E56;
   --shadow:0 1px 2px rgba(15,40,35,.06);
   --shadow-lg:0 12px 32px -12px rgba(15,40,35,.22);
   --wrap:1120px;
@@ -89,7 +90,7 @@ p{margin:0}
 .top{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .top-in{display:flex;align-items:center;gap:16px;min-height:68px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:21px;text-decoration:none;color:var(--t)}
-.mark{flex:none;width:40px;height:40px;border-radius:12px;background:var(--g);color:#fff;display:grid;place-items:center;font-size:23px;line-height:1}
+.mark{flex:none;width:40px;height:40px;border-radius:12px;background:var(--header);color:#fff;display:grid;place-items:center;font-size:23px;line-height:1}
 .nav{display:flex;gap:4px;margin-inline-start:auto}
 .nav a{padding:10px 14px;border-radius:10px;color:var(--m);text-decoration:none;font-size:15px;font-weight:500}
 .nav a:hover{background:var(--bg);color:var(--t)}
@@ -114,7 +115,7 @@ p{margin:0}
 .device{justify-self:center;width:min(312px,86vw);background:#101A1C;border-radius:40px;padding:10px;
   box-shadow:var(--shadow-lg)}
 .screen{background:var(--bg);border-radius:31px;overflow:hidden}
-.scr-top{background:var(--g);color:#fff;padding:26px 16px 18px}
+.scr-top{background:var(--header);color:#fff;padding:26px 16px 18px}
 .scr-top .hi{font-size:12px;opacity:.82}
 .scr-top .store{font-size:16px;font-weight:700}
 .scr-sum{display:flex;gap:8px;margin-top:14px}
@@ -183,7 +184,7 @@ section{padding:76px 0}
 .bar i{width:9px;height:9px;border-radius:50%;background:var(--field);flex:none}
 .url{flex:1;background:#fff;border:1px solid var(--line);border-radius:7px;padding:4px 10px;
   font-size:11.5px;color:var(--m);direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.st-top{background:var(--g);color:#fff;padding:18px 18px 44px}
+.st-top{background:var(--header);color:#fff;padding:18px 18px 44px}
 .st-top .s{font-size:17px;font-weight:700}
 .st-top .b{font-size:12px;opacity:.85}
 .st-body{padding:0 18px 20px;margin-top:-32px}
@@ -279,7 +280,14 @@ footer a:hover{color:#fff;text-decoration:underline}
 /* ===== الاتجاه المعتمد: جريء وتجاري — بطل أخضر داكن، خط Tajawal ===== */
 h1,h2{letter-spacing:-.4px}
 body{line-height:1.8}
-.hero{background:linear-gradient(170deg,#0F6E56 0%,#0B5A47 58%,#085041 100%)}
+.hero{background:linear-gradient(170deg,var(--header) 0%,color-mix(in srgb,var(--header) 82%,#000) 58%,color-mix(in srgb,var(--header) 66%,#000) 100%)}
+/* ب · فيروزي وكحلي — للتبديل أضف data-theme="ocean" على <html> (المظهر التسويقي يبقى موحّداً افتراضياً) */
+html[data-theme=ocean]{
+  --g:#11856F;--gd:#0D7A66;--gl:#E3F6F1;--header:#16324F;--accent:#16A085;
+  --t:#16324F;--m:#5B7183;--bg:#F4F7FA;--field:#CFDBE4;--line:#E8EEF3;
+  --debt:#C0392B;--debt-bg:#FBEDEB;--pay:#1E7A43;--pay-bg:#E4F3EA;
+  --warn:#7A4A07;--warn-bg:#FBF0DA;--warn-dot:#E0962A;--info:#1F6FB2;--info-bg:#E7F1FA;
+}
 .hero h1{color:#fff}
 .hero h1 em{color:#8FE0C7}
 .hero .lead{color:rgba(255,255,255,.86)}

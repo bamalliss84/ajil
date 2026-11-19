@@ -185,3 +185,27 @@
 - الوزن 700 بدل 600 (تجوال)، وكل هدف ضغط ≥ 44px والأزرار الرئيسية 54px.
 - لوحة الأرقام في أسفل الشاشة دائماً (استخدام بإبهام واحد)، و`00` مفتاح مستقل.
 - سطر «المتبقي بعده» يُحسب محلياً للعرض فقط؛ الرصيد المعتمد من الخادم بعد المزامنة (قاعدة 3).
+
+## 🎨 مظهران قابلان للتبديل (2026-11-19)
+رمزان لكل لون (الجدول الكامل في `docs/DESIGN.md`): **أ · الأخضر الكلاسيكي** (الافتراضي) و**ب · فيروزي وكحلي**.
+القاعدة: **ممنوع كتابة قيمة لون مباشرة في أي شاشة** — تُستخدم الرموز وإلا لن يتبدّل المظهر.
+
+**قرار تباين مهم:** `#16A085` مع نص أبيض تباينه 3.28:1 (يرسب في WCAG AA)، فهو يبقى لوناً للأيقونات
+والتظليل والرسوم (`accent`)، ويُعمَّق إلى `#11856F` (4.56) في الأسطح التي تحمل نصاً أبيض.
+الكحلي `#16324F` (13.1) للهيدر والأرقام الكبيرة — وهذا ما يظهر في المرجع الذي أرسله المالك.
+
+- ✅ منفَّذ: `docs/DESIGN.md` (جدول الرمزين)، `docs/design/Settings.dc.html` (صف «مظهر التطبيق»)،
+  `docs/design/SettingsTheme.dc.html` (شاشة الاختيار بمعاينة)، `web/statement/index.html`
+  (يتبع `theme` القادم من `public_statement`)، `web/landing/index.html` (نفس الرموز، المظهر التسويقي موحّد افتراضياً).
+- ⬜ متبقٍ:
+  1. **migration جديدة:** `alter table app.store_settings add column theme text not null default 'classic'
+     check (theme in ('classic','ocean'));` + `grant update (theme) on app.store_settings to authenticated;`
+     ولا تنسَ `revoke execute … from public, anon` لأي دالة جديدة.
+  2. **`app.public_statement`**: أضف `'theme', coalesce((select theme from app.store_settings where store_id = l.store_id), 'classic')`
+     إلى الـ jsonb المُرجَع (الصفحة تقرؤه الآن وتتجاهله إن غاب).
+  3. **اختبارات:** المظهر يرجع في الكشف العام؛ الموظف لا يغيّر المظهر (المالك فقط)؛ القيمة الوحيدة المقبولة `classic`/`ocean`.
+  4. **Flutter:** حوّل `AjilColors` من ثوابت إلى `AjilTheme` بحقلين (`classic`/`ocean`) مع `ThemeExtension`،
+     و`header` و`accent` رمزان جديدان. استبدل كل قيمة لون مباشرة في `app/lib` و`web/admin/lib` برمز.
+     احفظ الاختيار محلياً (يعمل بدون نت) وزامنه مع `store_settings` عند الاتصال، والمالك فقط يغيّره.
+  5. **الشاشتان:** صف «مظهر التطبيق» في الإعدادات + شاشة الاختيار حسب `SettingsTheme.dc.html`، والتبديل فوري بلا إعادة تشغيل.
+  6. `flutter analyze` و`flutter test`، ولقطة لكل شاشة بالمظهرين للمقارنة مع `docs/design`.
