@@ -11,7 +11,7 @@
   - `app.statement_link(p_customer, p_regenerate)`: يرجع الـ token أو ينشئه؛ التجديد (وإعادة تفعيل رابط ملغى) للمالك أو للموظف إن كان `employees_can_send_notices`. `app.revoke_statement_link(p_customer)` للإلغاء بدون بديل (غير مستخدمة في التطبيق بعد).
   - `app.public_statement(p_token)`: لـ anon فقط (`grant usage on schema app to anon`، بلا أي صلاحية على الجداول). ترجع اسم البقالة والفرع والزبون، الأرصدة لكل عملة (الإجماليات بدون الملغاة وقيودها)، آخر 50 حركة بدون الملغاة، الوعود المفتوحة (تاريخ ومبلغ فقط)، ووقت الاستعلام — بلا جوال ولا ملاحظات ولا سقف ولا معرّفات. `null` موحّد لأي رابط غير صالح/ملغى/زبون مؤرشف/بقالة موقوفة. تحدّث المشاهدات.
   - `statement_link_test.sql` (33) + تحديث `isolation_test.sql` (anon مسموح له `public_statement` فقط، ولا صلاحية لـ anon/public على جداول app) ← **166 ✓**. `_helpers.sql` يمنح anon مخطط `test` (للاختبارات فقط).
-- **الصفحة:** `web/statement/index.html` ملف واحد بلا framework (RTL، IBM Plex Sans Arabic، ألوان DESIGN.md، للجوال أولاً). الـ token في `location.hash` فلا يصل للخادم. `noindex` و `referrer=no-referrer` و CSP. عند النشر استبدل `__SUPABASE_URL__` و `__SUPABASE_ANON_KEY__` و `__LANDING_URL__`، وأضف ترويستي `Referrer-Policy: no-referrer` و `X-Robots-Tag: noindex` في الاستضافة.
+- **الصفحة:** `web/statement/index.html` ملف واحد بلا framework (RTL، خط Tajawal، ألوان DESIGN.md، للجوال أولاً). الـ token في `location.hash` فلا يصل للخادم. `noindex` و `referrer=no-referrer` و CSP. عند النشر استبدل `__SUPABASE_URL__` و `__SUPABASE_ANON_KEY__` و `__LANDING_URL__`، وأضف ترويستي `Referrer-Policy: no-referrer` و `X-Robots-Tag: noindex` في الاستضافة.
   - محلياً: `scripts/run-statement.ps1` (أو preview «statement») ← http://localhost:8092/statement/#token. جُرّبت: الكشف، و«الرابط غير صالح»، وبعرض 375px.
 - **التطبيق:** `services/statement_links.dart` (الـ token يُحفظ في `KeyValues` بعد أول جلب)، `features/customers/statement_link_sheet.dart` (نسخ، مشاركة، تجديد بتأكيد؛ رسالة واضحة بدون نت)، المدخل: شاشة الزبون ← «الكشف والمزيد» ← «رابط كشف الحساب».
   - `Whatsapp.remind` يستخدم الآن قالب البقالة `reminder_template` ويملأ `{الرابط}`؛ بدون رابط تُحذف جملة الرابط كاملة (`whatsapp_fill_test.dart`، 3 اختبارات).
@@ -153,3 +153,15 @@
   - اختبار مزامنة جديد في `test/sync_engine_test.dart` (استئناف الدفعة + عدم تكرار الإرسال من جوال ثانٍ).
 - ✅ `{الرابط}` لكشف الحساب العام مفعّل (2026-11-19). **لاحقاً (غير منفّذ):** قنوات مدفوعة SMS/WhatsApp API للباقة الأعلى.
 - **تحقق يدوي على جهاز حقيقي:** الرجوع من واتساب يُظهر «هل وصلت الرسالة؟»، والضغط على تنبيه المطالبة وهو مقفل يفتح الشاشة بعد إدخال PIN.
+
+## 🔤 توحيد الخط على Tajawal (2026-11-19)
+اعتُمد **Tajawal** بدل IBM Plex Sans Arabic في كل المنتج. تجوال لا يملك الوزن **600**، فكل 600 يصير **700**.
+- ✅ منفَّذ: `docs/DESIGN.md`، `CLAUDE.md`، `docs/DESIGN_FIDELITY.md`، `docs/design/*.dc.html` (12)، `web/statement/index.html`، `web/landing/index.html`
+- ⬜ متبقٍ (يحتاج ملفات الخط وتشغيل Flutter):
+  1. نزّل Tajawal من https://fonts.google.com/specimen/Tajawal وضع في `app/assets/fonts/` و`web/admin/assets/fonts/`:
+     `Tajawal-Regular.ttf` (400) و`Tajawal-Medium.ttf` (500) و`Tajawal-Bold.ttf` (700)، واحذف ملفات IBMPlexSansArabic وحدّث `README.txt` و`OFL.txt`.
+  2. `app/pubspec.yaml` و`web/admin/pubspec.yaml`: `family: Tajawal` بأوزان 400/500/**700** (لا تُعلن 600 — وإلا اختار Flutter وزناً أقرب بشكل غير محدَّد).
+  3. `app/lib/core/theme.dart`: `ajilFont = 'Tajawal'`، و`web/admin/lib/main.dart`: `fontFamily: 'Tajawal'`.
+  4. استبدل كل `FontWeight.w600` بـ `FontWeight.w700` في `app/lib` و`web/admin/lib` (≈88 موضعاً).
+  5. ملفات PDF (`statement_pdf.dart`, `receipt_pdf.dart`, `report_export.dart`): مسارات الأصول إلى Tajawal، وتحقّق من اسم الدالة في `PdfGoogleFonts` لتجوال (البديل على الويب) — إن لم تتوفر فاستخدم الأصول في الحالتين.
+  6. `flutter analyze` و`flutter test` ثم لقطة شاشة واحدة على الجوال للتأكد أن 700 ليس ثقيلاً أكثر من اللازم.
