@@ -24,7 +24,7 @@
   --debt:#B03224;--debt-bg:#FCEDEB;--pay:#1E7A43;--pay-bg:#E3F3E9;
   --warn:#7A4A07;--warn-bg:#FBEFD9;--warn-dot:#E0962A;--info:#1D4F86;--info-bg:#E6EEF8;
 }
-/* ب · فيروزي وكحلي — يُطبَّق حين تختاره البقالة (theme=ocean من public_statement) */
+/* ب · فيروزي وكحلي — يُطبَّق حين يختاره مالك البقالة (theme=ocean من public_statement) */
 html[data-theme=ocean]{
   --g:#11856F;--gd:#0D7A66;--gl:#E3F6F1;--t:#16324F;--m:#5B7183;--bg:#F4F7FA;
   --line:#E8EEF3;--border:#CFDBE4;--header:#16324F;--accent:#16A085;
@@ -155,7 +155,7 @@ function showState(title, body, retry) {
 }
 
 function render(d) {
-  // مظهر البقالة (classic | ocean) — الافتراضي الكلاسيكي إن لم يرسله الخادم
+  // مظهر مالك البقالة (classic | ocean) — الافتراضي الكلاسيكي إن لم يرسله الخادم
   if (d.theme === 'ocean') document.documentElement.setAttribute('data-theme', 'ocean');
   else document.documentElement.removeAttribute('data-theme');
   const tc = $('tc'); if (tc) tc.setAttribute('content', d.theme === 'ocean' ? '#16324F' : '#0F6E56');
