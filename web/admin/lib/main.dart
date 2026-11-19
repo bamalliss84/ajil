@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const Text('آجِل — إدارة المنصة', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  const Text('آجِل — إدارة المنصة', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 16),
                   TextField(controller: _email, decoration: const InputDecoration(labelText: 'البريد')),
                   TextField(controller: _pw, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور')),
@@ -160,7 +160,7 @@ class SummaryPage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                       Text(k, style: TextStyle(color: context.adm.textMuted)),
-                      Text(v, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w600)),
+                      Text(v, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
                     ]),
                   ),
                 ),
@@ -405,7 +405,7 @@ class _CodesPageState extends State<CodesPage> {
 
   @override
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(24), children: [
-        const Text('توليد أكواد تفعيل (تُباع عند المندوبين)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        const Text('توليد أكواد تفعيل (تُباع عند المندوبين)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
         const SizedBox(height: 12),
         Wrap(spacing: 12, runSpacing: 12, crossAxisAlignment: WrapCrossAlignment.center, children: [
           SizedBox(
@@ -461,7 +461,7 @@ class _CodesPageState extends State<CodesPage> {
               padding: const EdgeInsets.all(16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  const Expanded(child: Text('الأكواد الجديدة', style: TextStyle(fontWeight: FontWeight.w600))),
+                  const Expanded(child: Text('الأكواد الجديدة', style: TextStyle(fontWeight: FontWeight.w700))),
                   TextButton.icon(
                     onPressed: () => Clipboard.setData(ClipboardData(text: _new.join('\n'))),
                     icon: const Icon(Icons.copy),
@@ -474,7 +474,7 @@ class _CodesPageState extends State<CodesPage> {
           ),
         ],
         const SizedBox(height: 24),
-        const Text('كل الأكواد', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        const Text('كل الأكواد', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
         for (final c in _all)
           ListTile(
             dense: true,
@@ -508,7 +508,7 @@ class _AlertsPageState extends State<AlertsPage> {
 
   @override
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(24), children: [
-        const Text('تنبيهات سلامة البيانات (الفحص اليومي)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        const Text('تنبيهات سلامة البيانات (الفحص اليومي)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
         Text('سلسلة بصمات مكسورة = تعديل مباشر على قاعدة البيانات. عدم تطابق رصيد = خلل يحتاج مراجعة.',
             style: TextStyle(color: context.adm.textMuted)),
         const SizedBox(height: 12),

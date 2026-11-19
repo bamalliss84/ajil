@@ -25,14 +25,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   fonts:
-    - family: IBMPlexSansArabic
+    # Tajawal بأوزان 400/500/700 فقط — لا يوجد 600 (يُستخدم 700 بدله)
+    - family: Tajawal
       fonts:
-        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+        - asset: assets/fonts/Tajawal-Regular.ttf
           weight: 400
-        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+        - asset: assets/fonts/Tajawal-Medium.ttf
           weight: 500
-        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
-          weight: 600
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
 
 # نفس قيود تطبيق app/ (Flutter 3.24)
 dependency_overrides:

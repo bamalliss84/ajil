@@ -259,7 +259,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
         child: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
           SectionCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('الرصيد حتى تاريخ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              const Text('الرصيد حتى تاريخ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 PillChip(
@@ -303,7 +303,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
           ),
           SectionCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('من يستلم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              const Text('من يستلم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               CheckRow(
                 label: 'الزبائن الذين عليهم فقط',
                 subtitle: 'ألغِه لتشمل من لهم رصيد عندك',
@@ -358,7 +358,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
           ),
           SectionCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('نص الرسالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              const Text('نص الرسالة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               TextField(controller: _tpl, maxLines: 5, onChanged: (_) => setState(() {})),
               const SizedBox(height: 6),
@@ -472,7 +472,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
       SectionCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
-            Text('${b.done + 1} من $total', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            Text('${b.done + 1} من $total', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const Spacer(),
             Text('أُرسل ${b.sent.length} · تُخطي ${b.skipped.length}',
                 style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
@@ -494,7 +494,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
             const SizedBox(width: 10),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(r.customer.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                Text(r.customer.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
                 Text(r.customer.phone!, textDirection: TextDirection.ltr,
                     style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
               ]),
@@ -512,7 +512,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
                 child: Text(
                   '${f.amount(e.value.abs(), e.key, withSymbol: true)} ${e.value > Decimal.zero ? 'عليه' : 'له'}',
                   style: TextStyle(
-                      fontWeight: FontWeight.w600, color: e.value > Decimal.zero ? context.ajil.debt : context.ajil.paid),
+                      fontWeight: FontWeight.w700, color: e.value > Decimal.zero ? context.ajil.debt : context.ajil.paid),
                 ),
               ),
           ]),
@@ -532,7 +532,7 @@ class _BalanceNoticesScreenState extends ConsumerState<BalanceNoticesScreen> wit
             const SizedBox(height: 6),
             TextButton(onPressed: () => _skip(r), child: const Text('تخطي هذا الزبون')),
           ] else ...[
-            const Text('هل وصلت الرسالة؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text('هل وصلت الرسالة؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             FilledButton.icon(
               onPressed: () => _confirmSent(r),

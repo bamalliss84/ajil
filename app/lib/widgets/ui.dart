@@ -48,7 +48,7 @@ class AjilSegmented<T> extends StatelessWidget {
                     child: Text(label,
                         style: TextStyle(
                           fontSize: fontSize,
-                          fontWeight: v == value ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: v == value ? FontWeight.w700 : FontWeight.w400,
                           color: v == value ? (selectedFg ?? context.ajil.text) : context.ajil.textMuted,
                         )),
                   ),
@@ -122,7 +122,7 @@ class OptionTile extends StatelessWidget {
               child: Text(label,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
                     color: selected ? context.ajil.primaryDark : context.ajil.textSoft,
                   )),
             ),
@@ -198,7 +198,7 @@ class CheckRow extends StatelessWidget {
           child: Row(children: [
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                Text(label, style: TextStyle(fontSize: bold ? 16 : 15, fontWeight: bold ? FontWeight.w600 : FontWeight.w400)),
+                Text(label, style: TextStyle(fontSize: bold ? 16 : 15, fontWeight: bold ? FontWeight.w700 : FontWeight.w400)),
                 if (subtitle != null) Text(subtitle!, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
               ]),
             ),
@@ -266,7 +266,7 @@ class SquareIconButton extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(color: context.ajil.pendingDot, borderRadius: BorderRadius.circular(9)),
-                  child: Text('$badge', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: context.ajil.badgeText, height: 1.1)),
+                  child: Text('$badge', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: context.ajil.badgeText, height: 1.1)),
                 ),
               ),
             ),
@@ -324,7 +324,7 @@ class AjilHeader extends StatelessWidget implements PreferredSizeWidget {
             ],
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.w600)),
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: titleSize, fontWeight: FontWeight.w700)),
                 if (subtitle != null)
                   Text(subtitle!,
                       maxLines: 1,
@@ -352,7 +352,7 @@ class AjilLogo extends StatelessWidget {
         height: size,
         alignment: Alignment.center,
         decoration: BoxDecoration(color: context.ajil.primary, borderRadius: BorderRadius.circular(size * 0.28)),
-        child: Text('آ', style: TextStyle(color: context.ajil.onPrimary, fontSize: size * 0.55, fontWeight: FontWeight.w600, height: 1.25)),
+        child: Text('آ', style: TextStyle(color: context.ajil.onPrimary, fontSize: size * 0.55, fontWeight: FontWeight.w700, height: 1.25)),
       );
 }
 
@@ -453,7 +453,7 @@ class CardTitle extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 52),
         decoration: divider ? BoxDecoration(border: Border(bottom: BorderSide(color: context.ajil.divider))) : null,
         child: Row(children: [
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700))),
           if (trailing != null) trailing!,
         ]),
       );

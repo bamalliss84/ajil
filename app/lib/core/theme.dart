@@ -250,7 +250,7 @@ extension AjilThemeContext on BuildContext {
   AjilTheme get ajil => Theme.of(this).extension<AjilTheme>() ?? AjilTheme.classic;
 }
 
-const ajilFont = 'IBMPlexSansArabic';
+const ajilFont = 'Tajawal';
 
 ThemeData buildTheme([AjilTheme c = AjilTheme.classic]) {
   final scheme = ColorScheme.fromSeed(
@@ -284,7 +284,7 @@ ThemeData buildTheme([AjilTheme c = AjilTheme.classic]) {
       centerTitle: false,
       toolbarHeight: 72,
       shape: Border(bottom: BorderSide(color: c.headerBorder)),
-      titleTextStyle: TextStyle(fontFamily: ajilFont, fontSize: 19, fontWeight: FontWeight.w600, color: c.text),
+      titleTextStyle: TextStyle(fontFamily: ajilFont, fontSize: 19, fontWeight: FontWeight.w700, color: c.text),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -308,7 +308,7 @@ ThemeData buildTheme([AjilTheme c = AjilTheme.classic]) {
         minimumSize: const Size.fromHeight(54),
         shape: const RoundedRectangleBorder(borderRadius: r14),
         elevation: 0,
-        textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w700),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(

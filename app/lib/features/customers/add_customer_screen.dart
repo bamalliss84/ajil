@@ -168,7 +168,7 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
                 decoration: BoxDecoration(color: context.ajil.infoBg, borderRadius: BorderRadius.circular(14)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   Text('رصيد سابق من الدفتر (اختياري)',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: context.ajil.infoText)),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: context.ajil.infoText)),
                   const SizedBox(height: 2),
                   Text('ما كان على الزبون قبل استخدام التطبيق — يظهر أول سطر في الكشف',
                       style: TextStyle(fontSize: 13, color: context.ajil.infoText)),
@@ -242,7 +242,7 @@ class _AddCustomerScreenState extends ConsumerState<AddCustomerScreen> {
             child: FilledButton(
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(56),
-                textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600),
+                textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w700),
               ),
               onPressed: _busy ? null : _save,
               child: Text(editing ? 'حفظ التعديلات' : 'حفظ الزبون'),

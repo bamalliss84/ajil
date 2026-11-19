@@ -89,7 +89,7 @@ class AdminTheme extends ThemeExtension<AdminTheme> {
           surface: surface,
           onSurface: text,
         ),
-        fontFamily: 'IBMPlexSansArabic',
+        fontFamily: 'Tajawal',
         scaffoldBackgroundColor: background,
         dividerColor: border,
         navigationRailTheme: NavigationRailThemeData(
@@ -97,8 +97,8 @@ class AdminTheme extends ThemeExtension<AdminTheme> {
           indicatorColor: onHeader.withOpacity(.16),
           selectedIconTheme: IconThemeData(color: onHeader),
           unselectedIconTheme: IconThemeData(color: onHeaderMuted),
-          selectedLabelTextStyle: TextStyle(color: onHeader, fontFamily: 'IBMPlexSansArabic', fontWeight: FontWeight.w600),
-          unselectedLabelTextStyle: TextStyle(color: onHeaderMuted, fontFamily: 'IBMPlexSansArabic'),
+          selectedLabelTextStyle: TextStyle(color: onHeader, fontFamily: 'Tajawal', fontWeight: FontWeight.w700),
+          unselectedLabelTextStyle: TextStyle(color: onHeaderMuted, fontFamily: 'Tajawal'),
         ),
         extensions: [this],
       );

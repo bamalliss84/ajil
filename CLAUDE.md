@@ -15,7 +15,7 @@
 | الجزء | التقنية |
 | --- | --- |
 | الخادم | Supabase (PostgreSQL 15 + Auth + Realtime + Edge Functions). محلياً: Supabase CLI + Docker |
-| التطبيق | Flutter (Android + Web)، قاعدة محلية drift (SQLite) — التشفير بـ SQLCipher مهمة قادمة |
+| التطبيق | Flutter (Android + Web)، قاعدة محلية drift — **مشفّرة بـ SQLCipher على الجوال** (`data/local/connection/`)، و sqlite3.wasm على الويب |
 | الويب | صفحة المشترك = تطبيق `app/` مبنياً للويب (متصل فقط). لوحة الإدارة مشروع منفصل `web/admin`. يشتركان في `packages/ajil_core` |
 | الحالة | Riverpod |
 | التنبيهات | flutter_local_notifications (محلية، تعمل بدون نت) |
@@ -74,7 +74,9 @@ cd app && flutter pub get && flutter test && flutter run
 - 🟡 المرحلة 3: صفحة التعريف (`web/landing`) لم تكتمل؛ صفحة المشترك = التطبيق نفسه على الويب — ✅ جُرّبت كاملة (`scripts/run-web.ps1`، http://localhost:8091): زبون، حركة متصلة، ومنع الكتابة بدون اتصال. `drift_worker.js` يُترجم من `app/tool/drift_worker.dart`
 - ✅ فتح تطبيق الجوال بدون نت بعد إغلاقه: يفتح من آخر جلسة محفوظة (كان يعلق على شاشة البداية) — مُتحقَّق على الجوال
 - ✅ رابط كشف الحساب العام: `app.statement_links` + `app.public_statement` (الدالة الوحيدة لـ anon)، الصفحة `web/statement/index.html` (`scripts/run-statement.ps1`، http://localhost:8092/statement/#token)، وفي التطبيق: الزبون ← الكشف والمزيد ← «رابط كشف الحساب»، و`{الرابط}` في التذكير ورسائل الأرصدة (`STATEMENT_BASE_URL`)
-- ✅ مظهران قابلان للتبديل **لكل مستخدم** (migration 14 + `theme_test.sql`): `app_users.theme` (`classic`|`ocean`) و`app.set_my_theme` (صف المستخدم الحالي فقط)، والكشف العام يتبع مظهر **المالك**. في Flutter: `AjilTheme` (ThemeExtension) عبر `context.ajil.<رمز>` — **ممنوع أي لون ثابت خارج `core/theme.dart`** (حتى ملفات PDF عبر `services/pdf_palette.dart`). `state/theme_controller.dart`: محلياً لكل `app_user_id` ويُطبَّق قبل أول إطار بدون نت، والتغيير بدون اتصال يُرفع بعد أول مزامنة ناجحة. الإعدادات ← «مظهر التطبيق». `web/admin` يدعم `?theme=ocean` وزر تبديل. **180 اختبار SQL**، `flutter test` 17/17
+- ✅ مظهران قابلان للتبديل **لكل مستخدم** (migration 14 + `theme_test.sql`): `app_users.theme` (`classic`|`ocean`) و`app.set_my_theme` (صف المستخدم الحالي فقط)، والكشف العام يتبع مظهر **المالك**. في Flutter: `AjilTheme` (ThemeExtension) عبر `context.ajil.<رمز>` — **ممنوع أي لون ثابت خارج `core/theme.dart`** (حتى ملفات PDF عبر `services/pdf_palette.dart`). `state/theme_controller.dart`: محلياً لكل `app_user_id` ويُطبَّق قبل أول إطار بدون نت، والتغيير بدون اتصال يُرفع بعد أول مزامنة ناجحة. الإعدادات ← «مظهر التطبيق». `web/admin` يدعم `?theme=ocean` وزر تبديل. **180 اختبار SQL**، `flutter test` 17/17 (وقتها)
+- ✅ الخط **Tajawal** في التطبيق والإدارة وملفات PDF (400/500/700، لا 600) — مُتحقَّق على محاكي Android
+- ✅ تشفير القاعدة المحلية بـ SQLCipher: مفتاح 256 بت للجهاز في التخزين الآمن، تحويل القاعدة القديمة في مكانها، ويرفض العمل بلا SQLCipher. **لا تُرجع `drift_flutter` أو `sqlite3_flutter_libs`**. `flutter test` 23 (+2 على الجوال فقط)، و`integration_test/db_encryption_test.dart` 5/5 على المحاكي
 - ⏭️ التفاصيل والخطوات: `docs/NEXT_TASKS.md`
 
 حدّث هذا القسم و `docs/NEXT_TASKS.md` في نهاية كل جلسة عمل.

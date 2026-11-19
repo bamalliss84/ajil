@@ -46,7 +46,7 @@ class _EmployeesScreenState extends ConsumerState<EmployeesScreen> {
           content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('رقم البقالة: ${sessionOf(ref).storePhone}'),
             Text('رقم المستخدم: $userNo'),
-            SelectableText('كلمة المرور المؤقتة: $password', style: const TextStyle(fontWeight: FontWeight.w600)),
+            SelectableText('كلمة المرور المؤقتة: $password', style: const TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Text('سيُطلب منه تغييرها، وجهازه يحتاج اعتمادك من «الأجهزة».',
                 style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),

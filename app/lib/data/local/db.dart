@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
+
+import 'connection/connection.dart';
 
 part 'db.g.dart';
 
@@ -113,11 +114,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// قاعدة واحدة لكل بقالة على الجهاز؛ كل الاستعلامات تُفلتر بالفرع الحالي.
   /// عدّاد device_seq واحد للجهاز كله لأن الخادم يتحقق من التسلسل لكل جهاز.
-  factory AppDatabase.forStore(String storeId) =>
-      AppDatabase(driftDatabase(
-        name: 'ajil_${storeId.replaceAll('-', '').substring(0, 12)}',
-        web: DriftWebOptions(sqlite3Wasm: Uri.parse('sqlite3.wasm'), driftWorker: Uri.parse('drift_worker.js')),
-      ));
+  /// على الجوال مشفّرة بـ SQLCipher بمفتاح الجهاز (DbKey) — انظر connection/connection_native.dart
+  factory AppDatabase.forStore(String storeId, {required Future<String> Function() key}) =>
+      AppDatabase(openStoreDatabase('ajil_${storeId.replaceAll('-', '').substring(0, 12)}', key: key));
 
   @override
   int get schemaVersion => 2;

@@ -158,7 +158,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: _busy ? null : _submit,
-                    style: FilledButton.styleFrom(textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600)),
+                    style: FilledButton.styleFrom(textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w700)),
                     child: _busy
                         ? SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: context.ajil.onPrimary))
                         : const Text('دخول'),
@@ -185,7 +185,7 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) => Column(children: [
         AjilLogo(size: 72),
         SizedBox(height: 12),
-        Text('آجِل', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600)),
+        Text('آجِل', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
         SizedBox(height: 4),
         Text('دفتر ديون البقالة', style: TextStyle(fontSize: 15, color: context.ajil.textMuted)),
       ]);

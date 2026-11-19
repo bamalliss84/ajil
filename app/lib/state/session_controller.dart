@@ -11,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/config.dart';
 import '../data/device_identity.dart';
 import '../data/local/db.dart';
+import '../data/local/db_key.dart';
 import '../data/remote/remote_api.dart';
 import '../data/repository.dart';
 import '../data/sync_engine.dart';
@@ -59,6 +60,7 @@ class SessionController extends ChangeNotifier {
   Map<String, dynamic>? settings;
 
   late final SupabaseRemoteApi api = SupabaseRemoteApi(supabase, identity);
+  late final DbKey _dbKey = DbKey(storage);
 
   WorkSession? session;
   AppDatabase? db;
@@ -150,7 +152,7 @@ class SessionController extends ChangeNotifier {
     settings = o.settings;
     await theme?.attach(o.session.appUserId);
     await db?.close();
-    db = AppDatabase.forStore(o.session.storeId);
+    db = AppDatabase.forStore(o.session.storeId, key: _dbKey.obtain);
     repo = LedgerRepository(db!, o.session);
     await _startSync();
   }

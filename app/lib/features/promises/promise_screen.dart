@@ -160,7 +160,7 @@ class _PromiseScreenState extends ConsumerState<PromiseScreen> {
             child: FilledButton(
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(56),
-                textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600),
+                textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w700),
               ),
               onPressed: () async {
                 final amount = _amount.text.trim().isEmpty ? null : MoneyFormat.parse(_amount.text);

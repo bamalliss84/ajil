@@ -43,7 +43,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('الباقة: $plan', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                Text('الباقة: $plan', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                 if (exp != null)
                   Text('تنتهي: ${intl.DateFormat('d MMMM y', 'ar').format(exp)}',
                       style: TextStyle(fontSize: 13, color: s.subscriptionExpired ? context.ajil.debt : context.ajil.textMuted)),
@@ -141,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(color: context.ajil.pendingDot, borderRadius: BorderRadius.circular(11)),
-                child: Text(trailing, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: context.ajil.badgeText)),
+                child: Text(trailing, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: context.ajil.badgeText)),
               )
             : (color == null ? Icon(Icons.chevron_right_rounded, color: context.ajil.textMuted) : null),
       );
@@ -224,7 +224,7 @@ class SettingsScreen extends ConsumerWidget {
         builder: (ctx, set) => Padding(
           padding: EdgeInsets.fromLTRB(16, 0, 16, MediaQuery.viewInsetsOf(ctx).bottom + 16),
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('العملات المفعلة', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('العملات المفعلة', style: TextStyle(fontWeight: FontWeight.w700)),
             Wrap(spacing: 8, children: [
               for (final c in Currency.all)
                 FilterChip(
@@ -245,7 +245,7 @@ class SettingsScreen extends ConsumerWidget {
               child: const Text('حفظ العملات'),
             ),
             const Divider(height: 32),
-            const Text('إضافة فرع', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('إضافة فرع', style: TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             TextField(controller: branch, decoration: const InputDecoration(labelText: 'اسم الفرع')),
             const SizedBox(height: 8),

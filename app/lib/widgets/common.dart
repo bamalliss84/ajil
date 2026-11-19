@@ -15,7 +15,7 @@ export 'ui.dart';
 /// مبلغ منسق بلون حسب الإشارة (الأحمر للدين فقط)
 class MoneyText extends ConsumerWidget {
   const MoneyText(this.value, this.currency,
-      {super.key, this.size = 16, this.symbol = true, this.signed = false, this.color, this.weight = FontWeight.w600});
+      {super.key, this.size = 16, this.symbol = true, this.signed = false, this.color, this.weight = FontWeight.w700});
   final Decimal value;
   final String currency;
   final double size;
@@ -128,7 +128,7 @@ class Initials extends StatelessWidget {
   Widget build(BuildContext context) => CircleAvatar(
         radius: size / 2,
         backgroundColor: context.ajil.primaryLight,
-        child: Text(text, style: TextStyle(color: context.ajil.primaryDark, fontWeight: FontWeight.w600, fontSize: size * .34)),
+        child: Text(text, style: TextStyle(color: context.ajil.primaryDark, fontWeight: FontWeight.w700, fontSize: size * .34)),
       );
 }
 
@@ -227,7 +227,7 @@ class DebtPayButtons extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: context.ajil.debt,
               side: BorderSide(color: context.ajil.debtBorder, width: 1.5),
-              textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w600),
+              textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w700),
             ),
           ),
         ),
@@ -303,7 +303,7 @@ class AjilNavBar extends StatelessWidget {
                         Text(_items[i].$2,
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: i == index ? FontWeight.w600 : FontWeight.w400,
+                              fontWeight: i == index ? FontWeight.w700 : FontWeight.w400,
                               color: i == index ? context.ajil.primary : context.ajil.textMuted,
                             )),
                       ]),

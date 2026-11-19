@@ -87,7 +87,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(picking ? 'اختر الزبون — ${widget.pickFor!.labelAr}' : 'الزبائن',
-                          style: TextStyle(fontSize: picking ? 18 : 22, fontWeight: FontWeight.w600)),
+                          style: TextStyle(fontSize: picking ? 18 : 22, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 2),
                       Text(
                         limit == null ? '$active زبون · ${s.session!.branch.name}' : '$active من $limit في باقتك · ${s.session!.branch.name}',
@@ -218,11 +218,11 @@ class _CustomerTile extends ConsumerWidget {
             const SizedBox(width: 12),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
               if (main == null) ...[
-                Text('لا دين', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: context.ajil.paid)),
+                Text('لا دين', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: context.ajil.paid)),
                 Text('مسدد', style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
               ] else ...[
                 Text(f.amount(main.balance.abs(), main.currency),
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: main.balance > Decimal.zero ? context.ajil.debt : context.ajil.paid)),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: main.balance > Decimal.zero ? context.ajil.debt : context.ajil.paid)),
                 Text(
                   owed.length > 1 ? '${Currency.of(main.currency).symbolAr} +${owed.length - 1}' : (main.balance < Decimal.zero ? '${Currency.of(main.currency).symbolAr} · له' : Currency.of(main.currency).symbolAr),
                   style: TextStyle(fontSize: 12, color: context.ajil.textMuted),
@@ -252,7 +252,7 @@ class _Empty extends StatelessWidget {
               child: Icon(Icons.people_outline_rounded, size: 36, color: context.ajil.primaryDark),
             ),
             const SizedBox(height: 14),
-            Text(hasAny ? 'لا نتائج' : 'أضف أول زبون', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            Text(hasAny ? 'لا نتائج' : 'أضف أول زبون', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             if (!hasAny) ...[
               const SizedBox(height: 4),
               Text('سجّل زبائن دفترك مع رصيدهم السابق', style: TextStyle(color: context.ajil.textMuted)),

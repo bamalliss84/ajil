@@ -71,7 +71,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             child: FilledButton.icon(
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(54),
-                textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 16, fontWeight: FontWeight.w600),
+                textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 16, fontWeight: FontWeight.w700),
               ),
               onPressed: () => _shareDay(w, f, r),
               icon: const Icon(Icons.ios_share_rounded, size: 20),
@@ -116,7 +116,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             Row(children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('التقارير', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  const Text('التقارير', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
                   Text('${w.storeName} · ${w.branch.name}', style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
                 ]),
               ),
@@ -161,7 +161,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                           child: Text(periodLabel(f, period, today),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: context.ajil.primaryDark)),
+                              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: context.ajil.primaryDark)),
                         ),
                         const SizedBox(width: 8),
                         Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: context.ajil.primaryDark),
@@ -254,7 +254,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           height: 58,
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(dayShort[day.weekday - 1], style: TextStyle(fontSize: 11, color: fg.withOpacity(0.85))),
-            Text(f.digits('${day.day}'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: fg, height: 1.2)),
+            Text(f.digits('${day.day}'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: fg, height: 1.2)),
             const SizedBox(height: 2),
             Container(width: 5, height: 5, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
           ]),
@@ -377,7 +377,7 @@ class _CurrencyMini extends StatelessWidget {
                 child: Text(Currency.of(c).symbolAr,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: c == value ? FontWeight.w600 : FontWeight.w400,
+                      fontWeight: c == value ? FontWeight.w700 : FontWeight.w400,
                       color: c == value ? context.ajil.primaryDark : context.ajil.textMuted,
                     )),
               ),

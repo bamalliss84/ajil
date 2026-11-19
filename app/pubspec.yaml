@@ -25,8 +25,12 @@ dependencies:
 
   # القاعدة المحلية (تعمل على Android والويب)
   drift: ^2.22.0
-  drift_flutter: ">=0.2.4 <0.2.5"  # 0.2.5+ تتطلب drift أحدث من المتاح لـ Dart 3.5
+  # على Android: SQLCipher (تشفير AES-256) بدل sqlite3_flutter_libs — لا تجمعهما ولا تضف drift_flutter
+  # (يجلب sqlite3_flutter_libs). الويب: sqlite3.wasm عادي (الويب متصل فقط ويُمسح عند الخروج)
+  sqlite3: ^2.4.6
+  sqlcipher_flutter_libs: ^0.6.4
   path_provider: ^2.1.5
+  path: ^1.9.0
 
   # الأمان
   flutter_secure_storage: ^9.2.2
@@ -56,6 +60,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_lints: ^5.0.0
   build_runner: ^2.4.13
   drift_dev: ^2.22.0
@@ -66,14 +72,15 @@ flutter:
   assets:
     - assets/fonts/
   fonts:
-    - family: IBMPlexSansArabic
+    # Tajawal بأوزان 400/500/700 فقط — لا يوجد 600 (يُستخدم 700 بدله)
+    - family: Tajawal
       fonts:
-        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+        - asset: assets/fonts/Tajawal-Regular.ttf
           weight: 400
-        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+        - asset: assets/fonts/Tajawal-Medium.ttf
           weight: 500
-        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
-          weight: 600
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
 
 # Flutter 3.24 (Dart 3.5): app_links 6.4+ يستخدم flutter.compileSdkVersion في Gradle ولا يُبنى عليه
 dependency_overrides:

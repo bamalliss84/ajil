@@ -129,7 +129,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
               child: Center(
                 child: Text(
                   _amount.isEmpty ? '0' : f.amount(_entered!, displayCur),
-                  style: TextStyle(fontSize: 44, fontWeight: FontWeight.w600, color: color, height: 1.2),
+                  style: TextStyle(fontSize: 44, fontWeight: FontWeight.w700, color: color, height: 1.2),
                   textDirection: TextDirection.ltr,
                 ),
               ),
@@ -176,7 +176,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text('ينقص الدين: ${f.amount(applied, cur, withSymbol: true)}',
-                      style: TextStyle(fontWeight: FontWeight.w600, color: context.ajil.paid)),
+                      style: TextStyle(fontWeight: FontWeight.w700, color: context.ajil.paid)),
                 ),
             ],
             const SizedBox(height: 16),
@@ -267,7 +267,7 @@ class _AddTxScreenState extends ConsumerState<AddTxScreen> {
                 style: FilledButton.styleFrom(
                   backgroundColor: color,
                   minimumSize: const Size.fromHeight(56),
-                  textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w600),
+                  textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 18, fontWeight: FontWeight.w700),
                 ),
                 child: Text(switch (widget.kind) { TxKind.debt => 'حفظ الدين', TxKind.payment => 'حفظ السداد', _ => 'حفظ ${widget.kind.labelAr}' }),
               ),

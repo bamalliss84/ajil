@@ -34,7 +34,7 @@ class SectionHead extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: padding,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Expanded(child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
+          Expanded(child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700))),
           if (trailing != null) Text(trailing!, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         ]),
       );
@@ -53,12 +53,12 @@ class BestStrip extends StatelessWidget {
             child: Text.rich(
               TextSpan(style: const TextStyle(fontSize: 13), children: [
                 TextSpan(text: label),
-                TextSpan(text: bold, style: const TextStyle(fontWeight: FontWeight.w600)),
+                TextSpan(text: bold, style: const TextStyle(fontWeight: FontWeight.w700)),
                 TextSpan(text: suffix),
               ]),
             ),
           ),
-          Text(value, style: TextStyle(fontSize: 13, color: context.ajil.paid, fontWeight: FontWeight.w600)),
+          Text(value, style: TextStyle(fontSize: 13, color: context.ajil.paid, fontWeight: FontWeight.w700)),
         ]),
       );
 }
@@ -95,7 +95,7 @@ class SummaryCard extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label, style: muted),
             const SizedBox(height: 2),
-            Text(f.amount(v, r.currency), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: context.ajil.onPrimary)),
+            Text(f.amount(v, r.currency), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: context.ajil.onPrimary)),
             const SizedBox(height: 2),
             Text([_change(f, pct, vs), ops(f, count)].where((s) => s.isNotEmpty).join(' · '),
                 style: TextStyle(fontSize: 12, color: context.ajil.onHeaderMuted)),
@@ -110,7 +110,7 @@ class SummaryCard extends StatelessWidget {
         Text('الديون عند الزبائن نهاية $unit', style: TextStyle(fontSize: 14, color: context.ajil.onHeaderMuted)),
         const SizedBox(height: 2),
         Text.rich(TextSpan(style: TextStyle(color: context.ajil.onPrimary), children: [
-          TextSpan(text: f.amount(r.closingDebt, r.currency), style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600, height: 1.3)),
+          TextSpan(text: f.amount(r.closingDebt, r.currency), style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w700, height: 1.3)),
           TextSpan(text: ' $sym', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         ])),
         const SizedBox(height: 2),
@@ -127,7 +127,7 @@ class SummaryCard extends StatelessWidget {
         Row(children: [
           Expanded(child: Text('نسبة التحصيل إلى الديون الجديدة', style: muted)),
           Text(ratio == null ? '—' : '${f.digits('$ratio')}%',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: context.ajil.onPrimary)),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: context.ajil.onPrimary)),
         ]),
         const SizedBox(height: 6),
         ClipRRect(
@@ -280,7 +280,7 @@ class KindsCard extends StatelessWidget {
         SizedBox(width: 58, child: TypeBadge(name, bg: bg, fg: fg)),
         const SizedBox(width: 10),
         Expanded(child: Text(count, style: TextStyle(fontSize: 13, color: context.ajil.textMuted))),
-        Text(f.amount(k.amount, r.currency), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color)),
+        Text(f.amount(k.amount, r.currency), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: color)),
       ]),
     );
   }
@@ -298,7 +298,7 @@ class PromisesCard extends StatelessWidget {
     final current = r.period.kind == PeriodKind.month && r.period.contains(r.today);
     Widget stat(int n, Color c, String label) => Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(f.digits('$n'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: c)),
+            Text(f.digits('$n'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: c)),
             Text(label, style: const TextStyle(fontSize: 13)),
           ]),
         );
@@ -411,7 +411,7 @@ class CustomersCard extends StatelessWidget {
           ),
           Text(f.amount(c.amount, r.currency),
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: tab == CustomerTab.payers ? context.ajil.paid : context.ajil.debt)),
+                  fontSize: 15, fontWeight: FontWeight.w700, color: tab == CustomerTab.payers ? context.ajil.paid : context.ajil.debt)),
         ]),
       ),
     );
@@ -446,9 +446,9 @@ class UsersCard extends StatelessWidget {
             SizedBox(height: 6),
             Text.rich(TextSpan(style: TextStyle(fontSize: 13), children: [
               TextSpan(text: 'تحصيل '),
-              TextSpan(text: f.amount(u.collected, r.currency), style: TextStyle(color: context.ajil.paid, fontWeight: FontWeight.w600)),
+              TextSpan(text: f.amount(u.collected, r.currency), style: TextStyle(color: context.ajil.paid, fontWeight: FontWeight.w700)),
               TextSpan(text: '      ديون '),
-              TextSpan(text: f.amount(u.debt, r.currency), style: TextStyle(color: context.ajil.debt, fontWeight: FontWeight.w600)),
+              TextSpan(text: f.amount(u.debt, r.currency), style: TextStyle(color: context.ajil.debt, fontWeight: FontWeight.w700)),
             ])),
           ]),
         ),
@@ -515,7 +515,7 @@ class ExportButtons extends StatelessWidget {
       minimumSize: Size.fromHeight(50),
       foregroundColor: context.ajil.primary,
       side: BorderSide(color: context.ajil.borderStrong),
-      textStyle: TextStyle(fontFamily: ajilFont, fontSize: 15, fontWeight: FontWeight.w600),
+      textStyle: TextStyle(fontFamily: ajilFont, fontSize: 15, fontWeight: FontWeight.w700),
     );
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 14, 16, 16),

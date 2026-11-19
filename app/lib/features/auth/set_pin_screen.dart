@@ -66,7 +66,7 @@ class _SetPinScreenState extends ConsumerState<SetPinScreen> {
             child: Column(children: [
               const SizedBox(height: 24),
               Text(_confirming ? 'أعد إدخال رمز PIN' : 'اختر رمز PIN لفتح التطبيق',
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
               Text('4 إلى 6 أرقام، خاص بك على هذا الجوال', style: TextStyle(color: context.ajil.textMuted)),
               const SizedBox(height: 24),

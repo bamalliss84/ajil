@@ -75,7 +75,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                   child: Column(children: [
                     const AjilLogo(size: 56),
                     const SizedBox(height: 24),
-                    Text('أهلاً ${w?.displayName ?? ''}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                    Text('أهلاً ${w?.displayName ?? ''}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 4),
                     Text('المستخدم ${w?.userNo ?? ''} · ${w?.branch.name ?? ''}', style: TextStyle(fontSize: 14, color: context.ajil.textMuted)),
                     const SizedBox(height: 24),

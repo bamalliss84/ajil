@@ -17,13 +17,13 @@ class ReceiptPdf {
   static Future<pw.ThemeData> _theme() async {
     try {
       return pw.ThemeData.withFont(
-        base: pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-Regular.ttf')),
-        bold: pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-SemiBold.ttf')),
+        base: pw.Font.ttf(await rootBundle.load('assets/fonts/Tajawal-Regular.ttf')),
+        bold: pw.Font.ttf(await rootBundle.load('assets/fonts/Tajawal-Bold.ttf')),
       );
     } catch (_) {
       return pw.ThemeData.withFont(
-        base: await PdfGoogleFonts.iBMPlexSansArabicRegular(),
-        bold: await PdfGoogleFonts.iBMPlexSansArabicSemiBold(),
+        base: await PdfGoogleFonts.tajawalRegular(),
+        bold: await PdfGoogleFonts.tajawalBold(),
       );
     }
   }

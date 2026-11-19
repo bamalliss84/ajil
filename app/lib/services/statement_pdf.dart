@@ -17,12 +17,12 @@ class StatementPdf {
   /// الخط مضمّن في التطبيق حتى يعمل الـ PDF بدون إنترنت (assets/fonts)
   static Future<pw.ThemeData> _theme() async {
     try {
-      final regular = pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-Regular.ttf'));
-      final bold = pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-SemiBold.ttf'));
+      final regular = pw.Font.ttf(await rootBundle.load('assets/fonts/Tajawal-Regular.ttf'));
+      final bold = pw.Font.ttf(await rootBundle.load('assets/fonts/Tajawal-Bold.ttf'));
       return pw.ThemeData.withFont(base: regular, bold: bold);
     } catch (_) {
-      final regular = await PdfGoogleFonts.iBMPlexSansArabicRegular();
-      final bold = await PdfGoogleFonts.iBMPlexSansArabicSemiBold();
+      final regular = await PdfGoogleFonts.tajawalRegular();
+      final bold = await PdfGoogleFonts.tajawalBold();
       return pw.ThemeData.withFont(base: regular, bold: bold);
     }
   }

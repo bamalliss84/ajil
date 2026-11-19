@@ -117,7 +117,7 @@
 - [x] ✅ **رابط كشف الحساب العام للزبون** — نُفّذ بدالة `app.public_statement` (anon) وصفحة ثابتة `web/statement` بدل Edge Function (انظر القسم أعلاه)
 - [ ] **شاشة قائمة التحصيل الشهرية**: في يوم المطالبة، كل زبون عليه أكثر من الحد مع زر واتساب لكل واحد (الإعدادات والتنبيه موجودان)
 - [ ] **استيراد الزبائن** من جهات الاتصال أو Excel مع الرصيد الافتتاحي
-- [ ] **تشفير القاعدة المحلية** بـ SQLCipher (`sqlcipher_flutter_libs` + مفتاح في التخزين الآمن)
+- [x] **تشفير القاعدة المحلية** بـ SQLCipher — انظر «🔐 تشفير القاعدة المحلية» آخر الملف
 - [ ] **الطابعة الحرارية بلوتوث مباشرة** (حالياً عبر نافذة الطباعة بمقاس 57mm)
 - [ ] **التحديث الإجباري**: قيمة `min_app_version` في `platform_config` يقرؤها التطبيق عند الدخول
 - [ ] **Play Integrity** + نقل مفتاح الجهاز إلى Android Keystore عبر قناة Kotlin
@@ -157,14 +157,9 @@
 ## 🔤 توحيد الخط على Tajawal (2026-11-19)
 اعتُمد **Tajawal** بدل IBM Plex Sans Arabic في كل المنتج. تجوال لا يملك الوزن **600**، فكل 600 يصير **700**.
 - ✅ منفَّذ: `docs/DESIGN.md`، `CLAUDE.md`، `docs/DESIGN_FIDELITY.md`، `docs/design/*.dc.html` (12)، `web/statement/index.html`، `web/landing/index.html`
-- ⬜ متبقٍ (يحتاج ملفات الخط وتشغيل Flutter):
-  1. نزّل Tajawal من https://fonts.google.com/specimen/Tajawal وضع في `app/assets/fonts/` و`web/admin/assets/fonts/`:
-     `Tajawal-Regular.ttf` (400) و`Tajawal-Medium.ttf` (500) و`Tajawal-Bold.ttf` (700)، واحذف ملفات IBMPlexSansArabic وحدّث `README.txt` و`OFL.txt`.
-  2. `app/pubspec.yaml` و`web/admin/pubspec.yaml`: `family: Tajawal` بأوزان 400/500/**700** (لا تُعلن 600 — وإلا اختار Flutter وزناً أقرب بشكل غير محدَّد).
-  3. `app/lib/core/theme.dart`: `ajilFont = 'Tajawal'`، و`web/admin/lib/main.dart`: `fontFamily: 'Tajawal'`.
-  4. استبدل كل `FontWeight.w600` بـ `FontWeight.w700` في `app/lib` و`web/admin/lib` (≈88 موضعاً).
-  5. ملفات PDF (`statement_pdf.dart`, `receipt_pdf.dart`, `report_export.dart`): مسارات الأصول إلى Tajawal، وتحقّق من اسم الدالة في `PdfGoogleFonts` لتجوال (البديل على الويب) — إن لم تتوفر فاستخدم الأصول في الحالتين.
-  6. `flutter analyze` و`flutter test` ثم لقطة شاشة واحدة على الجوال للتأكد أن 700 ليس ثقيلاً أكثر من اللازم.
+- ✅ التطبيق والإدارة (2026-11-19): `assets/fonts/Tajawal-{Regular,Medium,Bold}.ttf` + `OFL.txt` (من google/fonts، حُذفت IBM Plex)،
+  `family: Tajawal` بأوزان 400/500/700 في pubspec الاثنين، `ajilFont = 'Tajawal'`، كل `w600` ← `w700`، وملفات PDF على Tajawal
+  (احتياطياً `PdfGoogleFonts.tajawalRegular/Bold`). مُتحقَّق على محاكي Android (لقطة لوحة التحكم) وبناء الويب.
 
 ## 🎨 تصاميم الشاشات المتبقية (2026-11-19)
 صُمِّمت ونُشرت في `docs/design/`، واعتُمد **النموذج أ** لكل شاشة بعد مقارنة نموذجين:
@@ -209,3 +204,21 @@
 - [ ] لم يُجرَّب على الجوال الحقيقي: التبديل ثم إغلاق التطبيق وفتحه بدون نت، ورفع الاختيار المعلّق بعد عودة الاتصال.
 - [ ] ملفات PDF تتبع مظهر **المستخدم** الذي أنشأها؛ إن أردنا أن تتبع مظهر المالك (كصفحة الكشف) نحتاج حفظ مظهر المالك في الجلسة.
 - [ ] اختيار المظهر في `web/admin` لا يُحفظ بين الزيارات (الرابط فقط).
+
+## ✅ 🔐 تشفير القاعدة المحلية بـ SQLCipher (2026-11-19)
+- **الحزم:** حُذف `drift_flutter` (يجلب `sqlite3_flutter_libs` العادي ويتعارض مع SQLCipher) وأُضيف `sqlcipher_flutter_libs` + `sqlite3` + `path`.
+  **لا تُرجع `drift_flutter` ولا `sqlite3_flutter_libs`** — الـ APK يجب أن يحوي `libsqlcipher.so` فقط.
+- `data/local/connection/`: `connection_native.dart` (الجوال) و`connection_web.dart` (الويب، `WasmDatabase` كما كان) باستيراد شرطي.
+  - المسار نفسه كما كان (`Documents/ajil_<store>.sqlite`)؛ القاعدة القديمة غير المشفّرة تُحوَّل في مكانها (`sqlcipher_export` ثم تحقق ثم rename) مع `user_version`.
+  - `PRAGMA key` بمفتاح خام 256 بت (بلا KDF في كل فتح). المفتاح من `data/local/db_key.dart`: `Random.secure`، مرة للجهاز، في التخزين الآمن (`ajil.db_key`).
+  - **يفشل مغلقاً:** إن لم تكن المكتبة المحمّلة SQLCipher (`PRAGMA cipher_version` فارغ) يرفض الفتح والتحويل — sqlite العادي يتجاهل `KEY` بصمت ويكتب ملفاً مكشوفاً (اكتشفه الاختبار).
+  - ملف لا يفتحه المفتاح (مُسح التخزين الآمن) يُعزل `*.unreadable-<ts>` ولا يُحذف، وتُنشأ قاعدة جديدة تُسحب من الخادم.
+  - إغلاق `setup` المُرسل لعزل drift يلتقط نص المفتاح فقط (التقاط كائن storage/FFI كان يكسر `Isolate.spawn`).
+- **الويب:** بلا تشفير (لا SQLCipher لـ wasm) — مقبول لأن الويب متصل فقط ويُمسح عند الخروج.
+- **الاختبارات:** `test/db_encryption_test.dart` (المفتاح، كشف الترويسة، الفشل المغلق؛ اختباران يحتاجان SQLCipher يُتخطّيان على الكمبيوتر)،
+  و`integration_test/db_encryption_test.dart` على محاكي Android (`ajil_test`): 5/5 — الملف مشفّر ولا تُقرأ أسماء الجداول، تحويل القديمة مع بياناتها، عزل الملف عند مفتاح مختلف، ومخطط التطبيق فوقها.
+  شغّلها: `flutter test integration_test/db_encryption_test.dart -d <device>`.
+- مُتحقَّق يدوياً على المحاكي: دخول ← مزامنة ← الملف على الجهاز بترويسة عشوائية، ثم إغلاق التطبيق وفتحه **بدون نت** ← القفل ← لوحة التحكم بالبيانات.
+- [ ] جوال حقيقي قديم (Android 7–8) للتحقق من `applyWorkaroundToOpenSqlCipherOnOldAndroidVersions`، وقياس زمن التحويل لقاعدة كبيرة.
+- [ ] Android Auto Backup: إن استُعيدت القاعدة بدون المفتاح ستُعزل — فكّر في استثناء `app_flutter/*.sqlite` من النسخ الاحتياطي.
+

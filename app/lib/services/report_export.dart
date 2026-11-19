@@ -61,8 +61,8 @@ class ReportExport {
   static Future<Uint8List> pdf(PeriodReport r,
       {required WorkSession session, required Map<String, String> users, AjilTheme theme = AjilTheme.classic}) async {
     _p = PdfPalette.of(theme);
-    final regular = pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-Regular.ttf'));
-    final bold = pw.Font.ttf(await rootBundle.load('assets/fonts/IBMPlexSansArabic-SemiBold.ttf'));
+    final regular = pw.Font.ttf(await rootBundle.load('assets/fonts/Tajawal-Regular.ttf'));
+    final bold = pw.Font.ttf(await rootBundle.load('assets/fonts/Tajawal-Bold.ttf'));
     final doc = pw.Document(theme: pw.ThemeData.withFont(base: regular, bold: bold));
     String user(String id) => users[id] ?? 'مستخدم';
 

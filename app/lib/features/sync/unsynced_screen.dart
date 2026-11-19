@@ -50,7 +50,7 @@ class UnsyncedScreen extends ConsumerWidget {
                           ? 'مرفوضة: ${t.syncError ?? ''}'
                           : 'رقم الجهاز ${t.deviceSeq} · ${intl.DateFormat('d/M h:mm a', 'ar').format(t.createdAt)}'),
                       trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        Text(f.amount(t.amount, t.currency, withSymbol: true), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        Text(f.amount(t.amount, t.currency, withSymbol: true), style: const TextStyle(fontWeight: FontWeight.w700)),
                         SyncBadge(t.sync),
                       ]),
                       onTap: t.sync == SyncState.failed

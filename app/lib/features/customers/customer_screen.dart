@@ -67,7 +67,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(customer.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w600)),
+                      Text(customer.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
                       if (customer.phone != null)
                         Text(customer.phone!,
                             textDirection: TextDirection.ltr, style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
@@ -248,7 +248,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
           context: context,
           builder: (ctx) => SafeArea(
             child: ListView(shrinkWrap: true, children: [
-              const ListTile(title: Text('رسائل الرصيد المرسلة', style: TextStyle(fontWeight: FontWeight.w600))),
+              const ListTile(title: Text('رسائل الرصيد المرسلة', style: TextStyle(fontWeight: FontWeight.w700))),
               if (rows.isEmpty) const ListTile(title: Text('لم تُرسل له رسالة رصيد بعد')),
               for (final n in rows)
                 ListTile(
@@ -356,7 +356,7 @@ class _BalanceCard extends ConsumerWidget {
             style: TextStyle(fontSize: 12, color: owes ? context.ajil.debtText : context.ajil.paidDark)),
         const SizedBox(height: 2),
         Text(f.amount(b.balance, b.currency),
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, height: 1.3, color: owes ? context.ajil.debt : context.ajil.paid)),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, height: 1.3, color: owes ? context.ajil.debt : context.ajil.paid)),
         const SizedBox(height: 2),
         Text('ديون ${f.amount(b.debit, b.currency)} · مسدد ${f.amount(b.credit, b.currency)}',
             maxLines: 1, overflow: TextOverflow.ellipsis,
@@ -378,7 +378,7 @@ class _Summary extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Text(Currency.of(cs.currency).nameAr, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              Text(Currency.of(cs.currency).nameAr, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
               const Divider(height: 20),
               if (st.from != null) _kv(context, 'رصيد ما قبل الفترة', f.amount(cs.openingBalance, cs.currency, withSymbol: true)),
               _kv(context, 'إجمالي الديون', f.amount(cs.debit, cs.currency, withSymbol: true)),

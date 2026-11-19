@@ -89,7 +89,7 @@ class _StatementLinkSheetState extends ConsumerState<StatementLinkSheet> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const Text('رابط كشف الحساب', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const Text('رابط كشف الحساب', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Text('صفحة للقراءة فقط يرى فيها ${widget.customer.name} رصيده وآخر حركاته ووعوده، بدون رقم جواله أو ملاحظاتك.',
               style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),

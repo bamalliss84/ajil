@@ -72,7 +72,7 @@ class _PickerState extends State<_Picker> {
           ),
           const SizedBox(height: 8),
           Row(children: [
-            const Expanded(child: Text('اختر الفترة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600))),
+            const Expanded(child: Text('اختر الفترة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700))),
             IconButton(
               onPressed: () => Navigator.pop(context),
               icon: Icon(Icons.close_rounded, color: context.ajil.textMuted),
@@ -114,7 +114,7 @@ class _PickerState extends State<_Picker> {
               child: FilledButton(
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(54),
-                  textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w600),
+                  textStyle: const TextStyle(fontFamily: ajilFont, fontSize: 17, fontWeight: FontWeight.w700),
                 ),
                 onPressed: () => Navigator.pop(context, _result),
                 child: Text(_cta),
@@ -205,7 +205,7 @@ class _PickerState extends State<_Picker> {
         borderRadius: BorderRadius.circular(14),
         onTap: future ? null : () => setState(() => _month = m),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(monthNames[m - 1], style: TextStyle(fontSize: 15, fontWeight: sel ? FontWeight.w600 : FontWeight.w500, color: fg)),
+          Text(monthNames[m - 1], style: TextStyle(fontSize: 15, fontWeight: sel ? FontWeight.w700 : FontWeight.w500, color: fg)),
           Text(future ? 'قادم' : '${thousands(f, paid)}${isNow ? ' · حتى الآن' : ''}', style: TextStyle(fontSize: 11, color: subFg)),
         ]),
       ),
@@ -232,7 +232,7 @@ class _PickerState extends State<_Picker> {
                     onTap: () => setState(() => _year = y),
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Text(f.digits('$y'),
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: sel ? context.ajil.onPrimary : context.ajil.text)),
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: sel ? context.ajil.onPrimary : context.ajil.text)),
                       Text('${thousands(f, total)} ألف${y == today.year ? ' · حتى الآن' : ''}',
                           style: TextStyle(fontSize: 11, color: sel ? context.ajil.onHeaderMuted : context.ajil.textMuted)),
                     ]),

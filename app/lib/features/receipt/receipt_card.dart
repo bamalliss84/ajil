@@ -48,12 +48,12 @@ class ReceiptCard extends StatelessWidget {
               height: 46,
               alignment: Alignment.center,
               decoration: BoxDecoration(color: context.ajil.primary, borderRadius: BorderRadius.circular(12)),
-              child: Text(d.storeMark, style: TextStyle(color: context.ajil.onPrimary, fontSize: 24, fontWeight: FontWeight.w600)),
+              child: Text(d.storeMark, style: TextStyle(color: context.ajil.onPrimary, fontSize: 24, fontWeight: FontWeight.w700)),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(d.storeName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: context.ajil.primaryDark)),
+                Text(d.storeName, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: context.ajil.primaryDark)),
                 Text(d.branchName, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
               ]),
             ),

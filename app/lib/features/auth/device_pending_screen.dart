@@ -19,7 +19,7 @@ class DevicePendingScreen extends ConsumerWidget {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(Icons.phonelink_lock_outlined, size: 64, color: context.ajil.primary),
             const SizedBox(height: 16),
-            const Text('هذا الجوال بانتظار اعتماد المالك', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+            const Text('هذا الجوال بانتظار اعتماد المالك', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             Text('اطلب من المالك اعتماد الجهاز من: المزيد ← الأجهزة. بعدها اضغط «تحقق».',
                 textAlign: TextAlign.center, style: TextStyle(color: context.ajil.textMuted)),

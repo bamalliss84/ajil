@@ -156,7 +156,7 @@ class DashboardScreen extends ConsumerWidget {
                 child: Row(children: [
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text('مطلوب تحصيله اليوم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      const Text('مطلوب تحصيله اليوم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                       Text(
                         due.isEmpty ? 'لا توجد وعود أو مواعيد مستحقة اليوم' : '${due.length} زبائن · ${f.amount(dueTotal, cur)} $sym',
                         style: TextStyle(fontSize: 13, color: context.ajil.textMuted),
@@ -195,7 +195,7 @@ class DashboardScreen extends ConsumerWidget {
           AjilCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                const Expanded(child: Text('التحصيل آخر 7 أيام', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
+                const Expanded(child: Text('التحصيل آخر 7 أيام', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700))),
                 Text('ألف $sym', style: TextStyle(color: context.ajil.textMuted, fontSize: 13)),
               ]),
               const SizedBox(height: 12),
@@ -251,7 +251,7 @@ class _Header extends ConsumerWidget {
         Row(children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(w.storeName, style: TextStyle(color: context.ajil.onPrimary, fontSize: 20, fontWeight: FontWeight.w600)),
+              Text(w.storeName, style: TextStyle(color: context.ajil.onPrimary, fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 2),
               const BranchChip(light: true),
             ]),
@@ -274,7 +274,7 @@ class _Header extends ConsumerWidget {
           for (final (i, e) in entries.indexed)
             Text.rich(
               TextSpan(children: [
-                TextSpan(text: f.amount(e.value, e.key), style: TextStyle(fontSize: i == 0 ? 30 : 22, fontWeight: FontWeight.w600)),
+                TextSpan(text: f.amount(e.value, e.key), style: TextStyle(fontSize: i == 0 ? 30 : 22, fontWeight: FontWeight.w700)),
                 TextSpan(text: ' ${Currency.of(e.key).symbolAr}', style: TextStyle(fontSize: i == 0 ? 16 : 14, fontWeight: FontWeight.w500)),
               ]),
               style: TextStyle(color: context.ajil.onPrimary, height: 1.3),
@@ -394,7 +394,7 @@ class _Kpi extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
           const SizedBox(height: 2),
-          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: color, height: 1.3)),
+          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: color, height: 1.3)),
           const SizedBox(height: 2),
           Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
         ]),
@@ -455,7 +455,7 @@ class _AgingBar extends StatelessWidget {
     ];
     final total = aging.total;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const Text('أعمار الديون', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+      const Text('أعمار الديون', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
       const SizedBox(height: 10),
       ClipRRect(
         borderRadius: BorderRadius.circular(6),

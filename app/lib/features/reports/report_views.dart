@@ -25,7 +25,7 @@ class DayKpis extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(label, style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
               const SizedBox(height: 2),
-              Text(f.amount(v, r.currency), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: c)),
+              Text(f.amount(v, r.currency), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: c)),
               const SizedBox(height: 2),
               Text('$sym · ${ops(f, n)}', style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
             ]),
@@ -52,7 +52,7 @@ class DayKpis extends StatelessWidget {
           child: Row(children: [
             Expanded(child: Text('صافي اليوم: $netLabel', style: const TextStyle(fontSize: 14))),
             Text(f.amount(net.abs(), r.currency, withSymbol: true),
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: netColor)),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: netColor)),
           ]),
         ),
       ]),
@@ -150,7 +150,7 @@ class _DayTxListState extends State<DayTxList> {
       Padding(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
         child: Row(children: [
-          const Expanded(child: Text('حركات اليوم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
+          const Expanded(child: Text('حركات اليوم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700))),
           Text(counted(f, txs.length, 'حركة', 'حركتان', 'حركات'), style: TextStyle(fontSize: 13, color: context.ajil.textMuted)),
         ]),
       ),
@@ -205,7 +205,7 @@ class _DayTxListState extends State<DayTxList> {
               Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: context.ajil.textMuted)),
             ]),
           ),
-          Text(f.amount(t.amount, t.currency), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: color)),
+          Text(f.amount(t.amount, t.currency), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: color)),
         ]),
       ),
     );
@@ -231,7 +231,7 @@ class YearSummary extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label, style: TextStyle(fontSize: 13, color: context.ajil.onHeaderMuted)),
             const SizedBox(height: 2),
-            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: context.ajil.onPrimary)),
+            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: context.ajil.onPrimary)),
             if (sub != null && sub.isNotEmpty) ...[
               const SizedBox(height: 2),
               Text(sub, style: TextStyle(fontSize: 12, color: context.ajil.onHeaderMuted)),
@@ -357,12 +357,12 @@ class MonthList extends StatelessWidget {
                 ),
               ),
               Text(f.amount(b.collected, r.currency),
-                  style: TextStyle(fontSize: 13, color: context.ajil.paid, fontWeight: FontWeight.w600)),
+                  style: TextStyle(fontSize: 13, color: context.ajil.paid, fontWeight: FontWeight.w700)),
               SizedBox(
                 width: 84,
                 child: Text(f.amount(b.debt, r.currency),
                     textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 13, color: context.ajil.debt, fontWeight: FontWeight.w600)),
+                    style: TextStyle(fontSize: 13, color: context.ajil.debt, fontWeight: FontWeight.w700)),
               ),
               const SizedBox(width: 4),
               Icon(Icons.chevron_right_rounded, size: 20, color: context.ajil.textMuted),
